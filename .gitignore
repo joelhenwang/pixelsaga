@@ -1,0 +1,9 @@
+./.agents
+.agents
+./.agents/*
+.agents/*
+.agents/skills/
+.claude/skills/
+.agents/skills/*
+.claude/skills/*
+.agents/skills/frontend-design/SKILL.md
