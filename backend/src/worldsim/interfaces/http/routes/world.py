@@ -1,0 +1,133 @@
+"""World reads, seed, and phase advancement (owned by S0-API-001)."""
+
+from __future__ import annotations
+
+from fastapi import APIRouter, Header, Request
+
+from worldsim.application.commands.seed_world import SeedService
+from worldsim.domain.errors import DomainError, ErrorCode
+from worldsim.domain.time import absolute_index
+from worldsim.domain.world import World
+from worldsim.interfaces.http.schemas import (
+    AdvanceRequest,
+    AdvanceResponse,
+    AdvanceResult,
+    ClockResponse,
+    CurrentPhaseResponse,
+    EventEntry,
+    EventsResponse,
+    SeedResponse,
+    WorldResponse,
+)
+
+router = APIRouter(tags=["world"])
+
+
+def _world_dto(world: World) -> WorldResponse:
+    return WorldResponse(
+        id=world.id,
+        name=world.name,
+        status=world.status.value,
+        day=world.day,
+        phase=world.phase,
+        absolute_index=absolute_index(world.day, world.phase),
+        seed_version=world.seed_version,
+        version=world.version,
+    )
+
+
+async def _only_world(request: Request) -> World:
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        worlds = await uow.worlds.list_worlds()
+    if not worlds:
+        raise DomainError(ErrorCode.NOT_FOUND, "no world has been seeded yet")
+    return worlds[0]
+
+
+@router.get("/world", response_model=WorldResponse)
+async def get_world(request: Request) -> WorldResponse:
+    return _world_dto(await _only_world(request))
+
+
+@router.get("/world/clock", response_model=ClockResponse)
+async def get_clock(request: Request) -> ClockResponse:
+    world = await _only_world(request)
+    return ClockResponse(
+        day=world.day, phase=world.phase, absolute_index=absolute_index(world.day, world.phase)
+    )
+
+
+@router.get("/world/phases/current", response_model=CurrentPhaseResponse)
+async def get_current_phase(request: Request) -> CurrentPhaseResponse:
+    state = request.app.state.app_state
+    world = await _only_world(request)
+    async with state.uow_factory()() as uow:
+        run = await uow.phases.find_open_run(world.id)
+    return CurrentPhaseResponse(
+        absolute_index=absolute_index(world.day, world.phase),
+        day=world.day,
+        phase=world.phase,
+        run_id=run.id if run is not None else None,
+        run_state=run.state.value if run is not None else None,
+    )
+
+
+@router.get("/world/events", response_model=EventsResponse)
+async def list_events(request: Request, after: int = 0, limit: int = 50) -> EventsResponse:
+    if after < 0:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "after cursor must be >= 0")
+    if not 1 <= limit <= 100:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "limit must be 1..100")
+    state = request.app.state.app_state
+    world = await _only_world(request)
+    async with state.uow_factory()() as uow:
+        events = await uow.events.list_range(world.id, after, limit)
+        entries = [
+            EventEntry(
+                sequence=event.sequence,
+                id=event.id,
+                event_type=event.event_type.value,
+                absolute_index=event.absolute_index,
+                phase_run_id=event.phase_run_id,
+                effect_count=len(await uow.events.list_effects(event.id)),
+            )
+            for event in events
+        ]
+    return EventsResponse(entries=entries, next_after=entries[-1].sequence if entries else after)
+
+
+@router.post("/world/seed", response_model=SeedResponse)
+async def seed_world(request: Request) -> SeedResponse:
+    state = request.app.state.app_state
+    result = await SeedService(state.uow_factory(), state.seed_dir).import_seed()
+    return SeedResponse(
+        world_id=result.world_id,
+        seed_version=result.seed_version,
+        content_hash=result.content_hash,
+        duplicate=result.duplicate,
+    )
+
+
+@router.post("/world/phases/advance", response_model=AdvanceResponse)
+async def advance_phase(
+    body: AdvanceRequest,
+    request: Request,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> AdvanceResponse:
+    if idempotency_key is None or not idempotency_key.strip():
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "Idempotency-Key header is required")
+    state = request.app.state.app_state
+    report = await state.orchestrator().advance_world(body.world_id, idempotency_key.strip())
+    async with state.uow_factory()() as uow:
+        world = await uow.worlds.get(body.world_id)
+        cursor = await uow.events.max_sequence(body.world_id)
+    return AdvanceResponse(
+        command_id=report.command_id,
+        run_id=report.run_id,
+        task_id=report.task_id,
+        world_version=world.version,
+        event_cursor=cursor,
+        idempotent_replay=report.duplicate,
+        result=AdvanceResult(event_id=report.event_id, sequence=report.sequence),
+    )

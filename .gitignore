@@ -7,3 +7,13 @@
 .agents/skills/*
 .claude/skills/*
 .agents/skills/frontend-design/SKILL.md
+.env
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+backend/.venv/
+.pi/skills/
+perchance-ver/
+evidence/

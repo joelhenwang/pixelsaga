@@ -1,0 +1,37 @@
+{
+  "meta": {"seed_format_version": 1, "license": "synthetic-original"},
+  "characters": [
+    {
+      "id": "10000000-0000-4000-8000-000000000101",
+      "name": "Wren",
+      "card": {
+        "id": "10000000-0000-4000-8000-000000000201",
+        "appearance": "Short copper hair, patched traveler coat, quick grey eyes.",
+        "personality": "Wary but kind; keeps promises literally.",
+        "background": "Grew up keeping the Hearth fire lit for travelers."
+      },
+      "state": {
+        "location_id": "10000000-0000-4000-8000-000000000011",
+        "stamina": 80,
+        "mana": 50,
+        "conditions": []
+      }
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000102",
+      "name": "Ash",
+      "card": {
+        "id": "10000000-0000-4000-8000-000000000202",
+        "appearance": "Tall, ash-grey cloak, charcoal hair tied back.",
+        "personality": "Dry humor; counts coins before blessings.",
+        "background": "Ran a Market stall before the road tolls rose."
+      },
+      "state": {
+        "location_id": "10000000-0000-4000-8000-000000000012",
+        "stamina": 70,
+        "mana": 60,
+        "conditions": []
+      }
+    }
+  ]
+}

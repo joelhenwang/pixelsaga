@@ -1,0 +1,3218 @@
+{
+  "models": {
+    "AdvanceClockEffect": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Ids",
+          "type": "array"
+        },
+        "effect_type": {
+          "const": "advance_clock",
+          "default": "advance_clock",
+          "title": "Effect Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "from_index": {
+          "minimum": 0,
+          "title": "From Index",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "to_index": {
+          "minimum": 0,
+          "title": "To Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "affected_ids",
+        "from_index",
+        "to_index"
+      ],
+      "title": "AdvanceClockEffect",
+      "type": "object"
+    },
+    "AdvancePhaseCommand": {
+      "$defs": {
+        "AuditMeta": {
+          "additionalProperties": false,
+          "properties": {
+            "requested_at": {
+              "format": "date-time",
+              "title": "Requested At",
+              "type": "string"
+            },
+            "requested_by": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Requested By",
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_by"
+          ],
+          "title": "AuditMeta",
+          "type": "object"
+        },
+        "UserRole": {
+          "enum": [
+            "watcher",
+            "director",
+            "deity",
+            "player",
+            "system"
+          ],
+          "title": "UserRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "actor_role": {
+          "$ref": "#/$defs/UserRole"
+        },
+        "audit": {
+          "$ref": "#/$defs/AuditMeta"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "command_type": {
+          "const": "advance_phase",
+          "default": "advance_phase",
+          "title": "Command Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command_id",
+        "idempotency_key",
+        "actor_role",
+        "world_id",
+        "audit"
+      ],
+      "title": "AdvancePhaseCommand",
+      "type": "object"
+    },
+    "AuditMeta": {
+      "additionalProperties": false,
+      "properties": {
+        "requested_at": {
+          "format": "date-time",
+          "title": "Requested At",
+          "type": "string"
+        },
+        "requested_by": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Requested By",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requested_by"
+      ],
+      "title": "AuditMeta",
+      "type": "object"
+    },
+    "Character": {
+      "$defs": {
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "card_version": {
+          "minimum": 1,
+          "title": "Card Version",
+          "type": "integer"
+        },
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8,
+          "title": "Conditions",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "life_status": {
+          "$ref": "#/$defs/LifeStatus",
+          "default": "alive"
+        },
+        "location_id": {
+          "format": "uuid",
+          "title": "Location Id",
+          "type": "string"
+        },
+        "mana": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Mana",
+          "type": "integer"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "stamina": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Stamina",
+          "type": "integer"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "name",
+        "card_version",
+        "location_id",
+        "stamina",
+        "mana"
+      ],
+      "title": "Character",
+      "type": "object"
+    },
+    "CharacterCard": {
+      "additionalProperties": false,
+      "properties": {
+        "appearance": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Appearance",
+          "type": "string"
+        },
+        "background": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Background",
+          "type": "string"
+        },
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "personality": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Personality",
+          "type": "string"
+        },
+        "version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "character_id",
+        "name"
+      ],
+      "title": "CharacterCard",
+      "type": "object"
+    },
+    "CommittedEffect": {
+      "$defs": {
+        "AdvanceClockEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "advance_clock",
+              "default": "advance_clock",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_index": {
+              "minimum": 0,
+              "title": "From Index",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_index": {
+              "minimum": 0,
+              "title": "To Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_index",
+            "to_index"
+          ],
+          "title": "AdvanceClockEffect",
+          "type": "object"
+        },
+        "MemoryRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_memory",
+              "default": "record_memory",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "owner_character_id": {
+              "format": "uuid",
+              "title": "Owner Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "text": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "owner_character_id",
+            "text"
+          ],
+          "title": "MemoryRecordedEffect",
+          "type": "object"
+        },
+        "MoveEntityEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "move_entity",
+              "default": "move_entity",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_location_id": {
+              "format": "uuid",
+              "title": "From Location Id",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_location_id": {
+              "format": "uuid",
+              "title": "To Location Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_location_id",
+            "to_location_id"
+          ],
+          "title": "MoveEntityEffect",
+          "type": "object"
+        },
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        },
+        "ObservationRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_observation",
+              "default": "record_observation",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/ObservationFact"
+              },
+              "minItems": 1,
+              "title": "Facts",
+              "type": "array"
+            },
+            "observer_character_id": {
+              "format": "uuid",
+              "title": "Observer Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "observer_character_id",
+            "facts"
+          ],
+          "title": "ObservationRecordedEffect",
+          "type": "object"
+        },
+        "ResourceAdjustedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "delta": {
+              "title": "Delta",
+              "type": "integer"
+            },
+            "effect_type": {
+              "const": "resource_adjusted",
+              "default": "resource_adjusted",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceKind"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "resource",
+            "delta"
+          ],
+          "title": "ResourceAdjustedEffect",
+          "type": "object"
+        },
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "effect": {
+          "discriminator": {
+            "mapping": {
+              "advance_clock": "#/$defs/AdvanceClockEffect",
+              "move_entity": "#/$defs/MoveEntityEffect",
+              "record_memory": "#/$defs/MemoryRecordedEffect",
+              "record_observation": "#/$defs/ObservationRecordedEffect",
+              "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+            },
+            "propertyName": "effect_type"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/AdvanceClockEffect"
+            },
+            {
+              "$ref": "#/$defs/MoveEntityEffect"
+            },
+            {
+              "$ref": "#/$defs/ResourceAdjustedEffect"
+            },
+            {
+              "$ref": "#/$defs/ObservationRecordedEffect"
+            },
+            {
+              "$ref": "#/$defs/MemoryRecordedEffect"
+            }
+          ],
+          "title": "Effect"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "ordinal": {
+          "minimum": 0,
+          "title": "Ordinal",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event_id",
+        "ordinal",
+        "effect"
+      ],
+      "title": "CommittedEffect",
+      "type": "object"
+    },
+    "ContextManifest": {
+      "$defs": {
+        "ManifestSource": {
+          "additionalProperties": false,
+          "description": "One context section entry: included for a reason, or excluded.",
+          "properties": {
+            "kind": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Kind",
+              "type": "string"
+            },
+            "owner_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Owner Id"
+            },
+            "reason": {
+              "default": "",
+              "maxLength": 512,
+              "title": "Reason",
+              "type": "string"
+            },
+            "score": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Score"
+            },
+            "source_id": {
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Source Id",
+              "type": "string"
+            },
+            "visibility": {
+              "$ref": "#/$defs/Visibility"
+            }
+          },
+          "required": [
+            "source_id",
+            "kind",
+            "visibility"
+          ],
+          "title": "ManifestSource",
+          "type": "object"
+        },
+        "Visibility": {
+          "enum": [
+            "public",
+            "private"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "budgets": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Budgets",
+          "type": "object"
+        },
+        "call_id": {
+          "format": "uuid",
+          "title": "Call Id",
+          "type": "string"
+        },
+        "dropped": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Dropped",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "perspective_policy": {
+          "default": "perspective-v1",
+          "maxLength": 64,
+          "title": "Perspective Policy",
+          "type": "string"
+        },
+        "profile_name": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Profile Name",
+          "type": "string"
+        },
+        "profile_version": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Profile Version",
+          "type": "string"
+        },
+        "prompt_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "rendered_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Rendered Hash",
+          "type": "string"
+        },
+        "role": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/ManifestSource"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "tokens": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Tokens",
+          "type": "object"
+        },
+        "world_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "World Id"
+        }
+      },
+      "required": [
+        "id",
+        "call_id",
+        "role",
+        "profile_name",
+        "profile_version",
+        "prompt_version",
+        "rendered_hash"
+      ],
+      "title": "ContextManifest",
+      "type": "object"
+    },
+    "FictionalTime": {
+      "$defs": {
+        "PhaseName": {
+          "enum": [
+            "dawn",
+            "sunrise",
+            "morning",
+            "noon",
+            "afternoon",
+            "sunset",
+            "dusk",
+            "evening",
+            "night",
+            "midnight"
+          ],
+          "title": "PhaseName",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Immutable fictional position; operational UTC time stays separate.",
+      "properties": {
+        "day": {
+          "minimum": 1,
+          "title": "Day",
+          "type": "integer"
+        },
+        "phase": {
+          "$ref": "#/$defs/PhaseName"
+        }
+      },
+      "required": [
+        "day",
+        "phase"
+      ],
+      "title": "FictionalTime",
+      "type": "object"
+    },
+    "Lease": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "minimum": 0,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "claimed_at": {
+          "format": "date-time",
+          "title": "Claimed At",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "input_version": {
+          "minimum": 1,
+          "title": "Input Version",
+          "type": "integer"
+        },
+        "max_attempts": {
+          "minimum": 1,
+          "title": "Max Attempts",
+          "type": "integer"
+        },
+        "owner": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "expires_at",
+        "attempt",
+        "max_attempts",
+        "input_version",
+        "idempotency_key"
+      ],
+      "title": "Lease",
+      "type": "object"
+    },
+    "Location": {
+      "$defs": {
+        "Route": {
+          "additionalProperties": false,
+          "properties": {
+            "destination_location_id": {
+              "format": "uuid",
+              "title": "Destination Location Id",
+              "type": "string"
+            },
+            "duration_phases": {
+              "minimum": 1,
+              "title": "Duration Phases",
+              "type": "integer"
+            },
+            "id": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            },
+            "stamina_cost": {
+              "minimum": 0,
+              "title": "Stamina Cost",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id",
+            "destination_location_id",
+            "duration_phases",
+            "stamina_cost"
+          ],
+          "title": "Route",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "capacity": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Capacity"
+        },
+        "discovered": {
+          "default": false,
+          "title": "Discovered",
+          "type": "boolean"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "region": {
+          "default": "",
+          "maxLength": 128,
+          "title": "Region",
+          "type": "string"
+        },
+        "routes": {
+          "items": {
+            "$ref": "#/$defs/Route"
+          },
+          "title": "Routes",
+          "type": "array"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "name"
+      ],
+      "title": "Location",
+      "type": "object"
+    },
+    "ManifestSource": {
+      "$defs": {
+        "Visibility": {
+          "enum": [
+            "public",
+            "private"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One context section entry: included for a reason, or excluded.",
+      "properties": {
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "owner_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Id"
+        },
+        "reason": {
+          "default": "",
+          "maxLength": 512,
+          "title": "Reason",
+          "type": "string"
+        },
+        "score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Score"
+        },
+        "source_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/$defs/Visibility"
+        }
+      },
+      "required": [
+        "source_id",
+        "kind",
+        "visibility"
+      ],
+      "title": "ManifestSource",
+      "type": "object"
+    },
+    "MemoryRecordedEffect": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Ids",
+          "type": "array"
+        },
+        "effect_type": {
+          "const": "record_memory",
+          "default": "record_memory",
+          "title": "Effect Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "owner_character_id": {
+          "format": "uuid",
+          "title": "Owner Character Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "affected_ids",
+        "owner_character_id",
+        "text"
+      ],
+      "title": "MemoryRecordedEffect",
+      "type": "object"
+    },
+    "ModelCall": {
+      "$defs": {
+        "CallStatus": {
+          "enum": [
+            "started",
+            "succeeded",
+            "failed"
+          ],
+          "title": "CallStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "actor_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Actor Id"
+        },
+        "completion_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Completion Tokens",
+          "type": "integer"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error Code"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "latency_ms": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Latency Ms",
+          "type": "integer"
+        },
+        "phase_run_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase Run Id"
+        },
+        "profile_name": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Profile Name",
+          "type": "string"
+        },
+        "profile_version": {
+          "maxLength": 32,
+          "minLength": 1,
+          "title": "Profile Version",
+          "type": "string"
+        },
+        "prompt_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Prompt Hash",
+          "type": "string"
+        },
+        "prompt_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Prompt Tokens",
+          "type": "integer"
+        },
+        "role": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CallStatus",
+          "default": "started"
+        },
+        "task_run_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Run Id"
+        },
+        "world_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "World Id"
+        }
+      },
+      "required": [
+        "id",
+        "profile_name",
+        "profile_version",
+        "role",
+        "prompt_hash"
+      ],
+      "title": "ModelCall",
+      "type": "object"
+    },
+    "MoveAction": {
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "destination_location_id": {
+          "format": "uuid",
+          "title": "Destination Location Id",
+          "type": "string"
+        },
+        "family": {
+          "const": "move",
+          "default": "move",
+          "title": "Family",
+          "type": "string"
+        },
+        "route_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Route Id"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "snapshot_id",
+        "destination_location_id"
+      ],
+      "title": "MoveAction",
+      "type": "object"
+    },
+    "MoveEntityEffect": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Ids",
+          "type": "array"
+        },
+        "effect_type": {
+          "const": "move_entity",
+          "default": "move_entity",
+          "title": "Effect Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "from_location_id": {
+          "format": "uuid",
+          "title": "From Location Id",
+          "type": "string"
+        },
+        "route_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Route Id"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "to_location_id": {
+          "format": "uuid",
+          "title": "To Location Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "affected_ids",
+        "from_location_id",
+        "to_location_id"
+      ],
+      "title": "MoveEntityEffect",
+      "type": "object"
+    },
+    "Observation": {
+      "$defs": {
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "created_phase_index": {
+          "minimum": 0,
+          "title": "Created Phase Index",
+          "type": "integer"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/ObservationFact"
+          },
+          "minItems": 1,
+          "title": "Facts",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "observer_character_id": {
+          "format": "uuid",
+          "title": "Observer Character Id",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "event_id",
+        "observer_character_id",
+        "facts",
+        "created_phase_index"
+      ],
+      "title": "Observation",
+      "type": "object"
+    },
+    "ObservationFact": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ],
+      "title": "ObservationFact",
+      "type": "object"
+    },
+    "ObservationRecordedEffect": {
+      "$defs": {
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "affected_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Ids",
+          "type": "array"
+        },
+        "effect_type": {
+          "const": "record_observation",
+          "default": "record_observation",
+          "title": "Effect Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/ObservationFact"
+          },
+          "minItems": 1,
+          "title": "Facts",
+          "type": "array"
+        },
+        "observer_character_id": {
+          "format": "uuid",
+          "title": "Observer Character Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "affected_ids",
+        "observer_character_id",
+        "facts"
+      ],
+      "title": "ObservationRecordedEffect",
+      "type": "object"
+    },
+    "ObserveAction": {
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "family": {
+          "const": "observe",
+          "default": "observe",
+          "title": "Family",
+          "type": "string"
+        },
+        "focus": {
+          "default": "surroundings",
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Focus",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "snapshot_id"
+      ],
+      "title": "ObserveAction",
+      "type": "object"
+    },
+    "OutboxMessage": {
+      "$defs": {
+        "OutboxState": {
+          "enum": [
+            "pending",
+            "claimed",
+            "acked",
+            "failed"
+          ],
+          "title": "OutboxState",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "kind": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "state": {
+          "$ref": "#/$defs/OutboxState",
+          "default": "pending"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "kind",
+        "idempotency_key"
+      ],
+      "title": "OutboxMessage",
+      "type": "object"
+    },
+    "PauseSimulationCommand": {
+      "$defs": {
+        "AuditMeta": {
+          "additionalProperties": false,
+          "properties": {
+            "requested_at": {
+              "format": "date-time",
+              "title": "Requested At",
+              "type": "string"
+            },
+            "requested_by": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Requested By",
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_by"
+          ],
+          "title": "AuditMeta",
+          "type": "object"
+        },
+        "UserRole": {
+          "enum": [
+            "watcher",
+            "director",
+            "deity",
+            "player",
+            "system"
+          ],
+          "title": "UserRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "actor_role": {
+          "$ref": "#/$defs/UserRole"
+        },
+        "audit": {
+          "$ref": "#/$defs/AuditMeta"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "command_type": {
+          "const": "pause_simulation",
+          "default": "pause_simulation",
+          "title": "Command Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command_id",
+        "idempotency_key",
+        "actor_role",
+        "world_id",
+        "audit"
+      ],
+      "title": "PauseSimulationCommand",
+      "type": "object"
+    },
+    "PhaseRun": {
+      "$defs": {
+        "PhaseRunState": {
+          "enum": [
+            "created",
+            "world_ticked",
+            "snapshot_sealed",
+            "director_complete",
+            "intents_complete",
+            "scenes_assembled",
+            "scenes_committed",
+            "perception_complete",
+            "post_commit_queued",
+            "completed",
+            "paused",
+            "retryable_failed",
+            "terminal_failed",
+            "cancelled"
+          ],
+          "title": "PhaseRunState",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "absolute_index": {
+          "minimum": 0,
+          "title": "Absolute Index",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/$defs/PhaseRunState",
+          "default": "created"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "absolute_index"
+      ],
+      "title": "PhaseRun",
+      "type": "object"
+    },
+    "PhaseSnapshot": {
+      "$defs": {
+        "SnapshotCharacter": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "version": {
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "character_id",
+            "version"
+          ],
+          "title": "SnapshotCharacter",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "absolute_index": {
+          "minimum": 0,
+          "title": "Absolute Index",
+          "type": "integer"
+        },
+        "characters": {
+          "items": {
+            "$ref": "#/$defs/SnapshotCharacter"
+          },
+          "minItems": 1,
+          "title": "Characters",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "phase_run_id": {
+          "format": "uuid",
+          "title": "Phase Run Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sealed_at": {
+          "format": "date-time",
+          "title": "Sealed At",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        },
+        "world_version": {
+          "minimum": 0,
+          "title": "World Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "phase_run_id",
+        "absolute_index",
+        "world_version",
+        "characters",
+        "content_hash"
+      ],
+      "title": "PhaseSnapshot",
+      "type": "object"
+    },
+    "RecentMemory": {
+      "$defs": {
+        "Visibility": {
+          "enum": [
+            "public",
+            "private"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "created_phase_index": {
+          "minimum": 0,
+          "title": "Created Phase Index",
+          "type": "integer"
+        },
+        "event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "observation_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observation Id"
+        },
+        "owner_character_id": {
+          "format": "uuid",
+          "title": "Owner Character Id",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/$defs/Visibility",
+          "default": "private"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "owner_character_id",
+        "text",
+        "created_phase_index"
+      ],
+      "title": "RecentMemory",
+      "type": "object"
+    },
+    "ResourceAdjustedEffect": {
+      "$defs": {
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "affected_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Affected Ids",
+          "type": "array"
+        },
+        "delta": {
+          "title": "Delta",
+          "type": "integer"
+        },
+        "effect_type": {
+          "const": "resource_adjusted",
+          "default": "resource_adjusted",
+          "title": "Effect Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "resource": {
+          "$ref": "#/$defs/ResourceKind"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "affected_ids",
+        "resource",
+        "delta"
+      ],
+      "title": "ResourceAdjustedEffect",
+      "type": "object"
+    },
+    "RestAction": {
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "duration_phases": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Duration Phases",
+          "type": "integer"
+        },
+        "family": {
+          "const": "rest",
+          "default": "rest",
+          "title": "Family",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "snapshot_id"
+      ],
+      "title": "RestAction",
+      "type": "object"
+    },
+    "ResumeSimulationCommand": {
+      "$defs": {
+        "AuditMeta": {
+          "additionalProperties": false,
+          "properties": {
+            "requested_at": {
+              "format": "date-time",
+              "title": "Requested At",
+              "type": "string"
+            },
+            "requested_by": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Requested By",
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_by"
+          ],
+          "title": "AuditMeta",
+          "type": "object"
+        },
+        "UserRole": {
+          "enum": [
+            "watcher",
+            "director",
+            "deity",
+            "player",
+            "system"
+          ],
+          "title": "UserRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "actor_role": {
+          "$ref": "#/$defs/UserRole"
+        },
+        "audit": {
+          "$ref": "#/$defs/AuditMeta"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "command_type": {
+          "const": "resume_simulation",
+          "default": "resume_simulation",
+          "title": "Command Type",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command_id",
+        "idempotency_key",
+        "actor_role",
+        "world_id",
+        "audit"
+      ],
+      "title": "ResumeSimulationCommand",
+      "type": "object"
+    },
+    "Route": {
+      "additionalProperties": false,
+      "properties": {
+        "destination_location_id": {
+          "format": "uuid",
+          "title": "Destination Location Id",
+          "type": "string"
+        },
+        "duration_phases": {
+          "minimum": 1,
+          "title": "Duration Phases",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "stamina_cost": {
+          "minimum": 0,
+          "title": "Stamina Cost",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "destination_location_id",
+        "duration_phases",
+        "stamina_cost"
+      ],
+      "title": "Route",
+      "type": "object"
+    },
+    "SeedWorldCommand": {
+      "$defs": {
+        "AuditMeta": {
+          "additionalProperties": false,
+          "properties": {
+            "requested_at": {
+              "format": "date-time",
+              "title": "Requested At",
+              "type": "string"
+            },
+            "requested_by": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Requested By",
+              "type": "string"
+            }
+          },
+          "required": [
+            "requested_by"
+          ],
+          "title": "AuditMeta",
+          "type": "object"
+        },
+        "UserRole": {
+          "enum": [
+            "watcher",
+            "director",
+            "deity",
+            "player",
+            "system"
+          ],
+          "title": "UserRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "actor_role": {
+          "$ref": "#/$defs/UserRole"
+        },
+        "audit": {
+          "$ref": "#/$defs/AuditMeta"
+        },
+        "command_id": {
+          "format": "uuid",
+          "title": "Command Id",
+          "type": "string"
+        },
+        "command_type": {
+          "const": "seed_world",
+          "default": "seed_world",
+          "title": "Command Type",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "expected_versions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Expected Versions",
+          "type": "object"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "seed_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Seed Version",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "command_id",
+        "idempotency_key",
+        "actor_role",
+        "world_id",
+        "audit",
+        "seed_version",
+        "content_hash"
+      ],
+      "title": "SeedWorldCommand",
+      "type": "object"
+    },
+    "SnapshotCharacter": {
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "character_id",
+        "version"
+      ],
+      "title": "SnapshotCharacter",
+      "type": "object"
+    },
+    "TaskRun": {
+      "$defs": {
+        "Lease": {
+          "additionalProperties": false,
+          "properties": {
+            "attempt": {
+              "minimum": 0,
+              "title": "Attempt",
+              "type": "integer"
+            },
+            "claimed_at": {
+              "format": "date-time",
+              "title": "Claimed At",
+              "type": "string"
+            },
+            "expires_at": {
+              "format": "date-time",
+              "title": "Expires At",
+              "type": "string"
+            },
+            "idempotency_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Idempotency Key",
+              "type": "string"
+            },
+            "input_version": {
+              "minimum": 1,
+              "title": "Input Version",
+              "type": "integer"
+            },
+            "max_attempts": {
+              "minimum": 1,
+              "title": "Max Attempts",
+              "type": "integer"
+            },
+            "owner": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Owner",
+              "type": "string"
+            }
+          },
+          "required": [
+            "owner",
+            "expires_at",
+            "attempt",
+            "max_attempts",
+            "input_version",
+            "idempotency_key"
+          ],
+          "title": "Lease",
+          "type": "object"
+        },
+        "TaskRunState": {
+          "enum": [
+            "pending",
+            "claimed",
+            "running",
+            "succeeded",
+            "retry_wait",
+            "dead_letter",
+            "cancelled"
+          ],
+          "title": "TaskRunState",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "pattern": "^[a-z0-9]+(?:_[a-z0-9]+)*$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "lease": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Lease"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "state": {
+          "$ref": "#/$defs/TaskRunState",
+          "default": "pending"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "kind"
+      ],
+      "title": "TaskRun",
+      "type": "object"
+    },
+    "WaitAction": {
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "family": {
+          "const": "wait",
+          "default": "wait",
+          "title": "Family",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "snapshot_id"
+      ],
+      "title": "WaitAction",
+      "type": "object"
+    },
+    "World": {
+      "$defs": {
+        "PhaseName": {
+          "enum": [
+            "dawn",
+            "sunrise",
+            "morning",
+            "noon",
+            "afternoon",
+            "sunset",
+            "dusk",
+            "evening",
+            "night",
+            "midnight"
+          ],
+          "title": "PhaseName",
+          "type": "string"
+        },
+        "WorldStatus": {
+          "enum": [
+            "active",
+            "paused",
+            "ended"
+          ],
+          "title": "WorldStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "day": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Day",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "phase": {
+          "$ref": "#/$defs/PhaseName",
+          "default": "dawn"
+        },
+        "seed_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Seed Version",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/WorldStatus",
+          "default": "active"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "seed_version"
+      ],
+      "title": "World",
+      "type": "object"
+    },
+    "WorldEvent": {
+      "$defs": {
+        "EventType": {
+          "enum": [
+            "world_seeded",
+            "world_ticked",
+            "action_resolved"
+          ],
+          "title": "EventType",
+          "type": "string"
+        },
+        "Visibility": {
+          "enum": [
+            "public",
+            "private"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "absolute_index": {
+          "minimum": 0,
+          "title": "Absolute Index",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/EventType"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "participant_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "phase_run_id": {
+          "format": "uuid",
+          "title": "Phase Run Id",
+          "type": "string"
+        },
+        "random_algorithm": {
+          "anyOf": [
+            {
+              "maxLength": 64,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Random Algorithm"
+        },
+        "random_result": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Random Result"
+        },
+        "random_seed": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Random Seed"
+        },
+        "schema_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "source_command_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Command Id"
+        },
+        "source_task_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Task Id"
+        },
+        "summary": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Summary",
+          "type": "object"
+        },
+        "visibility": {
+          "$ref": "#/$defs/Visibility",
+          "default": "public"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "sequence",
+        "event_type",
+        "absolute_index",
+        "phase_run_id"
+      ],
+      "title": "WorldEvent",
+      "type": "object"
+    },
+    "WorldEventRecord": {
+      "$defs": {
+        "AdvanceClockEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "advance_clock",
+              "default": "advance_clock",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_index": {
+              "minimum": 0,
+              "title": "From Index",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_index": {
+              "minimum": 0,
+              "title": "To Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_index",
+            "to_index"
+          ],
+          "title": "AdvanceClockEffect",
+          "type": "object"
+        },
+        "CommittedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "effect": {
+              "discriminator": {
+                "mapping": {
+                  "advance_clock": "#/$defs/AdvanceClockEffect",
+                  "move_entity": "#/$defs/MoveEntityEffect",
+                  "record_memory": "#/$defs/MemoryRecordedEffect",
+                  "record_observation": "#/$defs/ObservationRecordedEffect",
+                  "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+                },
+                "propertyName": "effect_type"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/AdvanceClockEffect"
+                },
+                {
+                  "$ref": "#/$defs/MoveEntityEffect"
+                },
+                {
+                  "$ref": "#/$defs/ResourceAdjustedEffect"
+                },
+                {
+                  "$ref": "#/$defs/ObservationRecordedEffect"
+                },
+                {
+                  "$ref": "#/$defs/MemoryRecordedEffect"
+                }
+              ],
+              "title": "Effect"
+            },
+            "event_id": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            },
+            "ordinal": {
+              "minimum": 0,
+              "title": "Ordinal",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "event_id",
+            "ordinal",
+            "effect"
+          ],
+          "title": "CommittedEffect",
+          "type": "object"
+        },
+        "EventType": {
+          "enum": [
+            "world_seeded",
+            "world_ticked",
+            "action_resolved"
+          ],
+          "title": "EventType",
+          "type": "string"
+        },
+        "MemoryRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_memory",
+              "default": "record_memory",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "owner_character_id": {
+              "format": "uuid",
+              "title": "Owner Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "text": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "owner_character_id",
+            "text"
+          ],
+          "title": "MemoryRecordedEffect",
+          "type": "object"
+        },
+        "MoveEntityEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "move_entity",
+              "default": "move_entity",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_location_id": {
+              "format": "uuid",
+              "title": "From Location Id",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_location_id": {
+              "format": "uuid",
+              "title": "To Location Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_location_id",
+            "to_location_id"
+          ],
+          "title": "MoveEntityEffect",
+          "type": "object"
+        },
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        },
+        "ObservationRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_observation",
+              "default": "record_observation",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/ObservationFact"
+              },
+              "minItems": 1,
+              "title": "Facts",
+              "type": "array"
+            },
+            "observer_character_id": {
+              "format": "uuid",
+              "title": "Observer Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "observer_character_id",
+            "facts"
+          ],
+          "title": "ObservationRecordedEffect",
+          "type": "object"
+        },
+        "ResourceAdjustedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "delta": {
+              "title": "Delta",
+              "type": "integer"
+            },
+            "effect_type": {
+              "const": "resource_adjusted",
+              "default": "resource_adjusted",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceKind"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "resource",
+            "delta"
+          ],
+          "title": "ResourceAdjustedEffect",
+          "type": "object"
+        },
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        },
+        "Visibility": {
+          "enum": [
+            "public",
+            "private"
+          ],
+          "title": "Visibility",
+          "type": "string"
+        },
+        "WorldEvent": {
+          "additionalProperties": false,
+          "properties": {
+            "absolute_index": {
+              "minimum": 0,
+              "title": "Absolute Index",
+              "type": "integer"
+            },
+            "created_at": {
+              "format": "date-time",
+              "title": "Created At",
+              "type": "string"
+            },
+            "event_type": {
+              "$ref": "#/$defs/EventType"
+            },
+            "id": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            },
+            "participant_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "title": "Participant Ids",
+              "type": "array"
+            },
+            "phase_run_id": {
+              "format": "uuid",
+              "title": "Phase Run Id",
+              "type": "string"
+            },
+            "random_algorithm": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Random Algorithm"
+            },
+            "random_result": {
+              "anyOf": [
+                {
+                  "maxLength": 512,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Random Result"
+            },
+            "random_seed": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Random Seed"
+            },
+            "schema_version": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "sequence": {
+              "minimum": 1,
+              "title": "Sequence",
+              "type": "integer"
+            },
+            "source_command_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source Command Id"
+            },
+            "source_task_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Source Task Id"
+            },
+            "summary": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "title": "Summary",
+              "type": "object"
+            },
+            "visibility": {
+              "$ref": "#/$defs/Visibility",
+              "default": "public"
+            },
+            "world_id": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "world_id",
+            "sequence",
+            "event_type",
+            "absolute_index",
+            "phase_run_id"
+          ],
+          "title": "WorldEvent",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One event with its ordered effects; ordinals must be contiguous.",
+      "properties": {
+        "effects": {
+          "items": {
+            "$ref": "#/$defs/CommittedEffect"
+          },
+          "minItems": 1,
+          "title": "Effects",
+          "type": "array"
+        },
+        "event": {
+          "$ref": "#/$defs/WorldEvent"
+        }
+      },
+      "required": [
+        "event",
+        "effects"
+      ],
+      "title": "WorldEventRecord",
+      "type": "object"
+    }
+  },
+  "schema_version": 1
+}

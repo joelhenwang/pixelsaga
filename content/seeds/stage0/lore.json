@@ -1,0 +1,21 @@
+{
+  "meta": {"seed_format_version": 1, "license": "synthetic-original"},
+  "lore": [
+    {
+      "key": "lore.well",
+      "text": "The old well at the Hearth has never run dry, not even in the ash winter.",
+      "visibility": "public"
+    },
+    {
+      "key": "lore.tolls",
+      "text": "Road tolls to the Market doubled after the bridge wardens changed.",
+      "visibility": "public"
+    }
+  ],
+  "secrets": [
+    {
+      "owner_character_id": "10000000-0000-4000-8000-000000000101",
+      "text": "Wren buried a rusted key beneath the Hearth flagstone and told no one."
+    }
+  ]
+}

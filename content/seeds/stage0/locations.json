@@ -1,0 +1,28 @@
+{
+  "meta": {"seed_format_version": 1, "license": "synthetic-original"},
+  "locations": [
+    {
+      "id": "10000000-0000-4000-8000-000000000011",
+      "name": "Hearth",
+      "region": "Ember Vale",
+      "capacity": 4,
+      "discovered": true,
+      "routes": [
+        {
+          "id": "10000000-0000-4000-8000-000000000021",
+          "destination_location_id": "10000000-0000-4000-8000-000000000012",
+          "duration_phases": 1,
+          "stamina_cost": 10
+        }
+      ]
+    },
+    {
+      "id": "10000000-0000-4000-8000-000000000012",
+      "name": "Market",
+      "region": "Ember Vale",
+      "capacity": 8,
+      "discovered": true,
+      "routes": []
+    }
+  ]
+}

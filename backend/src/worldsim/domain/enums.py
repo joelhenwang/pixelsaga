@@ -1,0 +1,152 @@
+"""Stable domain vocabulary (owned by S0-DOM-001).
+
+Enum members are never renamed once promoted; schema versions distinguish
+meaning changes.
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+
+class PhaseName(StrEnum):
+    DAWN = "dawn"
+    SUNRISE = "sunrise"
+    MORNING = "morning"
+    NOON = "noon"
+    AFTERNOON = "afternoon"
+    SUNSET = "sunset"
+    DUSK = "dusk"
+    EVENING = "evening"
+    NIGHT = "night"
+    MIDNIGHT = "midnight"
+
+
+class ActionFamily(StrEnum):
+    WAIT = "wait"
+    REST = "rest"
+    OBSERVE = "observe"
+    MOVE = "move"
+    CONTINUE_ACTIVITY = "continue_activity"
+    COMMUNICATE = "communicate"
+    INTERACT = "interact"
+    USE_ITEM = "use_item"
+    TRANSFER = "transfer"
+    TRAIN = "train"
+    WORK = "work"
+    CRAFT = "craft"
+    ATTACK = "attack"
+    DEFEND = "defend"
+    CAST_MAGIC = "cast_magic"
+    HELP = "help"
+    HIDE = "hide"
+    SEARCH = "search"
+    OTHER = "other"
+
+
+#: Families with validation and effect semantics in Stage 0.
+STAGE0_ACTION_FAMILIES = frozenset(
+    {
+        ActionFamily.WAIT,
+        ActionFamily.REST,
+        ActionFamily.OBSERVE,
+        ActionFamily.MOVE,
+    }
+)
+
+
+class CommandType(StrEnum):
+    SEED_WORLD = "seed_world"
+    ADVANCE_PHASE = "advance_phase"
+    PAUSE_SIMULATION = "pause_simulation"
+    RESUME_SIMULATION = "resume_simulation"
+    SUBMIT_PLAYER_INTENT = "submit_player_intent"
+    SUBMIT_DIRECTOR_PROPOSAL = "submit_director_proposal"
+    APPLY_DEITY_OVERRIDE = "apply_deity_override"
+    RETRY_TASK = "retry_task"
+    SKIP_TASK = "skip_task"
+    CREATE_EXPORT = "create_export"
+    IMPORT_WORLD = "import_world"
+
+
+class UserRole(StrEnum):
+    WATCHER = "watcher"
+    DIRECTOR = "director"
+    DEITY = "deity"
+    PLAYER = "player"
+    SYSTEM = "system"
+
+
+class EffectType(StrEnum):
+    ADVANCE_CLOCK = "advance_clock"
+    MOVE_ENTITY = "move_entity"
+    RESOURCE_ADJUSTED = "resource_adjusted"
+    RECORD_OBSERVATION = "record_observation"
+    RECORD_MEMORY = "record_memory"
+
+
+class ResourceKind(StrEnum):
+    STAMINA = "stamina"
+    MANA = "mana"
+
+
+class EventType(StrEnum):
+    WORLD_SEEDED = "world_seeded"
+    WORLD_TICKED = "world_ticked"
+    ACTION_RESOLVED = "action_resolved"
+
+
+class Visibility(StrEnum):
+    PUBLIC = "public"
+    PRIVATE = "private"
+
+
+class LifeStatus(StrEnum):
+    ALIVE = "alive"
+    DEAD = "dead"
+
+
+class WorldStatus(StrEnum):
+    ACTIVE = "active"
+    PAUSED = "paused"
+    ENDED = "ended"
+
+
+class PhaseRunState(StrEnum):
+    CREATED = "created"
+    WORLD_TICKED = "world_ticked"
+    SNAPSHOT_SEALED = "snapshot_sealed"
+    DIRECTOR_COMPLETE = "director_complete"
+    INTENTS_COMPLETE = "intents_complete"
+    SCENES_ASSEMBLED = "scenes_assembled"
+    SCENES_COMMITTED = "scenes_committed"
+    PERCEPTION_COMPLETE = "perception_complete"
+    POST_COMMIT_QUEUED = "post_commit_queued"
+    COMPLETED = "completed"
+    PAUSED = "paused"
+    RETRYABLE_FAILED = "retryable_failed"
+    TERMINAL_FAILED = "terminal_failed"
+    CANCELLED = "cancelled"
+
+
+class TaskRunState(StrEnum):
+    PENDING = "pending"
+    CLAIMED = "claimed"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    RETRY_WAIT = "retry_wait"
+    DEAD_LETTER = "dead_letter"
+    CANCELLED = "cancelled"
+
+
+class OutboxState(StrEnum):
+    PENDING = "pending"
+    CLAIMED = "claimed"
+    ACKED = "acked"
+    FAILED = "failed"
+
+
+class CallStatus(StrEnum):
+    STARTED = "started"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"

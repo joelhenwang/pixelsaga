@@ -1,0 +1,14 @@
+{
+  "meta": {"seed_format_version": 1, "license": "synthetic-original"},
+  "seed_version": "stage0-v1",
+  "world": {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "name": "Ember Vale",
+    "day": 1,
+    "phase": "dawn"
+  },
+  "config": {
+    "theme": {"tone": "soft-dark", "audience": "young-adult", "setting": "anime-inspired fantasy"},
+    "calendar": {"phases_per_day": 10}
+  }
+}
