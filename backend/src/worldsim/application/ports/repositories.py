@@ -17,6 +17,7 @@ from worldsim.domain.narration import NarrationBeat
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.perception import Observation, RecentMemory
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot
+from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
 from worldsim.domain.schedules import ScheduledEffect
@@ -96,6 +97,21 @@ class ScheduleRepository(Protocol):
     async def add(self, schedule: ScheduledEffect) -> None: ...
     async def list_due(self, world_id: UUID, absolute: int) -> list[ScheduledEffect]: ...
     async def save(self, schedule: ScheduledEffect, expected_version: int) -> ScheduledEffect: ...
+
+
+class RelationshipRepository(Protocol):
+    async def add_evidence(self, evidence: RelationshipEvidence) -> None: ...
+    async def get_pair(
+        self, world_id: UUID, source_id: UUID, target_id: UUID
+    ) -> Relationship | None: ...
+    async def list_for_character(
+        self, world_id: UUID, character_id: UUID
+    ) -> list[Relationship]: ...
+    async def add_relationship(self, relationship: Relationship) -> None: ...
+    async def save_relationship(
+        self, relationship: Relationship, expected_version: int
+    ) -> Relationship: ...
+    async def get_relationship(self, relationship_id: UUID) -> Relationship: ...
 
 
 class PhaseRepository(Protocol):

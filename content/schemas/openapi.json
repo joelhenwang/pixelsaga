@@ -1017,6 +1017,143 @@
         "title": "ReconcileResponse",
         "type": "object"
       },
+      "RelationshipEvidenceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "delta": {
+            "maximum": 10.0,
+            "minimum": -10.0,
+            "title": "Delta",
+            "type": "integer"
+          },
+          "dimension": {
+            "maxLength": 16,
+            "title": "Dimension",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "maxLength": 512,
+            "title": "Note",
+            "type": "string"
+          },
+          "source_id": {
+            "format": "uuid",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "source_id",
+          "target_id",
+          "dimension",
+          "delta"
+        ],
+        "title": "RelationshipEvidenceRequest",
+        "type": "object"
+      },
+      "RelationshipListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/RelationshipView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "character_id"
+        ],
+        "title": "RelationshipListResponse",
+        "type": "object"
+      },
+      "RelationshipView": {
+        "additionalProperties": false,
+        "properties": {
+          "affection": {
+            "title": "Affection",
+            "type": "integer"
+          },
+          "direction": {
+            "title": "Direction",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "respect": {
+            "title": "Respect",
+            "type": "integer"
+          },
+          "source_id": {
+            "format": "uuid",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "title": "Target Id",
+            "type": "string"
+          },
+          "trust": {
+            "title": "Trust",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "source_id",
+          "target_id",
+          "direction",
+          "trust",
+          "affection",
+          "respect",
+          "summary",
+          "version"
+        ],
+        "title": "RelationshipView",
+        "type": "object"
+      },
       "ResolutionView": {
         "additionalProperties": false,
         "properties": {
@@ -2340,6 +2477,102 @@
         "summary": "Resume",
         "tags": [
           "activities"
+        ]
+      }
+    },
+    "/api/v1/stage2/relationships": {
+      "get": {
+        "description": "Both directions around one character, labeled by direction.",
+        "operationId": "list_relationships_api_v1_stage2_relationships_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Relationships",
+        "tags": [
+          "relationships"
+        ]
+      }
+    },
+    "/api/v1/stage2/relationships/evidence": {
+      "post": {
+        "description": "Fold one directional evidence delta into the projection.",
+        "operationId": "record_api_v1_stage2_relationships_evidence_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationshipEvidenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationshipView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Record",
+        "tags": [
+          "relationships"
         ]
       }
     },

@@ -15,6 +15,8 @@ LocationId = UUID
 RouteId = UUID
 ActivityId = UUID
 ScheduleId = UUID
+RelationshipId = UUID
+RelationshipEvidenceId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
 TaskId = UUID
@@ -68,6 +70,14 @@ def new_activity_id() -> ActivityId:
 
 
 def new_schedule_id() -> ScheduleId:
+    return uuid4()
+
+
+def new_relationship_id() -> RelationshipId:
+    return uuid4()
+
+
+def new_relationship_evidence_id() -> RelationshipEvidenceId:
     return uuid4()
 
 

@@ -229,6 +229,12 @@ class ScheduleStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
+class RelationshipDimension(StrEnum):
+    TRUST = "trust"
+    AFFECTION = "affection"
+    RESPECT = "respect"
+
+
 class ParticipantRole(StrEnum):
     INITIATOR = "initiator"
     REACTOR = "reactor"

@@ -25,6 +25,9 @@ from worldsim.infrastructure.repositories.perception import (
     SqlAlchemyPerceptionRepository,
 )
 from worldsim.infrastructure.repositories.phases import SqlAlchemyPhaseRepository
+from worldsim.infrastructure.repositories.relationships import (
+    SqlAlchemyRelationshipRepository,
+)
 from worldsim.infrastructure.repositories.scenes import SqlAlchemySceneRepository
 from worldsim.infrastructure.repositories.schedules import SqlAlchemyScheduleRepository
 from worldsim.infrastructure.repositories.tasks import SqlAlchemyTaskRepository
@@ -49,6 +52,7 @@ class SqlAlchemyUnitOfWork:
         self._tasks: SqlAlchemyTaskRepository | None = None
         self._outbox: SqlAlchemyOutboxRepository | None = None
         self._perception: SqlAlchemyPerceptionRepository | None = None
+        self._relationships: SqlAlchemyRelationshipRepository | None = None
         self._traces: SqlAlchemyTraceRepository | None = None
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
@@ -120,6 +124,12 @@ class SqlAlchemyUnitOfWork:
         if self._perception is None:
             self._perception = SqlAlchemyPerceptionRepository(self._require_session())
         return self._perception
+
+    @property
+    def relationships(self) -> SqlAlchemyRelationshipRepository:
+        if self._relationships is None:
+            self._relationships = SqlAlchemyRelationshipRepository(self._require_session())
+        return self._relationships
 
     @property
     def traces(self) -> SqlAlchemyTraceRepository:
@@ -195,6 +205,7 @@ class SqlAlchemyUnitOfWork:
             self._schedules = None
             self._outbox = None
             self._perception = None
+            self._relationships = None
             self._traces = None
             self._scenes = None
 

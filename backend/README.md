@@ -367,6 +367,17 @@ backfilled by name order). Product decision 2026-09-16, recorded in
 the charter: the D&D HP engine is canonical; injuries arrive later
 as a complement.
 
+## Relationships (S2-REL-001)
+
+`relationship_evidence` stores sourced directional deltas;
+`relationship` folds trust/affection/respect per ordered pair with
+clamped totals (migration 0013). Recording validates both ends,
+audits the command, and folds in one transaction; scene replays
+pass their event ID, adhoc calls mint a fresh key. Reads label
+incoming vs outgoing, and decision context carries only the
+actor's own outgoing rows (incoming rows are manifest-excluded).
+Narration emits beats, never evidence.
+
 ## Activities (S2-ACTIVITY-001)
 
 `POST /stage2/activities` starts one activity per character (travel

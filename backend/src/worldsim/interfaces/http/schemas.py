@@ -378,6 +378,40 @@ class ActivityListResponse(BaseModel):
     members: list[ActivityView] = Field(default_factory=list)
 
 
+class RelationshipEvidenceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    source_id: UUID
+    target_id: UUID
+    dimension: str = Field(max_length=16)
+    delta: int = Field(ge=-10, le=10)
+    note: str = Field(default="", max_length=512)
+
+
+class RelationshipView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    source_id: UUID
+    target_id: UUID
+    direction: str
+    trust: int
+    affection: int
+    respect: int
+    summary: str
+    version: int
+
+
+class RelationshipListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    character_id: UUID
+    members: list[RelationshipView] = Field(default_factory=list)
+
+
 class PartyRosterResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 

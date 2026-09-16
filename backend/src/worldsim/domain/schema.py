@@ -32,6 +32,7 @@ from worldsim.domain import (
 )
 from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.party import Monster, PartyMember
+from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.schedules import ScheduledEffect
 
@@ -92,6 +93,8 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     Activity,
     Monster,
     PartyMember,
+    Relationship,
+    RelationshipEvidence,
     ScheduledEffect,
     Sheet,
     TravelRoute,

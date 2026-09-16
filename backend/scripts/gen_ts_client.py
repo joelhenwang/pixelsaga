@@ -40,6 +40,9 @@ WANTED = (
     "ActivityStartRequest",
     "ActivityView",
     "ActivityListResponse",
+    "RelationshipEvidenceRequest",
+    "RelationshipView",
+    "RelationshipListResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -60,6 +63,8 @@ ROUTES = (
     ("post", "/api/v1/stage2/activities/{activity_id}/resume", "resumeActivity"),
     ("post", "/api/v1/stage2/activities/{activity_id}/cancel", "cancelActivity"),
     ("get", "/api/v1/stage2/activities", "listActivities"),
+    ("post", "/api/v1/stage2/relationships/evidence", "recordRelationshipEvidence"),
+    ("get", "/api/v1/stage2/relationships", "listRelationships"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

@@ -116,6 +116,7 @@ from worldsim.domain.perception import (
     PerceivedFact,
 )
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot, SnapshotCharacter
+from worldsim.domain.relationships import describe
 from worldsim.domain.rules.dnd import (
     DataTables,
     MonsterState,
@@ -750,6 +751,8 @@ class Stage1Orchestrator:
             place = await uow.locations.get(character.location_id)
             observations = await uow.perception.observations_for_observer(character.id, 5)
             memories = await uow.perception.memories_for_owner(character.id)
+            relationships = await uow.relationships.list_for_character(world_id, character.id)
+            names = {c.id: c.name for c in await uow.characters.list_for_world(world_id)}
         candidates = [
             SourceCandidate(
                 source_id=f"card:{character.id}",
@@ -797,6 +800,19 @@ class Stage1Orchestrator:
                         created_phase_index=obs.created_phase_index,
                     )
                 )
+        for relationship in relationships:
+            outgoing = relationship.source_id == character.id
+            other = relationship.target_id if outgoing else relationship.source_id
+            candidates.append(
+                SourceCandidate(
+                    source_id=f"rel:{relationship.id}",
+                    data_class="relationships",
+                    visibility=Visibility.PRIVATE,
+                    owner_id=relationship.source_id,
+                    text=describe(relationship, names.get(other, other.hex[:8])),
+                    score=1.5,
+                )
+            )
         for memory in memories:
             candidates.append(
                 SourceCandidate(

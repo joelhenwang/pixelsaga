@@ -166,6 +166,34 @@ export interface ActivityListResponse {
   world_id: string;
 }
 
+export interface RelationshipEvidenceRequest {
+  delta: number;
+  dimension: string;
+  note?: string | null;
+  source_id: string;
+  target_id: string;
+  world_id: string;
+}
+
+export interface RelationshipView {
+  affection: number;
+  direction: string;
+  id: string;
+  respect: number;
+  source_id: string;
+  summary: string;
+  target_id: string;
+  trust: number;
+  version: number;
+  world_id: string;
+}
+
+export interface RelationshipListResponse {
+  character_id: string;
+  members?: RelationshipView[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -192,5 +220,7 @@ export const ROUTES = {
   resumeActivity: "POST /api/v1/stage2/activities/{activity_id}/resume",
   cancelActivity: "POST /api/v1/stage2/activities/{activity_id}/cancel",
   listActivities: "GET /api/v1/stage2/activities",
+  recordRelationshipEvidence: "POST /api/v1/stage2/relationships/evidence",
+  listRelationships: "GET /api/v1/stage2/relationships",
   listEvents: "GET /api/v1/world/events",
 } as const;

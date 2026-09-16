@@ -4024,6 +4024,148 @@
       "title": "RecentMemory",
       "type": "object"
     },
+    "Relationship": {
+      "additionalProperties": false,
+      "description": "Folded directional standing from source toward target.",
+      "properties": {
+        "affection": {
+          "default": 0,
+          "maximum": 100,
+          "minimum": -100,
+          "title": "Affection",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "respect": {
+          "default": 0,
+          "maximum": 100,
+          "minimum": -100,
+          "title": "Respect",
+          "type": "integer"
+        },
+        "source_id": {
+          "format": "uuid",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "format": "uuid",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "trust": {
+          "default": 0,
+          "maximum": 100,
+          "minimum": -100,
+          "title": "Trust",
+          "type": "integer"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "source_id",
+        "target_id"
+      ],
+      "title": "Relationship",
+      "type": "object"
+    },
+    "RelationshipEvidence": {
+      "$defs": {
+        "RelationshipDimension": {
+          "enum": [
+            "trust",
+            "affection",
+            "respect"
+          ],
+          "title": "RelationshipDimension",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One sourced directional observation.",
+      "properties": {
+        "delta": {
+          "maximum": 10,
+          "minimum": -10,
+          "title": "Delta",
+          "type": "integer"
+        },
+        "dimension": {
+          "$ref": "#/$defs/RelationshipDimension"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "maxLength": 512,
+          "title": "Note",
+          "type": "string"
+        },
+        "source_event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Event Id"
+        },
+        "source_id": {
+          "format": "uuid",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "format": "uuid",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "source_id",
+        "target_id",
+        "dimension",
+        "delta"
+      ],
+      "title": "RelationshipEvidence",
+      "type": "object"
+    },
     "Resolution": {
       "$defs": {
         "AdvanceClockEffect": {
