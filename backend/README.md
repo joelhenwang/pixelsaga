@@ -356,6 +356,17 @@ Stage 3, ComfyUI in Stage 4). The Vue surface draws deterministic
 `Portrait.vue`); `portraitFor` is the seam the gateway replaces.
 No backend surface: fixtures need none.
 
+## Stage 2 contracts (S2-CONTRACT-001a)
+
+`activity` tracks persistent undertakings (travel, rest, train,
+work) with phase-counted progress and version-guarded saves;
+`travel_route` stores world leg facts (duration, stamina) with one
+leg per origin-destination pair. Party members carry an explicit
+`focus_slot` (two mains, two subs, rest companions by seat order,
+backfilled by name order). Product decision 2026-09-16, recorded in
+the charter: the D&D HP engine is canonical; injuries arrive later
+as a complement.
+
 ## D&D surface reads (DND-Surface)
 
 `GET /api/v1/stage1/party` and `POST /api/v1/stage1/party/begin` project

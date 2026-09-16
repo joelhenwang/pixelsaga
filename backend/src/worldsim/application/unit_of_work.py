@@ -6,6 +6,7 @@ from types import TracebackType
 from typing import Protocol, Self
 
 from worldsim.application.ports.repositories import (
+    ActivityRepository,
     CharacterRepository,
     CommandRepository,
     EventRepository,
@@ -15,6 +16,7 @@ from worldsim.application.ports.repositories import (
     PartyRepository,
     PerceptionRepository,
     PhaseRepository,
+    RouteRepository,
     SceneRepository,
     TaskRepository,
     VersionStore,
@@ -34,6 +36,10 @@ class UnitOfWork(Protocol):
     def party(self) -> PartyRepository: ...
     @property
     def monsters(self) -> MonsterRepository: ...
+    @property
+    def activities(self) -> ActivityRepository: ...
+    @property
+    def routes(self) -> RouteRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property

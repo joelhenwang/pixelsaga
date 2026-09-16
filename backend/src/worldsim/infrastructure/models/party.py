@@ -30,6 +30,7 @@ class PartyMemberRow(Base):
         nullable=True,
         default=None,
     )
+    focus_slot: Mapped[str] = mapped_column(String(16), default="companion")
     sheet: Mapped[dict[str, Any]] = mapped_column(JSONB)
     version: Mapped[int] = mapped_column(Integer, default=0)
 

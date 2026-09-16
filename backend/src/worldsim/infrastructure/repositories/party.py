@@ -7,6 +7,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from worldsim.domain.enums import FocusSlot
 from worldsim.domain.ids import PartyMemberId
 from worldsim.domain.party import PartyMember
 from worldsim.domain.rules.dnd import Sheet
@@ -25,6 +26,7 @@ class SqlAlchemyPartyRepository:
             name=row.name,
             name_key=row.name_key,
             character_id=row.character_id,
+            focus_slot=FocusSlot(row.focus_slot),
             sheet=Sheet.model_validate(row.sheet),
             version=row.version,
         )
@@ -64,6 +66,7 @@ class SqlAlchemyPartyRepository:
                 name_key=member.name_key,
                 name=member.name,
                 character_id=member.character_id,
+                focus_slot=member.focus_slot.value,
                 sheet=member.sheet.model_dump(),
                 version=member.version,
             )

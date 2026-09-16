@@ -200,6 +200,27 @@ class NarrationKind(StrEnum):
     TRANSITION = "transition"
 
 
+class ActivityStatus(StrEnum):
+    PLANNED = "planned"
+    ACTIVE = "active"
+    COMPLETED = "completed"
+    INTERRUPTED = "interrupted"
+    CANCELLED = "cancelled"
+
+
+class ActivityKind(StrEnum):
+    TRAVEL = "travel"
+    REST = "rest"
+    TRAIN = "train"
+    WORK = "work"
+
+
+class FocusSlot(StrEnum):
+    MAIN = "main"
+    SUB = "sub"
+    COMPANION = "companion"
+
+
 class ParticipantRole(StrEnum):
     INITIATOR = "initiator"
     REACTOR = "reactor"

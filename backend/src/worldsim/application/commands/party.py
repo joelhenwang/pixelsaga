@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from worldsim.application.unit_of_work import UnitOfWork
+from worldsim.domain.activities import focus_for_seat
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import WorldId, new_party_member_id
 from worldsim.domain.party import PartyMember, party_name_key
@@ -61,11 +62,13 @@ async def begin_adventure(
     else:
         sheet = Sheet(name=name, race=race, character_class=class_key, level=level, stats=stats)
         ensure_hp(sheet, max_hp(data, sheet))
+    seated = len(await uow.party.list_for_world(world_id))
     member = PartyMember(
         id=new_party_member_id(),
         world_id=world_id,
         name=name,
         name_key=key,
+        focus_slot=focus_for_seat(seated),
         sheet=sheet,
     )
     await uow.party.add(member)
@@ -93,6 +96,7 @@ async def recruit_companion(
         world_id=world_id,
         name=tag_name.strip(),
         name_key=key,
+        focus_slot=focus_for_seat(len(roster)),
         sheet=sheet,
     )
     await uow.party.add(member)

@@ -38,7 +38,7 @@ A code change must not silently revise an accepted product or architecture decis
 | Testing | Pytest, property/state-machine tests where useful, Vitest, Playwright, deterministic scenario harness |
 | Initial deployment | One local application process plus PostgreSQL container |
 | Later deployment | Replaceable model and image workers; Temporal only after promotion criteria |
-| Rules | D&D-inspired fantasy simulation using 0-100 stats, stamina, mana, injuries, and conditions; no HP in the initial ruleset |
+| Rules | D&D SRD-based combat (d20, AC, HP pools) plus stamina, mana, and conditions; injury severity and recovery arrive later as a complement, not a replacement (decision 2026-09-16) |
 | Canon | One world, one active timeline, committed events plus transactional projections |
 
 ## 4. Document set

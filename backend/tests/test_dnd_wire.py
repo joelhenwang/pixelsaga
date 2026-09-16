@@ -95,9 +95,9 @@ def test_user_prompt_carries_dnd_block() -> None:
 
 def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeGateway]) -> None:
     import hashlib
+    import random
 
     from worldsim.domain.rules.dnd import MonsterState as MonsterStateModel
-    import random
 
     client, gateway = wire
     ids = asyncio.run(_seed_two())
@@ -218,9 +218,9 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
     borin_sheet = SheetModel.model_validate(before["borin"])
 
     def _seed_for(event_id: UUID) -> int:
-        return int.from_bytes(
-            hashlib.sha256(str(event_id).encode()).digest()[:8], "big"
-        ) & ((1 << 63) - 1)
+        return int.from_bytes(hashlib.sha256(str(event_id).encode()).digest()[:8], "big") & (
+            (1 << 63) - 1
+        )
 
     # Every scene narrated the same combat text, so replay each scene in
     # order, carrying pools forward exactly as the applier does.
@@ -257,7 +257,6 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
     after = asyncio.run(_roster_sheets())
     assert after["borin"]["hp"]["current"] == before["borin"]["hp"]["current"]
     assert after["borin"]["conditions"] == ["Poisoned"]
-
 
     async def _combat_records() -> dict[str, Any]:
         return await _combat_records_for(scene_event)

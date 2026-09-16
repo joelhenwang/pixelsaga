@@ -171,7 +171,10 @@ def _goblin(current: int) -> MonsterState:
 
 def test_carried_pool_continues_across_scenes() -> None:
     report = resolve_narration_tags(
-        "ATTACK[longsword at goblin]", [_borin()], DATA, _rng(0.5, 0.5),
+        "ATTACK[longsword at goblin]",
+        [_borin()],
+        DATA,
+        _rng(0.5, 0.5),
         live=[_goblin(2)],
     )
     assert report.outcomes[0].text == "Borin hits Goblin for 5 slashing. (2->0 HP)"
@@ -182,7 +185,10 @@ def test_carried_pool_continues_across_scenes() -> None:
 def test_fresh_encounter_respawns_pool() -> None:
     report = resolve_narration_tags(
         "ENCOUNTER[goblin]\nATTACK[longsword at goblin]",
-        [_borin()], DATA, _rng(0.5, 0.5), live=[_goblin(2)],
+        [_borin()],
+        DATA,
+        _rng(0.5, 0.5),
+        live=[_goblin(2)],
     )
     assert report.outcomes[1].text == "Borin hits Goblin for 5 slashing. (7->2 HP)"
     pool = report.monsters["goblin"]
@@ -191,7 +197,10 @@ def test_fresh_encounter_respawns_pool() -> None:
 
 def test_untouched_pool_not_persisted() -> None:
     report = resolve_narration_tags(
-        "CONDITION[poisoned on Borin for 2 rounds]", [_borin()], DATA, _rng(),
+        "CONDITION[poisoned on Borin for 2 rounds]",
+        [_borin()],
+        DATA,
+        _rng(),
         live=[_goblin(2)],
     )
     assert report.monsters == {}
@@ -200,7 +209,10 @@ def test_untouched_pool_not_persisted() -> None:
 
 def test_dead_pool_stays_down() -> None:
     report = resolve_narration_tags(
-        "ATTACK[longsword at goblin]", [_borin()], DATA, _rng(0.5, 0.5),
+        "ATTACK[longsword at goblin]",
+        [_borin()],
+        DATA,
+        _rng(0.5, 0.5),
         live=[_goblin(0)],
     )
     assert report.outcomes[0].text == "Borin hits Goblin for 5 slashing. (0->0 HP)"

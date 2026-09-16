@@ -30,6 +30,7 @@ from worldsim.domain import (
     tracing,
     world,
 )
+from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.rules.dnd import Sheet
 
@@ -87,9 +88,11 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     events.WorldEvent,
     events.CommittedEffect,
     events.WorldEventRecord,
+    Activity,
     Monster,
     PartyMember,
     Sheet,
+    TravelRoute,
     tracing.ManifestSource,
     tracing.ContextManifest,
     tracing.ModelCall,

@@ -118,6 +118,13 @@ The initial rules are **D&D-inspired**, not a 5e implementation:
 
 A future 5e-compatible mode requires a separate approved product decision, rules contract, persistence model, content-license review, and stage plan. It must not leak 5e assumptions into the initial world engine.
 
+**Recorded product decision 2026-09-16:** the shipped D&D track (d20
+attacks/saves, AC, HP pools for party and monsters, 5e SRD content
+tables) is canonical, not a future mode. The no-HP injury model in
+section 9 stays a later complement (severity, treatment, recovery),
+not a replacement. Charter section 15's HP-replacement gate is
+satisfied by this record.
+
 ## 10. Knowledge and memory
 
 Objective events, observations, claims, beliefs, rumours, and memories are distinct records.

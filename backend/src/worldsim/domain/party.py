@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from worldsim.domain.enums import FocusSlot
 from worldsim.domain.ids import CharacterId, MonsterId, PartyMemberId, WorldId
 from worldsim.domain.rules.dnd import Sheet, slugify
 
@@ -22,6 +23,7 @@ class PartyMember(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     name_key: str = Field(min_length=1, max_length=128)
     character_id: CharacterId | None = None
+    focus_slot: FocusSlot = FocusSlot.COMPANION
     sheet: Sheet
     version: int = Field(default=0, ge=0)
 

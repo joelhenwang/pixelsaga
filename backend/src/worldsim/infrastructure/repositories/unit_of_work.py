@@ -8,6 +8,10 @@ from typing import Self
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from worldsim.infrastructure.db.engine import session_factory
+from worldsim.infrastructure.repositories.activities import (
+    SqlAlchemyActivityRepository,
+    SqlAlchemyRouteRepository,
+)
 from worldsim.infrastructure.repositories.characters import (
     SqlAlchemyCharacterRepository,
 )
@@ -48,6 +52,8 @@ class SqlAlchemyUnitOfWork:
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
+        self._activities: SqlAlchemyActivityRepository | None = None
+        self._routes: SqlAlchemyRouteRepository | None = None
 
     def _require_session(self) -> AsyncSession:
         assert self._session is not None, "unit of work is not open"
@@ -126,6 +132,18 @@ class SqlAlchemyUnitOfWork:
         return self._scenes
 
     @property
+    def activities(self) -> SqlAlchemyActivityRepository:
+        if self._activities is None:
+            self._activities = SqlAlchemyActivityRepository(self._require_session())
+        return self._activities
+
+    @property
+    def routes(self) -> SqlAlchemyRouteRepository:
+        if self._routes is None:
+            self._routes = SqlAlchemyRouteRepository(self._require_session())
+        return self._routes
+
+    @property
     def monsters(self) -> SqlAlchemyMonsterRepository:
         if self._monsters is None:
             self._monsters = SqlAlchemyMonsterRepository(self._require_session())
@@ -164,6 +182,8 @@ class SqlAlchemyUnitOfWork:
             self._tasks = None
             self._party = None
             self._monsters = None
+            self._activities = None
+            self._routes = None
             self._outbox = None
             self._perception = None
             self._traces = None

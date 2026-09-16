@@ -1,5 +1,93 @@
 {
   "models": {
+    "Activity": {
+      "$defs": {
+        "ActivityKind": {
+          "enum": [
+            "travel",
+            "rest",
+            "train",
+            "work"
+          ],
+          "title": "ActivityKind",
+          "type": "string"
+        },
+        "ActivityStatus": {
+          "enum": [
+            "planned",
+            "active",
+            "completed",
+            "interrupted",
+            "cancelled"
+          ],
+          "title": "ActivityStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One persistent undertaking. Progress counts committed phases.",
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "duration_phases": {
+          "minimum": 1,
+          "title": "Duration Phases",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/ActivityKind"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "progress_phases": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Progress Phases",
+          "type": "integer"
+        },
+        "start_absolute": {
+          "minimum": 0,
+          "title": "Start Absolute",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/ActivityStatus",
+          "default": "planned"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "character_id",
+        "kind",
+        "start_absolute",
+        "duration_phases"
+      ],
+      "title": "Activity",
+      "type": "object"
+    },
     "AdvancePhaseCommand": {
       "$defs": {
         "AuditMeta": {
@@ -3042,6 +3130,15 @@
     },
     "PartyMember": {
       "$defs": {
+        "FocusSlot": {
+          "enum": [
+            "main",
+            "sub",
+            "companion"
+          ],
+          "title": "FocusSlot",
+          "type": "string"
+        },
         "HitPoints": {
           "additionalProperties": false,
           "properties": {
@@ -3222,6 +3319,10 @@
           ],
           "default": null,
           "title": "Character Id"
+        },
+        "focus_slot": {
+          "$ref": "#/$defs/FocusSlot",
+          "default": "companion"
         },
         "id": {
           "format": "uuid",
@@ -5491,6 +5592,58 @@
         "kind"
       ],
       "title": "TaskRun",
+      "type": "object"
+    },
+    "TravelRoute": {
+      "additionalProperties": false,
+      "description": "A traversable world fact: origin, destination, cost.",
+      "properties": {
+        "duration_phases": {
+          "minimum": 1,
+          "title": "Duration Phases",
+          "type": "integer"
+        },
+        "from_location_id": {
+          "format": "uuid",
+          "title": "From Location Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "stamina_cost": {
+          "minimum": 0,
+          "title": "Stamina Cost",
+          "type": "integer"
+        },
+        "to_location_id": {
+          "format": "uuid",
+          "title": "To Location Id",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "from_location_id",
+        "to_location_id",
+        "duration_phases",
+        "stamina_cost"
+      ],
+      "title": "TravelRoute",
       "type": "object"
     },
     "ValidationIssue": {

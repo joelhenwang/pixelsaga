@@ -172,6 +172,10 @@ Enable communicate, interact, use/transfer item, train, work, craft, help, hide,
 
 ### S3-INJURY-001: health, condition, and recovery
 
+Scope note (decision 2026-09-16): HP pools are canonical from the
+Stage 1/2 D&D track. This packet adds severity, treatment, recovery,
+and lasting consequences on top; it does not remove HP.
+
 Implement body-region injuries, severity, pain, bleeding, mobility/consciousness consequences, treatment, recovery, complications, and permanent outcomes.
 
 **Acceptance:** no HP; injuries have source events; recovery follows time/rules; duplicate treatment has one result.
