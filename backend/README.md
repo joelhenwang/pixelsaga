@@ -346,6 +346,16 @@ the same retry loop as party HP. A fresh ENCOUNTER respawns its keys
 to full (a new pack, not the survivors); scenes without one continue
 the persisted HP, including across scenes. No XP awards yet.
 
+## Visual assets (IMG-FIXTURE)
+
+`content/visual-styles/pixel-saga-v1.json` is the versioned style
+pack: portrait/sprite/background/event prompts, palette, continuity
+rules, and the staged pipeline (fixture now, provider gateway in
+Stage 3, ComfyUI in Stage 4). The Vue surface draws deterministic
+16x16 SVG portraits from the pack palette (`frontend/src/portrait.ts`,
+`Portrait.vue`); `portraitFor` is the seam the gateway replaces.
+No backend surface: fixtures need none.
+
 ## D&D surface reads (DND-Surface)
 
 `GET /api/v1/stage1/party` and `POST /api/v1/stage1/party/begin` project

@@ -2,6 +2,7 @@
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import type { BeatView, PartyMemberView, SceneDetail, SceneSummary } from "@gen";
 import { api, headersFor, type Role } from "./api";
+import Portrait from "./Portrait.vue";
 
 const role = ref<Role>("watcher");
 const characterId = ref<string>("");
@@ -264,6 +265,7 @@ onUnmounted(() => {
         <div v-if="roster.length > 0">
           <div v-for="m in roster" :key="m.id" class="member">
             <div class="mrow">
+              <Portrait :asset-id="m.id" :name="m.name" :size="32" />
               <span class="mname">{{ m.name }}</span>
               <span class="mmeta">lv {{ m.level }} {{ m.character_class }}</span>
               <span class="hp" :class="hpClass(m)"><span class="bar">{{ hpbar(m) }}</span> {{ m.hp_current }}/{{ m.hp_max }}</span>
@@ -313,7 +315,7 @@ onUnmounted(() => {
         <p v-if="beats.length === 0" class="dim">No beats yet. Narration lands after commit.</p>
         <div class="cast">
           <div v-for="p in detail.participants" :key="p.character_id" class="person">
-            <span class="avatar" aria-hidden="true">{{ p.role.slice(0, 1).toUpperCase() }}</span>
+            <Portrait :asset-id="p.character_id" :name="p.character_id.slice(0, 8)" />
             <span><span class="nm">{{ p.character_id.slice(0, 8) }}</span><br><span class="rl">{{ p.role }}</span></span>
           </div>
         </div>

@@ -80,6 +80,7 @@ body {
   font-size: 20px; flex: none;
 }
 .person .nm { font-size: 13px; }
+.portrait { image-rendering: pixelated; border: 1px solid var(--line); flex: none; }
 .person .rl { font-size: 12px; color: var(--dim); }
 .bar { border-top: 1px solid var(--line); padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
 .bar .row { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; flex-wrap: wrap; }

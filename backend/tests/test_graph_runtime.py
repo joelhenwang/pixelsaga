@@ -116,6 +116,10 @@ def test_prune_leaves_canon_intact() -> None:
             async with session_factory(engine)() as session:
                 row = await session.get(WorldRow, wid)
                 assert row is not None and row.name == "Vale"
+                # This test bypasses the scratch-DB fixture, so remove the
+                # probe row: stray worlds break the dev surface world listing.
+                await session.delete(row)
+                await session.commit()
         finally:
             await engine.dispose()
 
