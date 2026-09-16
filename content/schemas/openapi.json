@@ -293,6 +293,81 @@
         "title": "BeatView",
         "type": "object"
       },
+      "BeliefListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "holder_id": {
+            "format": "uuid",
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/BeliefView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "holder_id"
+        ],
+        "title": "BeliefListResponse",
+        "type": "object"
+      },
+      "BeliefView": {
+        "additionalProperties": false,
+        "properties": {
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "holder_id": {
+            "format": "uuid",
+            "title": "Holder Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "last_touched_absolute": {
+            "title": "Last Touched Absolute",
+            "type": "integer"
+          },
+          "proposition": {
+            "title": "Proposition",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "holder_id",
+          "proposition",
+          "confidence",
+          "last_touched_absolute",
+          "version"
+        ],
+        "title": "BeliefView",
+        "type": "object"
+      },
       "CharacterDetail": {
         "additionalProperties": false,
         "description": "Stage 1 character view; card excerpt only for self or watcher.",
@@ -379,6 +454,149 @@
           "location_id"
         ],
         "title": "CharacterSummary",
+        "type": "object"
+      },
+      "ClaimListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ClaimView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "viewer_id": {
+            "format": "uuid",
+            "title": "Viewer Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "viewer_id"
+        ],
+        "title": "ClaimListResponse",
+        "type": "object"
+      },
+      "ClaimRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "audience_location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audience Location Id"
+          },
+          "proposition": {
+            "maxLength": 1024,
+            "minLength": 1,
+            "title": "Proposition",
+            "type": "string"
+          },
+          "refutes_claim_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refutes Claim Id"
+          },
+          "speaker_id": {
+            "format": "uuid",
+            "title": "Speaker Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "speaker_id",
+          "proposition"
+        ],
+        "title": "ClaimRequest",
+        "type": "object"
+      },
+      "ClaimView": {
+        "additionalProperties": false,
+        "properties": {
+          "audience_location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audience Location Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "proposition": {
+            "title": "Proposition",
+            "type": "string"
+          },
+          "refutes_claim_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Refutes Claim Id"
+          },
+          "speaker_id": {
+            "format": "uuid",
+            "title": "Speaker Id",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "speaker_id",
+          "audience_location_id",
+          "proposition",
+          "refutes_claim_id",
+          "version"
+        ],
+        "title": "ClaimView",
         "type": "object"
       },
       "ClockResponse": {
@@ -2477,6 +2695,154 @@
         "summary": "Resume",
         "tags": [
           "activities"
+        ]
+      }
+    },
+    "/api/v1/stage2/beliefs": {
+      "get": {
+        "description": "Beliefs are private: holders and watchers only.",
+        "operationId": "list_beliefs_api_v1_stage2_beliefs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "holder_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Holder Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BeliefListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Beliefs",
+        "tags": [
+          "knowledge"
+        ]
+      }
+    },
+    "/api/v1/stage2/claims": {
+      "get": {
+        "description": "Only claims the viewer could have heard: global or co-located.",
+        "operationId": "list_claims_api_v1_stage2_claims_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "viewer_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Viewer Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Claims",
+        "tags": [
+          "knowledge"
+        ]
+      },
+      "post": {
+        "description": "Voice a proposition; eligible listeners fold beliefs.",
+        "operationId": "voice_claim_api_v1_stage2_claims_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClaimView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Voice Claim",
+        "tags": [
+          "knowledge"
         ]
       }
     },

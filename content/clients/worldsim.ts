@@ -194,6 +194,46 @@ export interface RelationshipListResponse {
   world_id: string;
 }
 
+export interface ClaimRequest {
+  audience_location_id?: string | null;
+  proposition: string;
+  refutes_claim_id?: string | null;
+  speaker_id: string;
+  world_id: string;
+}
+
+export interface ClaimView {
+  audience_location_id: string;
+  id: string;
+  proposition: string;
+  refutes_claim_id: string;
+  speaker_id: string;
+  version: number;
+  world_id: string;
+}
+
+export interface ClaimListResponse {
+  members?: ClaimView[] | null;
+  viewer_id: string;
+  world_id: string;
+}
+
+export interface BeliefView {
+  confidence: unknown;
+  holder_id: string;
+  id: string;
+  last_touched_absolute: number;
+  proposition: string;
+  version: number;
+  world_id: string;
+}
+
+export interface BeliefListResponse {
+  holder_id: string;
+  members?: BeliefView[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -222,5 +262,8 @@ export const ROUTES = {
   listActivities: "GET /api/v1/stage2/activities",
   recordRelationshipEvidence: "POST /api/v1/stage2/relationships/evidence",
   listRelationships: "GET /api/v1/stage2/relationships",
+  assertClaim: "POST /api/v1/stage2/claims",
+  listClaims: "GET /api/v1/stage2/claims",
+  listBeliefs: "GET /api/v1/stage2/beliefs",
   listEvents: "GET /api/v1/world/events",
 } as const;

@@ -202,10 +202,10 @@ def test_relationship_endpoints_label_direction(client: ApiClient) -> None:
     assert members[0]["direction"] == "incoming"
     assert members[0]["affection"] == 4
 
+
 def test_relationship_visibility_in_context() -> None:
     from worldsim.application.context.assembler import assemble
-    from worldsim.domain.context import ContextRequest
-    from worldsim.domain.context import SourceCandidate
+    from worldsim.domain.context import ContextRequest, SourceCandidate
     from worldsim.domain.enums import Visibility
 
     actor = new_character_id()

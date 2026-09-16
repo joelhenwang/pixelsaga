@@ -412,6 +412,56 @@ class RelationshipListResponse(BaseModel):
     members: list[RelationshipView] = Field(default_factory=list)
 
 
+class ClaimRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    speaker_id: UUID
+    proposition: str = Field(min_length=1, max_length=1024)
+    audience_location_id: UUID | None = None
+    refutes_claim_id: UUID | None = None
+
+
+class ClaimView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    speaker_id: UUID
+    audience_location_id: UUID | None
+    proposition: str
+    refutes_claim_id: UUID | None
+    version: int
+
+
+class ClaimListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    viewer_id: UUID
+    members: list[ClaimView] = Field(default_factory=list)
+
+
+class BeliefView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    holder_id: UUID
+    proposition: str
+    confidence: float
+    last_touched_absolute: int
+    version: int
+
+
+class BeliefListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    holder_id: UUID
+    members: list[BeliefView] = Field(default_factory=list)
+
+
 class PartyRosterResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 

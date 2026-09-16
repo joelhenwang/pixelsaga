@@ -10,6 +10,7 @@ from worldsim.application.ports.repositories import (
     CharacterRepository,
     CommandRepository,
     EventRepository,
+    KnowledgeRepository,
     LocationRepository,
     MonsterRepository,
     OutboxRepository,
@@ -46,6 +47,8 @@ class UnitOfWork(Protocol):
     def schedules(self) -> ScheduleRepository: ...
     @property
     def relationships(self) -> RelationshipRepository: ...
+    @property
+    def knowledge(self) -> KnowledgeRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property

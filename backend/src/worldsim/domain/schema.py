@@ -31,6 +31,7 @@ from worldsim.domain import (
     world,
 )
 from worldsim.domain.activities import Activity, TravelRoute
+from worldsim.domain.knowledge import Belief, Claim
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.rules.dnd import Sheet
@@ -93,6 +94,8 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     Activity,
     Monster,
     PartyMember,
+    Belief,
+    Claim,
     Relationship,
     RelationshipEvidence,
     ScheduledEffect,

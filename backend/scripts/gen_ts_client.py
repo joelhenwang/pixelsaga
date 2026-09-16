@@ -43,6 +43,11 @@ WANTED = (
     "RelationshipEvidenceRequest",
     "RelationshipView",
     "RelationshipListResponse",
+    "ClaimRequest",
+    "ClaimView",
+    "ClaimListResponse",
+    "BeliefView",
+    "BeliefListResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -65,6 +70,9 @@ ROUTES = (
     ("get", "/api/v1/stage2/activities", "listActivities"),
     ("post", "/api/v1/stage2/relationships/evidence", "recordRelationshipEvidence"),
     ("get", "/api/v1/stage2/relationships", "listRelationships"),
+    ("post", "/api/v1/stage2/claims", "assertClaim"),
+    ("get", "/api/v1/stage2/claims", "listClaims"),
+    ("get", "/api/v1/stage2/beliefs", "listBeliefs"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

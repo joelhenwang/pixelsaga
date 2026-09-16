@@ -367,6 +367,17 @@ backfilled by name order). Product decision 2026-09-16, recorded in
 the charter: the D&D HP engine is canonical; injuries arrive later
 as a complement.
 
+## Knowledge (S2-KNOW-001)
+
+`claim` rows record voiced propositions with audience and optional
+refutation links; `belief` rows fold per-holder confidence with
+provenance (migration 0014). Hearing is positional: co-located
+living characters form beliefs (speaker 0.9, first hearing 0.5,
+repeats reinforce to 0.9), contradiction halves toward doubt, and
+nothing is ever deleted. False claims touch no canon rows or
+events. Reads filter claims by what the viewer could hear;
+beliefs are holder- or watcher-only.
+
 ## Relationships (S2-REL-001)
 
 `relationship_evidence` stores sourced directional deltas;

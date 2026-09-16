@@ -17,6 +17,7 @@ from worldsim.infrastructure.repositories.characters import (
 )
 from worldsim.infrastructure.repositories.commands import SqlAlchemyCommandRepository
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
+from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
 from worldsim.infrastructure.repositories.monsters import SqlAlchemyMonsterRepository
 from worldsim.infrastructure.repositories.outbox import SqlAlchemyOutboxRepository
@@ -53,6 +54,7 @@ class SqlAlchemyUnitOfWork:
         self._outbox: SqlAlchemyOutboxRepository | None = None
         self._perception: SqlAlchemyPerceptionRepository | None = None
         self._relationships: SqlAlchemyRelationshipRepository | None = None
+        self._knowledge: SqlAlchemyKnowledgeRepository | None = None
         self._traces: SqlAlchemyTraceRepository | None = None
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
@@ -132,6 +134,12 @@ class SqlAlchemyUnitOfWork:
         return self._relationships
 
     @property
+    def knowledge(self) -> SqlAlchemyKnowledgeRepository:
+        if self._knowledge is None:
+            self._knowledge = SqlAlchemyKnowledgeRepository(self._require_session())
+        return self._knowledge
+
+    @property
     def traces(self) -> SqlAlchemyTraceRepository:
         if self._traces is None:
             self._traces = SqlAlchemyTraceRepository(self._require_session())
@@ -206,6 +214,7 @@ class SqlAlchemyUnitOfWork:
             self._outbox = None
             self._perception = None
             self._relationships = None
+            self._knowledge = None
             self._traces = None
             self._scenes = None
 

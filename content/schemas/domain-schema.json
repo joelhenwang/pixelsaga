@@ -751,6 +751,73 @@
       "title": "BeatProposal",
       "type": "object"
     },
+    "Belief": {
+      "additionalProperties": false,
+      "description": "One holder's confidence in a proposition, with provenance.",
+      "properties": {
+        "confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "holder_id": {
+          "format": "uuid",
+          "title": "Holder Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "last_touched_absolute": {
+          "minimum": 0,
+          "title": "Last Touched Absolute",
+          "type": "integer"
+        },
+        "proposition": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Proposition",
+          "type": "string"
+        },
+        "source_claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Claim Id"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "holder_id",
+        "proposition",
+        "confidence",
+        "last_touched_absolute"
+      ],
+      "title": "Belief",
+      "type": "object"
+    },
     "Character": {
       "$defs": {
         "LifeStatus": {
@@ -883,6 +950,86 @@
         "name"
       ],
       "title": "CharacterCard",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "description": "One voiced proposition with its audience.",
+      "properties": {
+        "audience_location_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audience Location Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "proposition": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "title": "Proposition",
+          "type": "string"
+        },
+        "refutes_claim_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Refutes Claim Id"
+        },
+        "source_event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Event Id"
+        },
+        "speaker_id": {
+          "format": "uuid",
+          "title": "Speaker Id",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "speaker_id",
+        "proposition"
+      ],
+      "title": "Claim",
       "type": "object"
     },
     "CommittedEffect": {
