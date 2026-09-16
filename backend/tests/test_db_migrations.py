@@ -23,7 +23,7 @@ from worldsim.infrastructure.db.verify import (
 from worldsim.infrastructure.settings import Settings
 
 SCRATCH_DB = "worldsim_migtest"
-HEAD = "0009_event_seed_bigint"
+HEAD = "0010_dnd_monsters"
 
 
 def _migrations_dir() -> Path:

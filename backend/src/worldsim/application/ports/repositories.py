@@ -13,7 +13,7 @@ from uuid import UUID
 from worldsim.domain.characters import Character, CharacterCard
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.narration import NarrationBeat
-from worldsim.domain.party import PartyMember
+from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.perception import Observation, RecentMemory
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot
 from worldsim.domain.rules.dnd import Sheet
@@ -66,6 +66,14 @@ class PartyRepository(Protocol):
     async def save_sheet(
         self, member_id: UUID, sheet: Sheet, expected_version: int
     ) -> PartyMember: ...
+
+
+class MonsterRepository(Protocol):
+    async def list_for_world(self, world_id: UUID) -> list[Monster]: ...
+    async def add(self, monster: Monster) -> None: ...
+    async def save_hp(
+        self, monster_id: UUID, hp_current: int, expected_version: int
+    ) -> Monster: ...
 
 
 class PhaseRepository(Protocol):

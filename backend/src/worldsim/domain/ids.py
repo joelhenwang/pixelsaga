@@ -30,6 +30,7 @@ ReactionId = UUID
 ResolutionId = UUID
 NarrationId = UUID
 PartyMemberId = UUID
+MonsterId = UUID
 
 
 def new_world_id() -> WorldId:
@@ -41,6 +42,10 @@ def new_character_id() -> CharacterId:
 
 
 def new_party_member_id() -> PartyMemberId:
+    return uuid4()
+
+
+def new_monster_id() -> MonsterId:
     return uuid4()
 
 

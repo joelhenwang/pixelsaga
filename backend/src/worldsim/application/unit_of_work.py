@@ -10,6 +10,7 @@ from worldsim.application.ports.repositories import (
     CommandRepository,
     EventRepository,
     LocationRepository,
+    MonsterRepository,
     OutboxRepository,
     PartyRepository,
     PerceptionRepository,
@@ -31,6 +32,8 @@ class UnitOfWork(Protocol):
     def characters(self) -> CharacterRepository: ...
     @property
     def party(self) -> PartyRepository: ...
+    @property
+    def monsters(self) -> MonsterRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property

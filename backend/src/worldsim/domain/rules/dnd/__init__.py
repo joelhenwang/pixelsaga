@@ -22,6 +22,8 @@ from worldsim.domain.rules.dnd.combat import (
 from worldsim.domain.rules.dnd.combat_resolve import (
     CombatBeat,
     CombatReport,
+    MonsterResult,
+    MonsterState,
     TagOutcome,
     resolve_narration_tags,
 )
@@ -157,6 +159,8 @@ __all__ = [
     "SpellDamage",
     "SpellLimits",
     "SpellSave",
+    "MonsterResult",
+    "MonsterState",
     "TagOutcome",
     "apply_damage",
     "armor_ac",

@@ -87,9 +87,11 @@ from worldsim.domain.ids import (
     derive_combat_event_id,
     derive_intent_id,
     derive_task_id,
+    new_monster_id,
     new_narration_id,
 )
 from worldsim.domain.narration import NarrationBeat
+from worldsim.domain.party import Monster
 from worldsim.domain.perception import (
     Disclosure,
     FactChannel,
@@ -100,6 +102,7 @@ from worldsim.domain.perception import (
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot, SnapshotCharacter
 from worldsim.domain.rules.dnd import (
     DataTables,
+    MonsterState,
     build_sheet_summary,
     dnd_party_prompt,
     dnd_rules_text,
@@ -1032,6 +1035,7 @@ class Stage1Orchestrator:
             roster = await uow.party.list_for_world(world_id)
             if not roster:
                 return "no-party"
+            live_monsters = await uow.monsters.list_for_world(world_id)
             run = await uow.phases.get_run(run_id)
         tables = self._dnd_tables()
         digest = hashlib.sha256(str(event_id).encode()).digest()[:8]
@@ -1043,6 +1047,16 @@ class Stage1Orchestrator:
                     [member.sheet for member in roster],
                     tables,
                     random.Random(seed).random,
+                    live=[
+                        MonsterState(
+                            key=monster.name_key,
+                            name=monster.name,
+                            hp_current=monster.hp_current,
+                            hp_max=monster.hp_max,
+                            ac=monster.ac,
+                        )
+                        for monster in live_monsters
+                    ],
                 )
                 if not report.outcomes and not report.unresolved:
                     return "no-tags"
@@ -1063,6 +1077,28 @@ class Stage1Orchestrator:
                         for key in sorted(touched):
                             member = by_key[key]
                             await uow.party.save_sheet(member.id, working[key], member.version)
+                        pools = {monster.name_key: monster for monster in live_monsters}
+                        for key in sorted(report.monsters):
+                            result = report.monsters[key]
+                            pool = pools.get(key)
+                            if pool is None:
+                                await uow.monsters.add(
+                                    Monster(
+                                        id=new_monster_id(),
+                                        world_id=world_id,
+                                        name_key=key,
+                                        name=result.name,
+                                        hp_current=result.hp_current,
+                                        hp_max=result.hp_max,
+                                        ac=result.ac,
+                                    )
+                                )
+                            elif (
+                                pool.hp_current != result.hp_current
+                                or pool.hp_max != result.hp_max
+                                or result.spawned
+                            ):
+                                await uow.monsters.save_hp(pool.id, result.hp_current, pool.version)
                         combat_id = derive_combat_event_id(event_id)
                         sequence = await uow.events.max_sequence(world_id) + 1
                         involved = {

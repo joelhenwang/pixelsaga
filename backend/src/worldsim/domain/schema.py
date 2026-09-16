@@ -30,7 +30,7 @@ from worldsim.domain import (
     tracing,
     world,
 )
-from worldsim.domain.party import PartyMember
+from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.rules.dnd import Sheet
 
 SCHEMA_VERSION = 1
@@ -87,6 +87,7 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     events.WorldEvent,
     events.CommittedEffect,
     events.WorldEventRecord,
+    Monster,
     PartyMember,
     Sheet,
     tracing.ManifestSource,

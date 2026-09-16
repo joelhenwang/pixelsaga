@@ -2351,6 +2351,66 @@
       "title": "ModelCall",
       "type": "object"
     },
+    "Monster": {
+      "additionalProperties": false,
+      "description": "One persistent monster pool per world and name key.\n\nNarrator tags address monsters by name only, so one row tracks the\nlive pool for a key. A new ENCOUNTER respawns the key to full: a\nfresh pack, not the survivors of the last fight.",
+      "properties": {
+        "ac": {
+          "minimum": 0,
+          "title": "Ac",
+          "type": "integer"
+        },
+        "hp_current": {
+          "minimum": 0,
+          "title": "Hp Current",
+          "type": "integer"
+        },
+        "hp_max": {
+          "minimum": 0,
+          "title": "Hp Max",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "name_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name Key",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "name_key",
+        "name",
+        "hp_current",
+        "hp_max",
+        "ac"
+      ],
+      "title": "Monster",
+      "type": "object"
+    },
     "MoveAction": {
       "additionalProperties": false,
       "properties": {

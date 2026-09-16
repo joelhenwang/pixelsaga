@@ -81,10 +81,34 @@ class TagOutcome:
 
 
 @dataclass(frozen=True)
+class MonsterState:
+    """Live pool carried in: one row per world and name key."""
+
+    key: str
+    name: str
+    hp_current: int
+    hp_max: int
+    ac: int
+
+
+@dataclass(frozen=True)
+class MonsterResult:
+    """Pool to persist: working HP plus the max/AC that own it."""
+
+    key: str
+    name: str
+    hp_current: int
+    hp_max: int
+    ac: int
+    spawned: bool
+
+
+@dataclass(frozen=True)
 class CombatReport:
     outcomes: list[TagOutcome] = field(default_factory=list)
     hp: dict[str, int] = field(default_factory=dict)
     conditions: dict[str, list[str]] = field(default_factory=dict)
+    monsters: dict[str, MonsterResult] = field(default_factory=dict)
     beats: list[CombatBeat] = field(default_factory=list)
     unresolved: list[str] = field(default_factory=list)
 
@@ -148,8 +172,14 @@ def resolve_narration_tags(
     sheets: list[Sheet],
     tables: DataTables,
     rng: Callable[[], float] | None = None,
+    live: list[MonsterState] | None = None,
 ) -> CombatReport:
-    """Resolve every combat tag in narration order. Inputs are never mutated."""
+    """Resolve every combat tag in narration order. Inputs are never mutated.
+
+    ``monsters`` carries live pools from earlier scenes; unknown keys
+    start at the table maximum and a fresh ENCOUNTER respawns its keys
+    to full.
+    """
     if not text or not sheets:
         return CombatReport()
     order = list(sheets)
@@ -159,7 +189,13 @@ def resolve_narration_tags(
     key_of = {id(sheet): key for sheet, key in zip(order, keys, strict=True)}
     monsters = table(tables, "monsters")
     weapons = table(tables, "weapons")
-    monster_hp: dict[str, int] = {}
+    carried = {state.key: state for state in live or []}
+    monster_hp = {
+        key: max(0, min(state.hp_current, state.hp_max)) for key, state in carried.items()
+    }
+    monster_meta: dict[str, _MonsterTarget] = {}
+    for key, state in carried.items():
+        monster_meta[key] = _MonsterTarget(label=state.name, ac=state.ac, hp=state.hp_max, key=key)
     outcomes: list[TagOutcome] = []
     beats: list[CombatBeat] = []
     unresolved: list[str] = []
@@ -185,10 +221,16 @@ def resolve_narration_tags(
         hp_updates[key_of[id(sheet)]] = after
         return before, after
 
+    damaged: set[str] = set()
+    spawned: set[str] = set()
+
     def hurt_monster(target: _MonsterTarget, amount: int) -> tuple[int, int]:
+        monster_meta.setdefault(target.key, target)
         start = monster_hp.get(target.key, target.hp)
         after = max(0, start - amount)
         monster_hp[target.key] = after
+        if after != start:
+            damaged.add(target.key)
         return start, after
 
     for match in _TAG_RE.finditer(text):
@@ -203,6 +245,17 @@ def resolve_narration_tags(
                 [MonsterRef(index=r.index, count=r.count) for r in refs],
                 tables,
             )
+            for ref in refs:
+                encounter_row = entry(monsters, ref.index)
+                fresh = _MonsterTarget(
+                    label=str(encounter_row.get("name", ref.name)),
+                    ac=int_field(encounter_row, "ac", 10),
+                    hp=int_field(encounter_row, "hp"),
+                    key=ref.index,
+                )
+                monster_hp[ref.index] = fresh.hp
+                monster_meta[ref.index] = fresh
+                spawned.add(ref.index)
             described = ", ".join(f"{r.count}x {r.name}" if r.count > 1 else r.name for r in refs)
             outcomes.append(
                 TagOutcome(
@@ -437,10 +490,23 @@ def resolve_narration_tags(
             continue
         unresolved.append(match.group(0))
 
+    persisted = {
+        key: MonsterResult(
+            key=key,
+            name=monster_meta[key].label,
+            hp_current=monster_hp[key],
+            hp_max=monster_meta[key].hp,
+            ac=monster_meta[key].ac,
+            spawned=key in spawned,
+        )
+        for key in sorted(set(spawned) | damaged)
+        if key in monster_meta and key in monster_hp
+    }
     return CombatReport(
         outcomes=outcomes,
         hp=hp_updates,
         conditions=new_conditions,
+        monsters=persisted,
         beats=beats,
         unresolved=unresolved,
     )

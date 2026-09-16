@@ -335,8 +335,16 @@ mask), persists HP/conditions through version-guarded saves, and
 records one `ACTION_RESOLVED` world event (seed, algorithm, roll log)
 plus deterministic outcome beats. Combat event IDs derive from the
 source event, so a double resolve collides instead of double-applying.
-Monster HP does not persist across scenes. Migration 0009 widens
-`world_event.random_seed` to 64-bit.
+Migration 0009 widens `world_event.random_seed` to 64-bit.
+
+## D&D monster pools (DND-MONSTER)
+
+`dnd_monster` (migration 0010) keeps one live HP pool per world and
+monster key. The resolver takes live pools in and returns the touched
+ones out; the applier upserts them through version-guarded saves in
+the same retry loop as party HP. A fresh ENCOUNTER respawns its keys
+to full (a new pack, not the survivors); scenes without one continue
+the persisted HP, including across scenes. No XP awards yet.
 
 ## D&D surface reads (DND-Surface)
 

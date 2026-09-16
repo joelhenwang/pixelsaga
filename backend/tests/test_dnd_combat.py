@@ -13,6 +13,7 @@ from pathlib import Path
 
 from worldsim.domain.rules.dnd import (
     HitPoints,
+    MonsterState,
     Sheet,
     load_data,
     resolve_narration_tags,
@@ -162,3 +163,45 @@ def test_seeded_streams_replay() -> None:
     first = resolve_narration_tags(text, [_borin(), _elara()], DATA, random.Random(7).random)
     second = resolve_narration_tags(text, [_borin(), _elara()], DATA, random.Random(7).random)
     assert first == second
+
+
+def _goblin(current: int) -> MonsterState:
+    return MonsterState(key="goblin", name="Goblin", hp_current=current, hp_max=7, ac=15)
+
+
+def test_carried_pool_continues_across_scenes() -> None:
+    report = resolve_narration_tags(
+        "ATTACK[longsword at goblin]", [_borin()], DATA, _rng(0.5, 0.5),
+        live=[_goblin(2)],
+    )
+    assert report.outcomes[0].text == "Borin hits Goblin for 5 slashing. (2->0 HP)"
+    pool = report.monsters["goblin"]
+    assert (pool.hp_current, pool.hp_max, pool.spawned) == (0, 7, False)
+
+
+def test_fresh_encounter_respawns_pool() -> None:
+    report = resolve_narration_tags(
+        "ENCOUNTER[goblin]\nATTACK[longsword at goblin]",
+        [_borin()], DATA, _rng(0.5, 0.5), live=[_goblin(2)],
+    )
+    assert report.outcomes[1].text == "Borin hits Goblin for 5 slashing. (7->2 HP)"
+    pool = report.monsters["goblin"]
+    assert (pool.hp_current, pool.spawned) == (2, True)
+
+
+def test_untouched_pool_not_persisted() -> None:
+    report = resolve_narration_tags(
+        "CONDITION[poisoned on Borin for 2 rounds]", [_borin()], DATA, _rng(),
+        live=[_goblin(2)],
+    )
+    assert report.monsters == {}
+    assert report.conditions == {"borin": ["Poisoned"]}
+
+
+def test_dead_pool_stays_down() -> None:
+    report = resolve_narration_tags(
+        "ATTACK[longsword at goblin]", [_borin()], DATA, _rng(0.5, 0.5),
+        live=[_goblin(0)],
+    )
+    assert report.outcomes[0].text == "Borin hits Goblin for 5 slashing. (0->0 HP)"
+    assert report.monsters == {}

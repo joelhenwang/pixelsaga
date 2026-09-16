@@ -95,6 +95,8 @@ def test_user_prompt_carries_dnd_block() -> None:
 
 def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeGateway]) -> None:
     import hashlib
+
+    from worldsim.domain.rules.dnd import MonsterState as MonsterStateModel
     import random
 
     client, gateway = wire
@@ -116,19 +118,26 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
     assert begun.status_code == 200, begun.text
 
     snapshot = str(ids["world"])
-    combat_text = (
+    narration_texts = [
         "Borin advances.\n"
         "ENCOUNTER[2x goblin]\n"
         "ATTACK[longsword at goblin]\n"
         "ATTACK[handaxe at goblin]\n"
-        "CONDITION[poisoned on Borin for 2 rounds]"
-    )
+        "CONDITION[poisoned on Borin for 2 rounds]",
+        "Borin presses on.\nATTACK[longsword at goblin]",
+    ]
+    combat_text = narration_texts[0]
 
     def _route(request: Any) -> str | None:
         prompt, system = request.prompt, request.system or ""
         if "You narrate" in system:
             return json.dumps(
-                [{"text": combat_text, "cited_fact_keys": ["attempt:wait", "dnd-sheet:borin"]}]
+                [
+                    {
+                        "text": narration_texts[0],
+                        "cited_fact_keys": ["attempt:wait", "dnd-sheet:borin"],
+                    }
+                ]
             )
         if "You resolve" in system:
             return json.dumps(
@@ -188,25 +197,11 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
     # Recompute the expected report from the pre-combat sheets and seed.
     from worldsim.domain.rules.dnd import Sheet as SheetModel
 
-    before = asyncio.run(_roster_sheets())
-    seed = int.from_bytes(hashlib.sha256(str(scene_event).encode()).digest()[:8], "big") & (
-        (1 << 63) - 1
-    )
-    expected = resolve_narration_tags(
-        combat_text,
-        [SheetModel.model_validate(before["borin"])],
-        tables,
-        random.Random(seed).random,
-    )
-    after = asyncio.run(_roster_sheets())
-    assert after["borin"]["hp"]["current"] == before["borin"]["hp"]["current"]
-    assert after["borin"]["conditions"] == ["Poisoned"]
-
-    async def _combat_records() -> dict[str, Any]:
+    async def _combat_records_for(event_id: UUID) -> dict[str, Any]:
         engine = create_engine(Settings())
         try:
             async with create_unit_of_work(engine) as uow:
-                combat_id = derive_combat_event_id(scene_event)
+                combat_id = derive_combat_event_id(event_id)
                 event = await uow.events.get_event(combat_id)
                 beats = await uow.scenes.narrations_for_event(combat_id)
                 return {
@@ -218,6 +213,54 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
                 }
         finally:
             await engine.dispose()
+
+    before = asyncio.run(_roster_sheets())
+    borin_sheet = SheetModel.model_validate(before["borin"])
+
+    def _seed_for(event_id: UUID) -> int:
+        return int.from_bytes(
+            hashlib.sha256(str(event_id).encode()).digest()[:8], "big"
+        ) & ((1 << 63) - 1)
+
+    # Every scene narrated the same combat text, so replay each scene in
+    # order, carrying pools forward exactly as the applier does.
+    scene_ids = [UUID(entry["event_id"]) for entry in response.json()["scenes"]]
+    assert scene_ids[0] == scene_event
+    live_states: list[MonsterStateModel] = []
+    for scene_id in scene_ids:
+        rep = resolve_narration_tags(
+            combat_text,
+            [borin_sheet],
+            tables,
+            random.Random(_seed_for(scene_id)).random,
+            live=live_states,
+        )
+        scene_records = asyncio.run(_combat_records_for(scene_id))
+        assert scene_records["beats"] == [b.text for b in rep.beats]
+        merged = {state.key: state for state in live_states}
+        for key, result in rep.monsters.items():
+            merged[key] = MonsterStateModel(
+                key,
+                result.name,
+                result.hp_current,
+                result.hp_max,
+                result.ac,
+            )
+        live_states = sorted(merged.values(), key=lambda state: state.key)
+    seed = _seed_for(scene_event)
+    expected = resolve_narration_tags(
+        combat_text,
+        [borin_sheet],
+        tables,
+        random.Random(seed).random,
+    )
+    after = asyncio.run(_roster_sheets())
+    assert after["borin"]["hp"]["current"] == before["borin"]["hp"]["current"]
+    assert after["borin"]["conditions"] == ["Poisoned"]
+
+
+    async def _combat_records() -> dict[str, Any]:
+        return await _combat_records_for(scene_event)
 
     records = asyncio.run(_combat_records())
     assert records["type"] == "action_resolved"
@@ -233,6 +276,52 @@ def test_combat_tags_resolve_to_hp_events_and_beats(wire: tuple[ApiClient, FakeG
     borin = roster.json()["members"][0]
     assert borin["conditions"] == ["Poisoned"]
     assert borin["hp_current"] == after["borin"]["hp"]["current"]
+
+    # A second scene without ENCOUNTER continues the persisted pool.
+    async def _live_monsters() -> list[dict[str, Any]]:
+        engine = create_engine(Settings())
+        try:
+            async with create_unit_of_work(engine) as uow:
+                return [m.model_dump() for m in await uow.monsters.list_for_world(ids["world"])]
+        finally:
+            await engine.dispose()
+
+    pools = asyncio.run(_live_monsters())
+    assert [p["name_key"] for p in pools] == ["goblin"]
+    assert pools[0]["hp_current"] == live_states[0].hp_current
+    assert pools[0]["hp_max"] == live_states[0].hp_max
+
+    narration_texts.pop(0)
+    second = client.post(
+        "/api/v1/stage1/advance",
+        json={"world_id": str(ids["world"]), "absolute_index": 2},
+        headers=headers,
+    )
+    assert second.status_code == 200, second.text
+    second_borin = SheetModel.model_validate(asyncio.run(_roster_sheets())["borin"])
+    for entry in second.json()["scenes"]:
+        scene_id = UUID(entry["event_id"])
+        rep = resolve_narration_tags(
+            narration_texts[0],
+            [second_borin],
+            tables,
+            random.Random(_seed_for(scene_id)).random,
+            live=live_states,
+        )
+        scene_records = asyncio.run(_combat_records_for(scene_id))
+        assert scene_records["beats"] == [b.text for b in rep.beats]
+        merged = {state.key: state for state in live_states}
+        for key, result in rep.monsters.items():
+            merged[key] = MonsterStateModel(
+                key,
+                result.name,
+                result.hp_current,
+                result.hp_max,
+                result.ac,
+            )
+        live_states = sorted(merged.values(), key=lambda state: state.key)
+    pools_after = asyncio.run(_live_monsters())
+    assert pools_after[0]["hp_current"] == live_states[0].hp_current
 
 
 def test_party_context_and_recruit_flow(wire: tuple[ApiClient, FakeGateway]) -> None:
