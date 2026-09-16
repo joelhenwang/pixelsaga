@@ -575,6 +575,100 @@ class DeityOverrideView(BaseModel):
     retcon: bool
 
 
+class TimelineEntry(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    sequence: int
+    event_id: UUID
+    event_type: str
+    absolute_index: int
+    snippet: str | None = None
+
+
+class TimelineResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    entries: list[TimelineEntry] = Field(default_factory=list)
+    total: int
+
+
+class MapRoute(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    to_location_id: UUID
+    duration_phases: int
+
+
+class MapPlace(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    name: str
+    region: str
+    discovered: bool
+    routes: list[MapRoute] = Field(default_factory=list)
+    occupants: list[str] = Field(default_factory=list)
+
+
+class MapResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    places: list[MapPlace] = Field(default_factory=list)
+
+
+class DiaryEntry(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: str
+    phase: int
+    text: str
+
+
+class DiaryResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    character_id: UUID
+    observations: list[DiaryEntry] = Field(default_factory=list)
+    memories: list[DiaryEntry] = Field(default_factory=list)
+    summaries: list[DiaryEntry] = Field(default_factory=list)
+
+
+class HookView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    title: str
+    status: str
+
+
+class ArcView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    title: str
+    status: str
+
+
+class HookListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    hooks: list[HookView] = Field(default_factory=list)
+    arcs: list[ArcView] = Field(default_factory=list)
+
+
+class OperationsStatus(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    open_run_id: UUID | None
+    open_run_state: str | None
+    pending_outbox: int
+    total_events: int
+
+
 class PartyRosterResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 

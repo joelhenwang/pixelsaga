@@ -19,7 +19,7 @@ from worldsim.interfaces.http import schemas as api
 router = APIRouter(tags=["roles"])
 
 
-async def _effective_role(request: Request, world_id: UUID) -> tuple[str, UUID | None]:
+async def effective_role(request: Request, world_id: UUID) -> tuple[str, UUID | None]:
     """Grant-selected role wins; otherwise the request header decides."""
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
@@ -33,7 +33,7 @@ async def _effective_role(request: Request, world_id: UUID) -> tuple[str, UUID |
     return header_role, None
 
 
-def _require_role(role: str, *allowed: str) -> None:
+def require_role(role: str, *allowed: str) -> None:
     if role not in allowed:
         raise DomainError(ErrorCode.FORBIDDEN, f"{role} cannot use this command")
 
@@ -104,8 +104,8 @@ async def read_role(world_id: UUID, request: Request) -> api.RoleGrantView | Non
 @router.post("/stage2/director/proposals", response_model=api.DirectorProposalView)
 async def propose(body: api.DirectorProposalRequest, request: Request) -> api.DirectorProposalView:
     """A user Director proposal through the same validation as model ones."""
-    role, _viewer = await _effective_role(request, body.world_id)
-    _require_role(role, "director")
+    role, _viewer = await effective_role(request, body.world_id)
+    require_role(role, "director")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         characters = await uow.characters.list_for_world(body.world_id)
@@ -155,8 +155,8 @@ async def propose(body: api.DirectorProposalRequest, request: Request) -> api.Di
 @router.post("/stage2/deity/overrides", response_model=api.DeityOverrideView)
 async def override(body: api.DeityOverrideRequest, request: Request) -> api.DeityOverrideView:
     """A typed deity patch through one audited canonical commit."""
-    role, _viewer = await _effective_role(request, body.world_id)
-    _require_role(role, "deity")
+    role, _viewer = await effective_role(request, body.world_id)
+    require_role(role, "deity")
     try:
         life_status = LifeStatus(body.life_status) if body.life_status else None
     except ValueError as exc:

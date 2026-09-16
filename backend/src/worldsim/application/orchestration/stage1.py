@@ -324,8 +324,15 @@ class Stage1Orchestrator:
             over_budget = await self._over_budget(world_id, run_id)
             outcomes.append(
                 await self._commit_scene(
-                    world_id, run_id, index, sealed, scene, intents, names,
-                    quiet, over_budget,
+                    world_id,
+                    run_id,
+                    index,
+                    sealed,
+                    scene,
+                    intents,
+                    names,
+                    quiet,
+                    over_budget,
                 )
             )
         await self._set_state(run_id, PhaseRunState.SCENES_COMMITTED)

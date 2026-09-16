@@ -256,10 +256,11 @@ def test_seven_days_survive_injected_failure(migrated_db: None) -> None:
 
     _run(_inner())
 
+
 def test_quiet_party_still_narrates(migrated_db: None) -> None:
     """Suppression never starves model-authored combat and recruit tags."""
-    from worldsim.domain.party import PartyMember, party_name_key
     from worldsim.domain.ids import new_party_member_id
+    from worldsim.domain.party import PartyMember, party_name_key
     from worldsim.domain.rules.dnd import Sheet
 
     async def _inner() -> None:
@@ -274,10 +275,11 @@ def test_quiet_party_still_narrates(migrated_db: None) -> None:
                         name="Borin",
                         name_key=party_name_key("Borin"),
                         sheet=Sheet(
-                            name="Borin", race="dwarf", character_class="fighter",
+                            name="Borin",
+                            race="dwarf",
+                            character_class="fighter",
                             level=1,
-                            stats={"str": 16, "dex": 12, "con": 15, "int": 8,
-                                   "wis": 11, "cha": 10},
+                            stats={"str": 16, "dex": 12, "con": 15, "int": 8, "wis": 11, "cha": 10},
                             weapons=["longsword"],
                         ),
                     )

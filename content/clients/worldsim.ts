@@ -323,6 +323,78 @@ export interface DeityOverrideView {
   world_id: string;
 }
 
+export interface TimelineEntry {
+  absolute_index: number;
+  event_id: string;
+  event_type: string;
+  sequence: number;
+  snippet?: string | null;
+}
+
+export interface TimelineResponse {
+  entries?: TimelineEntry[] | null;
+  total: number;
+  world_id: string;
+}
+
+export interface MapRoute {
+  duration_phases: number;
+  to_location_id: string;
+}
+
+export interface MapPlace {
+  discovered: boolean;
+  id: string;
+  name: string;
+  occupants?: string[] | null;
+  region: string;
+  routes?: MapRoute[] | null;
+}
+
+export interface MapResponse {
+  places?: MapPlace[] | null;
+  world_id: string;
+}
+
+export interface DiaryEntry {
+  kind: string;
+  phase: number;
+  text: string;
+}
+
+export interface DiaryResponse {
+  character_id: string;
+  memories?: DiaryEntry[] | null;
+  observations?: DiaryEntry[] | null;
+  summaries?: DiaryEntry[] | null;
+}
+
+export interface HookView {
+  id: string;
+  status: string;
+  title: string;
+}
+
+export interface ArcView {
+  id: string;
+  status: string;
+  title: string;
+}
+
+export interface HookListResponse {
+  arcs?: ArcView[] | null;
+  hooks?: HookView[] | null;
+  world_id: string;
+}
+
+export interface OperationsStatus {
+  open_run_id: string;
+  open_run_state: string;
+  pending_outbox: number;
+  total_events: number;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -362,5 +434,11 @@ export const ROUTES = {
   readRole: "GET /api/v1/stage2/roles",
   proposeDirectorHook: "POST /api/v1/stage2/director/proposals",
   applyDeityOverride: "POST /api/v1/stage2/deity/overrides",
+  listTimeline: "GET /api/v1/stage2/timeline",
+  readMap: "GET /api/v1/stage2/map",
+  readDiary: "GET /api/v1/stage2/characters/{character_id}/diary",
+  listCharacterActivities: "GET /api/v1/stage2/characters/{character_id}/activities",
+  listDirectorHooks: "GET /api/v1/stage2/director/hooks",
+  readOperationsStatus: "GET /api/v1/stage2/operations/status",
   listEvents: "GET /api/v1/world/events",
 } as const;

@@ -33,6 +33,7 @@ from worldsim.interfaces.http.routes import (
     relationships,
     roles,
     stage1,
+    stage2,
     world,
 )
 from worldsim.interfaces.http.state import (
@@ -90,4 +91,5 @@ def create_app(
     app.include_router(knowledge.router, prefix="/api/v1")
     app.include_router(progress.router, prefix="/api/v1")
     app.include_router(roles.router, prefix="/api/v1")
+    app.include_router(stage2.router, prefix="/api/v1")
     return app

@@ -60,6 +60,17 @@ WANTED = (
     "DirectorProposalView",
     "DeityOverrideRequest",
     "DeityOverrideView",
+    "TimelineEntry",
+    "TimelineResponse",
+    "MapRoute",
+    "MapPlace",
+    "MapResponse",
+    "DiaryEntry",
+    "DiaryResponse",
+    "HookView",
+    "ArcView",
+    "HookListResponse",
+    "OperationsStatus",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -93,6 +104,12 @@ ROUTES = (
     ("get", "/api/v1/stage2/roles", "readRole"),
     ("post", "/api/v1/stage2/director/proposals", "proposeDirectorHook"),
     ("post", "/api/v1/stage2/deity/overrides", "applyDeityOverride"),
+    ("get", "/api/v1/stage2/timeline", "listTimeline"),
+    ("get", "/api/v1/stage2/map", "readMap"),
+    ("get", "/api/v1/stage2/characters/{character_id}/diary", "readDiary"),
+    ("get", "/api/v1/stage2/characters/{character_id}/activities", "listCharacterActivities"),
+    ("get", "/api/v1/stage2/director/hooks", "listDirectorHooks"),
+    ("get", "/api/v1/stage2/operations/status", "readOperationsStatus"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

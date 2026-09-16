@@ -48,6 +48,19 @@ class SqlAlchemyActivityRepository:
         ).scalars()
         return [self._to_domain(row) for row in rows]
 
+    async def list_for_character(self, world_id: UUID, character_id: UUID) -> list[Activity]:
+        rows = (
+            await self._session.execute(
+                select(ActivityRow)
+                .where(
+                    ActivityRow.world_id == world_id,
+                    ActivityRow.character_id == character_id,
+                )
+                .order_by(ActivityRow.start_absolute)
+            )
+        ).scalars()
+        return [self._to_domain(row) for row in rows]
+
     async def add(self, activity: Activity) -> None:
         self._session.add(
             ActivityRow(

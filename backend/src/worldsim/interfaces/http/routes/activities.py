@@ -23,7 +23,7 @@ router = APIRouter(tags=["activities"])
 _ACTIVITY_ADAPTER: TypeAdapter[api.ActivityStartRequest] = TypeAdapter(api.ActivityStartRequest)
 
 
-def _activity_view(member: Activity) -> api.ActivityView:
+def activity_view(member: Activity) -> api.ActivityView:
     return api.ActivityView(
         id=member.id,
         world_id=member.world_id,
@@ -61,7 +61,7 @@ async def start(body: api.ActivityStartRequest, request: Request) -> api.Activit
             to_location_id=body.to_location_id,
             skill=body.skill,
         )
-    return _activity_view(activity)
+    return activity_view(activity)
 
 
 @router.post("/stage2/activities/{activity_id}/interrupt", response_model=api.ActivityView)
@@ -73,7 +73,7 @@ async def interrupt(activity_id: UUID, request: Request) -> api.ActivityView:
     now = await _absolute_now(request, world_id)
     async with state.uow_factory()() as uow:
         result = await interrupt_activity(uow, activity_id, now)
-    return _activity_view(result.activity)
+    return activity_view(result.activity)
 
 
 @router.post("/stage2/activities/{activity_id}/resume", response_model=api.ActivityView)
@@ -85,7 +85,7 @@ async def resume(activity_id: UUID, request: Request) -> api.ActivityView:
     now = await _absolute_now(request, world_id)
     async with state.uow_factory()() as uow:
         result = await resume_activity(uow, activity_id, now)
-    return _activity_view(result.activity)
+    return activity_view(result.activity)
 
 
 @router.post("/stage2/activities/{activity_id}/cancel", response_model=api.ActivityView)
@@ -94,7 +94,7 @@ async def cancel(activity_id: UUID, request: Request) -> api.ActivityView:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         result = await cancel_activity(uow, activity_id)
-    return _activity_view(result.activity)
+    return activity_view(result.activity)
 
 
 @router.get("/stage2/activities", response_model=api.ActivityListResponse)
@@ -103,4 +103,4 @@ async def list_activities(world_id: UUID, request: Request) -> api.ActivityListR
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         actives = await uow.activities.list_active_for_world(world_id)
-    return api.ActivityListResponse(world_id=world_id, members=[_activity_view(a) for a in actives])
+    return api.ActivityListResponse(world_id=world_id, members=[activity_view(a) for a in actives])

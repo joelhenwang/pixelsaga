@@ -365,6 +365,17 @@ and malformed output fall back to structural counts. Versions
 accumulate per (world, owner, day); raw observations and memories
 are never touched, and summary failures never fail the phase.
 
+## Stage 2 reads (S2-API-001)
+
+Timeline (visibility-filtered events with narration snippets),
+map (discovered ground plus presence for players, everything for
+watchers), diary (observations, memories, summaries, holder or
+watcher only), character activities, director-side hooks/arcs
+(players learn through scenes, 403 here), and operations counts.
+Stale writes conflict with 409. Goals and mode selection wait
+for CAST-001 and the auto loop; server push stays cursor polling
+until the UI needs it.
+
 ## Orchestration (S2-ORCH-001)
 
 Quiet phases (empty or all WAIT) skip narrator model calls and

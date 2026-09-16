@@ -231,6 +231,31 @@
         "title": "AdvanceResult",
         "type": "object"
       },
+      "ArcView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status"
+        ],
+        "title": "ArcView",
+        "type": "object"
+      },
       "AttemptView": {
         "additionalProperties": false,
         "properties": {
@@ -821,6 +846,66 @@
         "title": "DependencyCheck",
         "type": "object"
       },
+      "DiaryEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "phase",
+          "text"
+        ],
+        "title": "DiaryEntry",
+        "type": "object"
+      },
+      "DiaryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "memories": {
+            "items": {
+              "$ref": "#/components/schemas/DiaryEntry"
+            },
+            "title": "Memories",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/DiaryEntry"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "summaries": {
+            "items": {
+              "$ref": "#/components/schemas/DiaryEntry"
+            },
+            "title": "Summaries",
+            "type": "array"
+          }
+        },
+        "required": [
+          "character_id"
+        ],
+        "title": "DiaryResponse",
+        "type": "object"
+      },
       "DirectorProposalRequest": {
         "additionalProperties": false,
         "properties": {
@@ -993,6 +1078,60 @@
           }
         },
         "title": "HealthLiveResponse",
+        "type": "object"
+      },
+      "HookListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "arcs": {
+            "items": {
+              "$ref": "#/components/schemas/ArcView"
+            },
+            "title": "Arcs",
+            "type": "array"
+          },
+          "hooks": {
+            "items": {
+              "$ref": "#/components/schemas/HookView"
+            },
+            "title": "Hooks",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "HookListResponse",
+        "type": "object"
+      },
+      "HookView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "status"
+        ],
+        "title": "HookView",
         "type": "object"
       },
       "IntentView": {
@@ -1175,6 +1314,92 @@
         "title": "ItemView",
         "type": "object"
       },
+      "MapPlace": {
+        "additionalProperties": false,
+        "properties": {
+          "discovered": {
+            "title": "Discovered",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "occupants": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Occupants",
+            "type": "array"
+          },
+          "region": {
+            "title": "Region",
+            "type": "string"
+          },
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/MapRoute"
+            },
+            "title": "Routes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "region",
+          "discovered"
+        ],
+        "title": "MapPlace",
+        "type": "object"
+      },
+      "MapResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/MapPlace"
+            },
+            "title": "Places",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "MapResponse",
+        "type": "object"
+      },
+      "MapRoute": {
+        "additionalProperties": false,
+        "properties": {
+          "duration_phases": {
+            "title": "Duration Phases",
+            "type": "integer"
+          },
+          "to_location_id": {
+            "format": "uuid",
+            "title": "To Location Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to_location_id",
+          "duration_phases"
+        ],
+        "title": "MapRoute",
+        "type": "object"
+      },
       "ModelRunView": {
         "additionalProperties": false,
         "description": "Watcher-only model audit view: metadata, never raw hidden content.",
@@ -1249,6 +1474,56 @@
           "status"
         ],
         "title": "ModelRunView",
+        "type": "object"
+      },
+      "OperationsStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "open_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Run Id"
+          },
+          "open_run_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Run State"
+          },
+          "pending_outbox": {
+            "title": "Pending Outbox",
+            "type": "integer"
+          },
+          "total_events": {
+            "title": "Total Events",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "open_run_id",
+          "open_run_state",
+          "pending_outbox",
+          "total_events"
+        ],
+        "title": "OperationsStatus",
         "type": "object"
       },
       "ParticipantView": {
@@ -2246,6 +2521,74 @@
         "title": "TaskResponse",
         "type": "object"
       },
+      "TimelineEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet"
+          }
+        },
+        "required": [
+          "sequence",
+          "event_id",
+          "event_type",
+          "absolute_index"
+        ],
+        "title": "TimelineEntry",
+        "type": "object"
+      },
+      "TimelineResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineEntry"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "total"
+        ],
+        "title": "TimelineResponse",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -3240,6 +3583,94 @@
         ]
       }
     },
+    "/api/v1/stage2/characters/{character_id}/activities": {
+      "get": {
+        "description": "One character's undertakings, oldest first.",
+        "operationId": "character_activities_api_v1_stage2_characters__character_id__activities_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Character Activities",
+        "tags": [
+          "stage2"
+        ]
+      }
+    },
+    "/api/v1/stage2/characters/{character_id}/diary": {
+      "get": {
+        "description": "One owner's observations, memories, and summaries. Holder or watcher.",
+        "operationId": "diary_api_v1_stage2_characters__character_id__diary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiaryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Diary",
+        "tags": [
+          "stage2"
+        ]
+      }
+    },
     "/api/v1/stage2/claims": {
       "get": {
         "description": "Only claims the viewer could have heard: global or co-located.",
@@ -3373,6 +3804,50 @@
         "summary": "Override",
         "tags": [
           "roles"
+        ]
+      }
+    },
+    "/api/v1/stage2/director/hooks": {
+      "get": {
+        "description": "Open opportunities. Director-side: players learn through scenes.",
+        "operationId": "director_hooks_api_v1_stage2_director_hooks_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HookListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Director Hooks",
+        "tags": [
+          "stage2"
         ]
       }
     },
@@ -3572,6 +4047,94 @@
         "summary": "Transfer",
         "tags": [
           "progress"
+        ]
+      }
+    },
+    "/api/v1/stage2/map": {
+      "get": {
+        "description": "Places, routes, and occupants; players see discovered ground only.",
+        "operationId": "world_map_api_v1_stage2_map_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MapResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "World Map",
+        "tags": [
+          "stage2"
+        ]
+      }
+    },
+    "/api/v1/stage2/operations/status": {
+      "get": {
+        "description": "Counts only: open runs, pending outbox, committed events.",
+        "operationId": "operations_status_api_v1_stage2_operations_status_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OperationsStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Operations Status",
+        "tags": [
+          "stage2"
         ]
       }
     },
@@ -3816,6 +4379,73 @@
         "summary": "List Skills",
         "tags": [
           "progress"
+        ]
+      }
+    },
+    "/api/v1/stage2/timeline": {
+      "get": {
+        "description": "Committed events with narration snippets, newest last.",
+        "operationId": "timeline_api_v1_stage2_timeline_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "After",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimelineResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Timeline",
+        "tags": [
+          "stage2"
         ]
       }
     },
