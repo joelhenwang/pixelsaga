@@ -95,12 +95,13 @@ class AppState:
             NARRATOR_FAKE_PROFILE,
             REACTION_FAKE_PROFILE,
             RESOLVER_FAKE_PROFILE,
+            SUMMARY_FAKE_PROFILE,
         )
 
         factory = self.uow_factory()
         gateways = {
             role: self.gateway_factory()
-            for role in ("character", "reaction", "resolver", "narrator", "director")
+            for role in ("character", "reaction", "resolver", "narrator", "director", "summary")
         }
 
         def _for_role(role: str) -> FakeGateway:
@@ -118,6 +119,7 @@ class AppState:
                 "resolver": RESOLVER_FAKE_PROFILE,
                 "narrator": NARRATOR_FAKE_PROFILE,
                 "director": DIRECTOR_FAKE_PROFILE,
+                "summary": SUMMARY_FAKE_PROFILE,
             },
         )
 

@@ -27,7 +27,7 @@ import random
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import timedelta
-from typing import Protocol
+from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from sqlalchemy.exc import IntegrityError
@@ -67,6 +67,12 @@ from worldsim.application.graphs.resolve import (
 )
 from worldsim.application.graphs.runtime import invoke
 from worldsim.application.graphs.state import GraphInvocation
+from worldsim.application.graphs.summary import (
+    SUMMARY_PROMPT_VERSION,
+    SummaryGraphDeps,
+    build_summary_graph,
+    load_summary_prompt,
+)
 from worldsim.application.orchestration.service import derive_run_id, derive_snapshot_id
 from worldsim.application.ports.model_gateway import ModelGateway
 from worldsim.application.tasks.service import TaskService
@@ -119,6 +125,7 @@ from worldsim.domain.ids import (
     new_hook_id,
     new_monster_id,
     new_narration_id,
+    new_summary_id,
 )
 from worldsim.domain.narration import NarrationBeat
 from worldsim.domain.party import Monster
@@ -149,8 +156,9 @@ from worldsim.domain.rules.resources import rest_recovery, restore, spend
 from worldsim.domain.rules.scenes import assemble_scenes
 from worldsim.domain.rules.views import WorldView
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
+from worldsim.domain.summaries import DailySummary, day_range, fallback_text
 from worldsim.domain.tasks import Lease
-from worldsim.domain.time import absolute_index, utcnow
+from worldsim.domain.time import PHASES_PER_DAY, absolute_index, utcnow
 from worldsim.domain.tracing import ManifestSource
 
 DND_DATA_DIR = "content/dnd"
@@ -317,6 +325,8 @@ class Stage1Orchestrator:
         await self._set_state(run_id, PhaseRunState.SCENES_COMMITTED)
         self._fire("after_scenes_committed")
         await self._set_state(run_id, PhaseRunState.COMPLETED)
+        if index % PHASES_PER_DAY == PHASES_PER_DAY - 1:
+            await self._summarize_day(world_id, run_id, index, index // PHASES_PER_DAY + 1)
         return Stage1PhaseReport(
             run_id=run_id,
             world_id=world_id,
@@ -630,6 +640,133 @@ class Stage1Orchestrator:
                 await uow.commit()
             except DomainError:
                 pass
+
+    async def _summarize_day(self, world_id: UUID, run_id: UUID, index: int, day: int) -> int:
+        """Record one versioned summary per owner with same-day sources.
+
+        Runs after midnight commits and never fails the phase: each
+        owner is attempted independently, and model trouble falls back
+        to structural counts. Owners with no sources get no record.
+        """
+        start, end = day_range(day)
+        async with self._factory() as uow:
+            characters = [
+                c
+                for c in await uow.characters.list_for_world(world_id)
+                if c.life_status == LifeStatus.ALIVE
+            ]
+        written = 0
+        for character in sorted(characters, key=lambda c: c.id.hex):
+            try:
+                if await self._summarize_owner(world_id, run_id, character, day, start, end):
+                    written += 1
+            except Exception:
+                continue
+        return written
+
+    async def _summarize_owner(
+        self,
+        world_id: UUID,
+        run_id: UUID,
+        character: Character,
+        day: int,
+        start: int,
+        end: int,
+    ) -> bool:
+        """Propose and store one owner's day account; False when sourceless."""
+        async with self._factory() as uow:
+            observations = [
+                obs
+                for obs in await uow.perception.observations_for_observer(character.id, 20)
+                if start <= obs.created_phase_index <= end
+            ]
+            memories = [
+                mem
+                for mem in await uow.perception.memories_for_owner(character.id)
+                if start <= mem.created_phase_index <= end
+            ]
+        if not observations and not memories:
+            return False
+        lines: list[str] = []
+        source_ids: list[str] = []
+        for obs in observations:
+            for fact in obs.facts:
+                lines.append(f"obs:{obs.id} {fact.key}: {fact.value}")
+                source_ids.append(f"obs:{obs.id}")
+        for mem in memories:
+            lines.append(f"mem:{mem.id} {mem.text}")
+            source_ids.append(f"mem:{mem.id}")
+        task_run_id = derive_task_id(run_id, "summary", character.id)
+        owner = f"s1sum:{run_id.hex[:8]}"
+        await self._track_task(world_id, task_run_id, owner)
+        spec = ManifestSpec(
+            role="daily_summary",
+            profile=self._profiles["summary"],  # type: ignore[arg-type]
+            prompt_version=SUMMARY_PROMPT_VERSION,
+            world_id=world_id,
+            phase_run_id=run_id,
+            task_run_id=task_run_id,
+            actor_id=character.id,
+            sources=[],
+            budgets={},
+            tokens={},
+            dropped=[],
+        )
+        traced = TracedGateway(self._gateways("summary"), self._traces, spec)
+        invocation = GraphInvocation(
+            graph_name="daily-summary",
+            graph_version="v1",
+            task_run_id=task_run_id,
+            world_id=world_id,
+            phase_run_id=run_id,
+            snapshot_id=run_id,
+            actor_id=character.id,
+            role="daily_summary",
+            profile_version=traced.profile.version,
+            prompt_version=SUMMARY_PROMPT_VERSION,
+            input={
+                "owner_name": character.name,
+                "day": day,
+                "sources_text": "\n".join(lines),
+                "source_ids": sorted(set(source_ids)),
+            },
+        )
+        graph = build_summary_graph(
+            SummaryGraphDeps(
+                gateway=traced,
+                profile=self._profiles["summary"],  # type: ignore[arg-type]
+                system_template=load_summary_prompt(),
+            )
+        )
+        try:
+            result = await invoke(graph, invocation)
+        except Exception:
+            await self._finish_task(task_run_id, owner, False)
+            return False
+        await self._finish_task(task_run_id, owner, True)
+        proposal: dict[str, Any] = result.get("proposal") or {}
+        is_fallback = result.get("fallback", True) is True
+        text = str(proposal.get("text", "")) or fallback_text(len(observations), len(memories))
+        raw_cited: list[Any] = proposal.get("source_ids", [])
+        cited = [str(s) for s in raw_cited] or sorted(set(source_ids))
+        async with self._factory() as uow:
+            taken = await uow.summaries.count_versions(world_id, character.id, day)
+            await uow.summaries.add(
+                DailySummary(
+                    id=new_summary_id(),
+                    world_id=world_id,
+                    owner_id=character.id,
+                    day=day,
+                    text=text,
+                    source_ids=cited,
+                    profile_version=traced.profile.version,
+                    prompt_version=SUMMARY_PROMPT_VERSION,
+                    fallback=is_fallback or not proposal,
+                    version=taken + 1,
+                )
+            )
+            await uow.commit()
+        return True
 
     async def _seal(self, world_id: UUID, run_id: UUID, index: int) -> SealedPhase:
         """Seal the shared snapshot every character decides from."""

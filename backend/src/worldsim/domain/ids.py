@@ -23,6 +23,7 @@ SkillId = UUID
 ItemInstanceId = UUID
 HookId = UUID
 ArcId = UUID
+SummaryId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
 TaskId = UUID
@@ -108,6 +109,10 @@ def new_hook_id() -> HookId:
 
 
 def new_arc_id() -> ArcId:
+    return uuid4()
+
+
+def new_summary_id() -> SummaryId:
     return uuid4()
 
 

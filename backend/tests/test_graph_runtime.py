@@ -14,6 +14,7 @@ from langgraph.types import Command, interrupt
 
 from worldsim.application.graphs.character import CharacterGraphDeps
 from worldsim.application.graphs.director import DirectorGraphDeps
+from worldsim.application.graphs.summary import SummaryGraphDeps
 from worldsim.application.graphs.narrate import NarratorGraphDeps
 from worldsim.application.graphs.reaction import ReactionGraphDeps
 from worldsim.application.graphs.resolve import ResolverGraphDeps
@@ -160,6 +161,7 @@ def test_graph_deps_carry_no_repositories() -> None:
         ResolverGraphDeps,
         NarratorGraphDeps,
         DirectorGraphDeps,
+        SummaryGraphDeps,
     ):
         assert dataclasses.is_dataclass(deps), deps
         for field in dataclasses.fields(deps):

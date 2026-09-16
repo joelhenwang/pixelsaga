@@ -356,6 +356,15 @@ Stage 3, ComfyUI in Stage 4). The Vue surface draws deterministic
 `Portrait.vue`); `portraitFor` is the seam the gateway replaces.
 No backend surface: fixtures need none.
 
+## Daily summaries (S2-SUMMARY-001)
+
+After each midnight commit the orchestrator records one versioned
+summary per owner with same-day sources (migration 0017).
+Proposals cite only input source IDs; unknown citations, outages,
+and malformed output fall back to structural counts. Versions
+accumulate per (world, owner, day); raw observations and memories
+are never touched, and summary failures never fail the phase.
+
 ## Director (S2-DIRECTOR-001)
 
 `narrative_hook` and `narrative_arc` rows hold opportunities, never

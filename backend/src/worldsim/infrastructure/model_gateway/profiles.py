@@ -58,6 +58,14 @@ NARRATOR_FAKE_PROFILE = ModelProfile(
     capabilities=["chat", "json_mode"],
 )
 
+SUMMARY_FAKE_PROFILE = ModelProfile(
+    name="summary",
+    version="summary-fake-v1",
+    adapter="fake",
+    model_id="fake-summary",
+    max_context_tokens=4096,
+    capabilities=["chat", "json_mode"],
+)
 DIRECTOR_FAKE_PROFILE = ModelProfile(
     name="director",
     version="direct-fake-v1",

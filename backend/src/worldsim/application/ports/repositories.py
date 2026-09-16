@@ -24,6 +24,7 @@ from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
 from worldsim.domain.schedules import ScheduledEffect
+from worldsim.domain.summaries import DailySummary
 from worldsim.domain.tasks import Lease, OutboxMessage, TaskRun
 from worldsim.domain.world import Location, World
 
@@ -165,6 +166,12 @@ class NarrativeRepository(Protocol):
     async def list_arcs_for_world(self, world_id: UUID) -> list[NarrativeArc]: ...
     async def get_hook(self, hook_id: UUID) -> NarrativeHook: ...
     async def get_arc(self, arc_id: UUID) -> NarrativeArc: ...
+
+
+class SummaryRepository(Protocol):
+    async def add(self, summary: DailySummary) -> None: ...
+    async def count_versions(self, world_id: UUID, owner_id: UUID, day: int) -> int: ...
+    async def list_for_owner(self, world_id: UUID, owner_id: UUID) -> list[DailySummary]: ...
 
 
 class PhaseRepository(Protocol):
