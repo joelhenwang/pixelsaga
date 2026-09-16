@@ -12,6 +12,10 @@ from typing import Any
 from langgraph.graph import StateGraph
 from langgraph.types import Command, interrupt
 
+from worldsim.application.graphs.character import CharacterGraphDeps
+from worldsim.application.graphs.narrate import NarratorGraphDeps
+from worldsim.application.graphs.reaction import ReactionGraphDeps
+from worldsim.application.graphs.resolve import ResolverGraphDeps
 from worldsim.application.graphs.retention import prune_thread, thread_checkpoint_count
 from worldsim.application.graphs.runtime import checkpointer, invoke, psycopg_dsn, read_thread
 from worldsim.application.graphs.state import (
@@ -134,3 +138,19 @@ def test_langsmith_disabled_behavior_identical() -> None:
 
     off, on = _run(_inner())
     assert off == on == {"proposal": {"decision": "same"}, "status": "completed"}
+
+
+def test_graph_deps_carry_no_repositories() -> None:
+    """Model graphs propose; only the orchestrator writes.
+
+    Pins the hard-gate item: no Deps field may smuggle a repository,
+    session, unit of work, or engine into model reach.
+    """
+    import dataclasses
+
+    forbidden = ("repositor", "session", "unit_of_work", "uow", "engine")
+    for deps in (CharacterGraphDeps, ReactionGraphDeps, ResolverGraphDeps, NarratorGraphDeps):
+        assert dataclasses.is_dataclass(deps), deps
+        for field in dataclasses.fields(deps):
+            blob = f"{field.name} {field.type}".lower()
+            assert not any(token in blob for token in forbidden), (deps, field.name)
