@@ -365,6 +365,16 @@ and malformed output fall back to structural counts. Versions
 accumulate per (world, owner, day); raw observations and memories
 are never touched, and summary failures never fail the phase.
 
+## Orchestration (S2-ORCH-001)
+
+Quiet phases (empty or all WAIT) skip narrator model calls and
+store structured fallback beats: same canon, no call. A per-phase
+model-call budget (world config `model.max_calls_per_phase`,
+default 32) degrades the same way when exhausted. `advance_days`
+drives multi-day soaks; injected crashes resume through the
+idempotent tick/seal/commit path with no missing or duplicate
+scenes.
+
 ## Roles (S2-ROLE-001)
 
 One active grant per world selects the operating role at safe

@@ -52,6 +52,7 @@ from worldsim.application.graphs.narrate import (
     NARRATOR_PROMPT_VERSION,
     NarratorGraphDeps,
     build_narration_graph,
+    fallback_beats,
     load_narrator_prompt,
 )
 from worldsim.application.graphs.reaction import (
@@ -320,8 +321,12 @@ class Stage1Orchestrator:
         await self._set_state(run_id, PhaseRunState.SCENES_ASSEMBLED)
         outcomes: list[SceneOutcome] = []
         for scene in scenes:
+            over_budget = await self._over_budget(world_id, run_id)
             outcomes.append(
-                await self._commit_scene(world_id, run_id, index, sealed, scene, intents, names)
+                await self._commit_scene(
+                    world_id, run_id, index, sealed, scene, intents, names,
+                    quiet, over_budget,
+                )
             )
         await self._set_state(run_id, PhaseRunState.SCENES_COMMITTED)
         self._fire("after_scenes_committed")
@@ -336,6 +341,30 @@ class Stage1Orchestrator:
             scenes=outcomes,
             quiet=quiet,
         )
+
+    async def _over_budget(self, world_id: UUID, run_id: UUID) -> bool:
+        """True when this run already spent its model-call budget."""
+        async with self._factory() as uow:
+            config = await uow.worlds.get_config(world_id)
+            spent = len(await uow.traces.list_for_phase_run(run_id))
+        raw = config.get("model.max_calls_per_phase")
+        budget = int(raw) if isinstance(raw, int) else 32
+        return spent >= max(1, budget)
+
+    async def advance_days(
+        self,
+        world_id: UUID,
+        start_index: int,
+        day_count: int,
+        player_intents: Mapping[int, Mapping[UUID, ActionIntent]] | None = None,
+    ) -> list[Stage1PhaseReport]:
+        """Advance whole days (ten phases each) for soak scenarios."""
+        reports: list[Stage1PhaseReport] = []
+        for offset in range(day_count * PHASES_PER_DAY):
+            index = start_index + offset
+            intents = (player_intents or {}).get(index)
+            reports.append(await self.advance_phase(world_id, index, intents))
+        return reports
 
     async def advance_three_phases(
         self,
@@ -1153,6 +1182,8 @@ class Stage1Orchestrator:
         scene: Scene,
         intents: list[Intent],
         names: Mapping[UUID, str],
+        quiet: bool = False,
+        over_budget: bool = False,
     ) -> SceneOutcome:
         """React, resolve, commit, and narrate one scene (sequential barrier)."""
         members = [i for i in intents if i.id in scene.intent_ids]
@@ -1195,7 +1226,9 @@ class Stage1Orchestrator:
             )
         )
         self._fire("before_narration")
-        narration = await self._narrate_scene(world_id, run_id, scene, result.event_id)
+        narration = await self._narrate_scene(
+            world_id, run_id, scene, result.event_id, quiet, over_budget
+        )
         return SceneOutcome(
             scene_id=scene.id,
             event_id=result.event_id,
@@ -1439,10 +1472,26 @@ class Stage1Orchestrator:
             self._dnd_data = load_data(DND_DATA_DIR)
         return self._dnd_data
 
+    async def _roster_present(self, world_id: UUID) -> bool:
+        async with self._factory() as uow:
+            return bool(await uow.party.list_for_world(world_id))
+
     async def _narrate_scene(
-        self, world_id: UUID, run_id: UUID, scene: Scene, event_id: UUID
+        self,
+        world_id: UUID,
+        run_id: UUID,
+        scene: Scene,
+        event_id: UUID,
+        quiet: bool = False,
+        over_budget: bool = False,
     ) -> str:
-        """Narrate one committed scene; failures never fail the phase."""
+        """Narrate one committed scene; failures never fail the phase.
+
+        Quiet non-party phases and over-budget phases skip the model
+        and store structured fallback beats directly: same canon, no
+        call. Party scenes always narrate because combat and recruit
+        tags live in model-authored beats.
+        """
         async with self._factory() as uow:
             existing = await uow.scenes.narrations_for_event(event_id)
             observations = await uow.perception.observations_for_event(event_id)
@@ -1511,6 +1560,19 @@ class Stage1Orchestrator:
                 "dnd_context": dnd_context,
             },
         )
+        roster_pre = await self._roster_present(world_id)
+        if over_budget or (quiet and not roster_pre):
+            async with self._factory() as uow:
+                for beat in fallback_beats(
+                    world_id=world_id,
+                    scene_id=scene.id,
+                    event_id=event_id,
+                    visible_facts=facts,
+                    beats_budget=scene.beat_budget,
+                ):
+                    await uow.scenes.save_narration(beat)
+                await uow.commit()
+            return "fallback"
         try:
             graph = build_narration_graph(
                 NarratorGraphDeps(
