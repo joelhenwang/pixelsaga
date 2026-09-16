@@ -26,6 +26,10 @@ from worldsim.infrastructure.repositories.perception import (
     SqlAlchemyPerceptionRepository,
 )
 from worldsim.infrastructure.repositories.phases import SqlAlchemyPhaseRepository
+from worldsim.infrastructure.repositories.progress import (
+    SqlAlchemyInventoryRepository,
+    SqlAlchemyProgressRepository,
+)
 from worldsim.infrastructure.repositories.relationships import (
     SqlAlchemyRelationshipRepository,
 )
@@ -55,6 +59,8 @@ class SqlAlchemyUnitOfWork:
         self._perception: SqlAlchemyPerceptionRepository | None = None
         self._relationships: SqlAlchemyRelationshipRepository | None = None
         self._knowledge: SqlAlchemyKnowledgeRepository | None = None
+        self._progress: SqlAlchemyProgressRepository | None = None
+        self._inventory: SqlAlchemyInventoryRepository | None = None
         self._traces: SqlAlchemyTraceRepository | None = None
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
@@ -140,6 +146,18 @@ class SqlAlchemyUnitOfWork:
         return self._knowledge
 
     @property
+    def progress(self) -> SqlAlchemyProgressRepository:
+        if self._progress is None:
+            self._progress = SqlAlchemyProgressRepository(self._require_session())
+        return self._progress
+
+    @property
+    def inventory(self) -> SqlAlchemyInventoryRepository:
+        if self._inventory is None:
+            self._inventory = SqlAlchemyInventoryRepository(self._require_session())
+        return self._inventory
+
+    @property
     def traces(self) -> SqlAlchemyTraceRepository:
         if self._traces is None:
             self._traces = SqlAlchemyTraceRepository(self._require_session())
@@ -215,6 +233,8 @@ class SqlAlchemyUnitOfWork:
             self._perception = None
             self._relationships = None
             self._knowledge = None
+            self._progress = None
+            self._inventory = None
             self._traces = None
             self._scenes = None
 

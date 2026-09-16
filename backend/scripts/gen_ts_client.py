@@ -48,6 +48,12 @@ WANTED = (
     "ClaimListResponse",
     "BeliefView",
     "BeliefListResponse",
+    "ItemGiveRequest",
+    "ItemTransferRequest",
+    "ItemView",
+    "ItemListResponse",
+    "SkillView",
+    "SkillListResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -73,6 +79,10 @@ ROUTES = (
     ("post", "/api/v1/stage2/claims", "assertClaim"),
     ("get", "/api/v1/stage2/claims", "listClaims"),
     ("get", "/api/v1/stage2/beliefs", "listBeliefs"),
+    ("post", "/api/v1/stage2/items/give", "giveItem"),
+    ("post", "/api/v1/stage2/items/{item_id}/transfer", "transferItem"),
+    ("get", "/api/v1/stage2/items", "listItems"),
+    ("get", "/api/v1/stage2/skills", "listSkills"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

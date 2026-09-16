@@ -19,6 +19,8 @@ RelationshipId = UUID
 RelationshipEvidenceId = UUID
 ClaimId = UUID
 BeliefId = UUID
+SkillId = UUID
+ItemInstanceId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
 TaskId = UUID
@@ -88,6 +90,14 @@ def new_claim_id() -> ClaimId:
 
 
 def new_belief_id() -> BeliefId:
+    return uuid4()
+
+
+def new_skill_id() -> SkillId:
+    return uuid4()
+
+
+def new_item_instance_id() -> ItemInstanceId:
     return uuid4()
 
 

@@ -84,6 +84,7 @@ from worldsim.domain.effects import (
     DomainEffect,
     MoveEntityEffect,
     ResourceAdjustedEffect,
+    SkillProgressEffect,
 )
 from worldsim.domain.enums import (
     ActivityKind,
@@ -116,6 +117,7 @@ from worldsim.domain.perception import (
     PerceivedFact,
 )
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot, SnapshotCharacter
+from worldsim.domain.progress import TRAINING_STAMINA_COST
 from worldsim.domain.relationships import describe
 from worldsim.domain.rules.dnd import (
     DataTables,
@@ -499,6 +501,28 @@ class Stage1Orchestrator:
                             delta=rested_mana - character.mana,
                         )
                     )
+            elif activity.kind == ActivityKind.TRAIN:
+                session = self._training_session_key(activity)
+                assert session is not None
+                if character.stamina < TRAINING_STAMINA_COST:
+                    raise DomainError(ErrorCode.INSUFFICIENT_RESOURCE, "too tired to train")
+                effects.append(
+                    SkillProgressEffect(
+                        affected_ids=[character.id],
+                        expected_versions={str(character.id): character.version},
+                        character_id=character.id,
+                        skill_key=str(activity.payload.get("skill", "general")),
+                        session_key=session,
+                    )
+                )
+                effects.append(
+                    ResourceAdjustedEffect(
+                        affected_ids=[character.id],
+                        expected_versions={str(character.id): character.version},
+                        resource=ResourceKind.STAMINA,
+                        delta=-TRAINING_STAMINA_COST,
+                    )
+                )
             elif activity.kind == ActivityKind.PATROL:
                 async with self._factory() as uow:
                     origin = await uow.locations.get(character.location_id)
@@ -517,29 +541,35 @@ class Stage1Orchestrator:
             await self._stall_activity(activity, index)
             return False
         key = f"activity_complete:{activity.id.hex}"
-        await self._canonical.commit(
-            CommitRequest(
-                command_id=uuid4(),
-                world_id=world_id,
-                idempotency_key=key,
-                actor_role="system",
-                command_type="complete_activity",
-                expected_versions={str(character.id): character.version},
-                payload={"activity_id": str(activity.id), "kind": activity.kind.value},
-                input_hash=canonical_input_hash(
-                    {
-                        "key": key,
-                        "activity": str(activity.id),
-                        "effects": [e.model_dump(mode="json") for e in effects],
-                    }
-                ),
-                absolute_index=index,
-                phase_run_id=run_id,
-                event_type=EventType.ACTION_RESOLVED,
-                effects=effects,
-                observations=observations,
+        try:
+            await self._canonical.commit(
+                CommitRequest(
+                    command_id=uuid4(),
+                    world_id=world_id,
+                    idempotency_key=key,
+                    actor_role="system",
+                    command_type="complete_activity",
+                    expected_versions={str(character.id): character.version},
+                    payload={"activity_id": str(activity.id), "kind": activity.kind.value},
+                    input_hash=canonical_input_hash(
+                        {
+                            "key": key,
+                            "activity": str(activity.id),
+                            "effects": [e.model_dump(mode="json") for e in effects],
+                        }
+                    ),
+                    absolute_index=index,
+                    phase_run_id=run_id,
+                    event_type=EventType.ACTION_RESOLVED,
+                    effects=effects,
+                    observations=observations,
+                )
             )
-        )
+        except IntegrityError:
+            if not await self._session_awarded(
+                world_id, activity, self._training_session_key(activity)
+            ):
+                raise
         async with self._factory() as uow:
             try:
                 await uow.activities.save(
@@ -550,6 +580,24 @@ class Stage1Orchestrator:
             except DomainError:
                 pass
         return True
+
+    def _training_session_key(self, activity: Activity) -> str | None:
+        if activity.kind != ActivityKind.TRAIN:
+            return None
+        return f"activity:{activity.id.hex}:{activity.start_absolute}"
+
+    async def _session_awarded(
+        self, world_id: UUID, activity: Activity, session_key: str | None
+    ) -> bool:
+        if session_key is None:
+            return False
+        async with self._factory() as uow:
+            return await uow.progress.has_session(
+                world_id,
+                activity.character_id,
+                str(activity.payload.get("skill", "general")),
+                session_key,
+            )
 
     async def _stall_activity(self, activity: Activity, index: int) -> None:
         """Exhausted traveler: bake progress and freeze without moving."""

@@ -81,6 +81,7 @@ class EffectType(StrEnum):
     RESOURCE_ADJUSTED = "resource_adjusted"
     RECORD_OBSERVATION = "record_observation"
     RECORD_MEMORY = "record_memory"
+    SKILL_PROGRESS = "skill_progress"
 
 
 class ResourceKind(StrEnum):

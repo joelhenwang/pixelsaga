@@ -77,6 +77,13 @@ class ObservationRecordedEffect(EffectBase):
     facts: list[ObservationFact] = Field(min_length=1)
 
 
+class SkillProgressEffect(EffectBase):
+    effect_type: Literal[EffectType.SKILL_PROGRESS] = EffectType.SKILL_PROGRESS
+    character_id: UUID
+    skill_key: str = Field(min_length=1, max_length=64)
+    session_key: str = Field(min_length=1, max_length=128)
+
+
 class MemoryRecordedEffect(EffectBase):
     effect_type: Literal[EffectType.RECORD_MEMORY] = EffectType.RECORD_MEMORY
     owner_character_id: UUID
@@ -88,6 +95,7 @@ DomainEffect = Annotated[
     | MoveEntityEffect
     | ResourceAdjustedEffect
     | ObservationRecordedEffect
-    | MemoryRecordedEffect,
+    | MemoryRecordedEffect
+    | SkillProgressEffect,
     Field(discriminator="effect_type"),
 ]

@@ -49,6 +49,18 @@
             "title": "Kind",
             "type": "string"
           },
+          "skill": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Skill"
+          },
           "to_location_id": {
             "anyOf": [
               {
@@ -826,6 +838,148 @@
         "title": "IntentView",
         "type": "object"
       },
+      "ItemGiveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "item_key": {
+            "maxLength": 64,
+            "title": "Item Key",
+            "type": "string"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "quantity": {
+            "default": 1,
+            "minimum": 1.0,
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "item_key"
+        ],
+        "title": "ItemGiveRequest",
+        "type": "object"
+      },
+      "ItemListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/ItemView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "owner_id"
+        ],
+        "title": "ItemListResponse",
+        "type": "object"
+      },
+      "ItemTransferRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "to_owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Owner Id"
+          }
+        },
+        "title": "ItemTransferRequest",
+        "type": "object"
+      },
+      "ItemView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "item_key": {
+            "title": "Item Key",
+            "type": "string"
+          },
+          "owner_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Id"
+          },
+          "quantity": {
+            "title": "Quantity",
+            "type": "integer"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "item_key",
+          "owner_id",
+          "quantity",
+          "version"
+        ],
+        "title": "ItemView",
+        "type": "object"
+      },
       "ModelRunView": {
         "additionalProperties": false,
         "description": "Watcher-only model audit view: metadata, never raw hidden content.",
@@ -1567,6 +1721,63 @@
           "duplicate"
         ],
         "title": "SeedResponse",
+        "type": "object"
+      },
+      "SkillListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/SkillView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "character_id"
+        ],
+        "title": "SkillListResponse",
+        "type": "object"
+      },
+      "SkillView": {
+        "additionalProperties": false,
+        "properties": {
+          "progress": {
+            "title": "Progress",
+            "type": "integer"
+          },
+          "sessions": {
+            "title": "Sessions",
+            "type": "integer"
+          },
+          "skill_key": {
+            "title": "Skill Key",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skill_key",
+          "progress",
+          "sessions",
+          "version"
+        ],
+        "title": "SkillView",
         "type": "object"
       },
       "Stage1AdvanceRequest": {
@@ -2846,6 +3057,163 @@
         ]
       }
     },
+    "/api/v1/stage2/items": {
+      "get": {
+        "description": "Instances held by one holder (or lying on the ground).",
+        "operationId": "list_items_api_v1_stage2_items_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Items",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
+    "/api/v1/stage2/items/give": {
+      "post": {
+        "description": "Create one instance for a holder (or the ground).",
+        "operationId": "give_api_v1_stage2_items_give_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemGiveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Give",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
+    "/api/v1/stage2/items/{item_id}/transfer": {
+      "post": {
+        "description": "Move one instance to a new holder (or drop it).",
+        "operationId": "transfer_api_v1_stage2_items__item_id__transfer_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "item_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Item Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ItemTransferRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Transfer",
+        "tags": [
+          "progress"
+        ]
+      }
+    },
     "/api/v1/stage2/relationships": {
       "get": {
         "description": "Both directions around one character, labeled by direction.",
@@ -2939,6 +3307,60 @@
         "summary": "Record",
         "tags": [
           "relationships"
+        ]
+      }
+    },
+    "/api/v1/stage2/skills": {
+      "get": {
+        "description": "Folded skill progress for one character (read-only; sessions award).",
+        "operationId": "list_skills_api_v1_stage2_skills_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Skills",
+        "tags": [
+          "progress"
         ]
       }
     },

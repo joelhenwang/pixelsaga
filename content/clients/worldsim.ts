@@ -145,6 +145,7 @@ export interface ActivityStartRequest {
   character_id: string;
   duration_phases?: number | null;
   kind: string;
+  skill?: string | null;
   to_location_id?: string | null;
   world_id: string;
 }
@@ -234,6 +235,45 @@ export interface BeliefListResponse {
   world_id: string;
 }
 
+export interface ItemGiveRequest {
+  item_key: string;
+  owner_id?: string | null;
+  quantity?: number | null;
+  world_id: string;
+}
+
+export interface ItemTransferRequest {
+  to_owner_id?: string | null;
+}
+
+export interface ItemView {
+  id: string;
+  item_key: string;
+  owner_id: string;
+  quantity: number;
+  version: number;
+  world_id: string;
+}
+
+export interface ItemListResponse {
+  members?: ItemView[] | null;
+  owner_id: string;
+  world_id: string;
+}
+
+export interface SkillView {
+  progress: number;
+  sessions: number;
+  skill_key: string;
+  version: number;
+}
+
+export interface SkillListResponse {
+  character_id: string;
+  members?: SkillView[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -265,5 +305,9 @@ export const ROUTES = {
   assertClaim: "POST /api/v1/stage2/claims",
   listClaims: "GET /api/v1/stage2/claims",
   listBeliefs: "GET /api/v1/stage2/beliefs",
+  giveItem: "POST /api/v1/stage2/items/give",
+  transferItem: "POST /api/v1/stage2/items/{item_id}/transfer",
+  listItems: "GET /api/v1/stage2/items",
+  listSkills: "GET /api/v1/stage2/skills",
   listEvents: "GET /api/v1/world/events",
 } as const;

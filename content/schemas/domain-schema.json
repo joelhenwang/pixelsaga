@@ -484,6 +484,64 @@
           ],
           "title": "ResourceKind",
           "type": "string"
+        },
+        "SkillProgressEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "effect_type": {
+              "const": "skill_progress",
+              "default": "skill_progress",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "session_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Key",
+              "type": "string"
+            },
+            "skill_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Skill Key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id",
+            "skill_key",
+            "session_key"
+          ],
+          "title": "SkillProgressEffect",
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -512,7 +570,8 @@
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
-                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect",
+                "skill_progress": "#/$defs/SkillProgressEffect"
               },
               "propertyName": "effect_type"
             },
@@ -531,6 +590,9 @@
               },
               {
                 "$ref": "#/$defs/MemoryRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/SkillProgressEffect"
               }
             ]
           },
@@ -952,6 +1014,59 @@
       "title": "CharacterCard",
       "type": "object"
     },
+    "CharacterSkill": {
+      "additionalProperties": false,
+      "description": "Folded progress of one character in one skill.",
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "progress": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Progress",
+          "type": "integer"
+        },
+        "sessions": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Sessions",
+          "type": "integer"
+        },
+        "skill_key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Skill Key",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "character_id",
+        "skill_key"
+      ],
+      "title": "CharacterSkill",
+      "type": "object"
+    },
     "Claim": {
       "additionalProperties": false,
       "description": "One voiced proposition with its audience.",
@@ -1328,6 +1443,64 @@
           ],
           "title": "ResourceKind",
           "type": "string"
+        },
+        "SkillProgressEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "effect_type": {
+              "const": "skill_progress",
+              "default": "skill_progress",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "session_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Key",
+              "type": "string"
+            },
+            "skill_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Skill Key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id",
+            "skill_key",
+            "session_key"
+          ],
+          "title": "SkillProgressEffect",
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -1339,7 +1512,8 @@
               "move_entity": "#/$defs/MoveEntityEffect",
               "record_memory": "#/$defs/MemoryRecordedEffect",
               "record_observation": "#/$defs/ObservationRecordedEffect",
-              "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+              "resource_adjusted": "#/$defs/ResourceAdjustedEffect",
+              "skill_progress": "#/$defs/SkillProgressEffect"
             },
             "propertyName": "effect_type"
           },
@@ -1358,6 +1532,9 @@
             },
             {
               "$ref": "#/$defs/MemoryRecordedEffect"
+            },
+            {
+              "$ref": "#/$defs/SkillProgressEffect"
             }
           ],
           "title": "Effect"
@@ -2173,6 +2350,101 @@
         "idempotency_key"
       ],
       "title": "Intent",
+      "type": "object"
+    },
+    "ItemDefinition": {
+      "additionalProperties": false,
+      "description": "One catalogued item kind.",
+      "properties": {
+        "description": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Description",
+          "type": "string"
+        },
+        "key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "stackable": {
+          "default": false,
+          "title": "Stackable",
+          "type": "boolean"
+        },
+        "weight": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Weight",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "key",
+        "name"
+      ],
+      "title": "ItemDefinition",
+      "type": "object"
+    },
+    "ItemInstance": {
+      "additionalProperties": false,
+      "description": "One item stack with exactly one holder (or none, lying where left).",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "item_key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Item Key",
+          "type": "string"
+        },
+        "owner_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Id"
+        },
+        "quantity": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "item_key"
+      ],
+      "title": "ItemInstance",
       "type": "object"
     },
     "Lease": {
@@ -4627,6 +4899,64 @@
           ],
           "title": "ResourceKind",
           "type": "string"
+        },
+        "SkillProgressEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "effect_type": {
+              "const": "skill_progress",
+              "default": "skill_progress",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "session_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Key",
+              "type": "string"
+            },
+            "skill_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Skill Key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id",
+            "skill_key",
+            "session_key"
+          ],
+          "title": "SkillProgressEffect",
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -4645,7 +4975,8 @@
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
-                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect",
+                "skill_progress": "#/$defs/SkillProgressEffect"
               },
               "propertyName": "effect_type"
             },
@@ -4664,6 +4995,9 @@
               },
               {
                 "$ref": "#/$defs/MemoryRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/SkillProgressEffect"
               }
             ]
           },
@@ -5026,6 +5360,64 @@
           ],
           "title": "ResourceKind",
           "type": "string"
+        },
+        "SkillProgressEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "effect_type": {
+              "const": "skill_progress",
+              "default": "skill_progress",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "session_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Key",
+              "type": "string"
+            },
+            "skill_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Skill Key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id",
+            "skill_key",
+            "session_key"
+          ],
+          "title": "SkillProgressEffect",
+          "type": "object"
         }
       },
       "additionalProperties": false,
@@ -5039,7 +5431,8 @@
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
-                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect",
+                "skill_progress": "#/$defs/SkillProgressEffect"
               },
               "propertyName": "effect_type"
             },
@@ -5058,6 +5451,9 @@
               },
               {
                 "$ref": "#/$defs/MemoryRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/SkillProgressEffect"
               }
             ]
           },
@@ -5805,6 +6201,54 @@
       "title": "Sheet",
       "type": "object"
     },
+    "SkillDefinition": {
+      "additionalProperties": false,
+      "description": "One trainable skill, registered lazily on first session.",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "max_progress": {
+          "default": 100,
+          "minimum": 1,
+          "title": "Max Progress",
+          "type": "integer"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "key",
+        "name"
+      ],
+      "title": "SkillDefinition",
+      "type": "object"
+    },
     "SnapshotCharacter": {
       "additionalProperties": false,
       "properties": {
@@ -5943,6 +6387,60 @@
         "kind"
       ],
       "title": "TaskRun",
+      "type": "object"
+    },
+    "TrainingSession": {
+      "additionalProperties": false,
+      "description": "One counted session: the duplicate-proof progress record.",
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "gain": {
+          "minimum": 0,
+          "title": "Gain",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "session_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Session Key",
+          "type": "string"
+        },
+        "skill_key": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Skill Key",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "character_id",
+        "skill_key",
+        "session_key",
+        "gain"
+      ],
+      "title": "TrainingSession",
       "type": "object"
     },
     "TravelRoute": {
@@ -6350,7 +6848,8 @@
                   "move_entity": "#/$defs/MoveEntityEffect",
                   "record_memory": "#/$defs/MemoryRecordedEffect",
                   "record_observation": "#/$defs/ObservationRecordedEffect",
-                  "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+                  "resource_adjusted": "#/$defs/ResourceAdjustedEffect",
+                  "skill_progress": "#/$defs/SkillProgressEffect"
                 },
                 "propertyName": "effect_type"
               },
@@ -6369,6 +6868,9 @@
                 },
                 {
                   "$ref": "#/$defs/MemoryRecordedEffect"
+                },
+                {
+                  "$ref": "#/$defs/SkillProgressEffect"
                 }
               ],
               "title": "Effect"
@@ -6646,6 +7148,64 @@
           ],
           "title": "ResourceKind",
           "type": "string"
+        },
+        "SkillProgressEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "effect_type": {
+              "const": "skill_progress",
+              "default": "skill_progress",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "session_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Session Key",
+              "type": "string"
+            },
+            "skill_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Skill Key",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id",
+            "skill_key",
+            "session_key"
+          ],
+          "title": "SkillProgressEffect",
+          "type": "object"
         },
         "Visibility": {
           "enum": [

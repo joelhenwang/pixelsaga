@@ -61,6 +61,7 @@ async def start_activity(
     absolute: int,
     duration_phases: int | None = None,
     to_location_id: LocationId | None = None,
+    skill: str | None = None,
 ) -> Activity:
     """Begin one activity; travelers resolve their leg first."""
     character = await uow.characters.get(character_id)
@@ -97,7 +98,11 @@ async def start_activity(
     else:
         if to_location_id is not None:
             raise DomainError(ErrorCode.VALIDATION_FAILED, "only travel takes a destination")
+        if skill is not None and kind != ActivityKind.TRAIN:
+            raise DomainError(ErrorCode.VALIDATION_FAILED, "only training names a skill")
         duration = duration_phases or KIND_DURATIONS[kind]
+        if skill is not None:
+            payload = {"skill": skill}
         if duration < 1:
             raise DomainError(ErrorCode.VALIDATION_FAILED, "duration needs a phase")
     activity = Activity(

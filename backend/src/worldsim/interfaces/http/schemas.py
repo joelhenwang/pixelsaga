@@ -355,6 +355,58 @@ class ActivityStartRequest(BaseModel):
     kind: str = Field(max_length=32)
     duration_phases: int | None = Field(default=None, ge=1, le=100)
     to_location_id: UUID | None = None
+    skill: str | None = Field(default=None, max_length=64)
+
+
+class ItemGiveRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    item_key: str = Field(max_length=64)
+    owner_id: UUID | None = None
+    quantity: int = Field(default=1, ge=1)
+
+
+class ItemTransferRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    to_owner_id: UUID | None = None
+
+
+class ItemView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    item_key: str
+    owner_id: UUID | None
+    quantity: int
+    version: int
+
+
+class ItemListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    owner_id: UUID | None
+    members: list[ItemView] = Field(default_factory=list)
+
+
+class SkillView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    skill_key: str
+    progress: int
+    sessions: int
+    version: int
+
+
+class SkillListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    character_id: UUID
+    members: list[SkillView] = Field(default_factory=list)
 
 
 class ActivityView(BaseModel):

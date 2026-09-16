@@ -87,7 +87,7 @@ class EventEffectRow(Base):
         CheckConstraint("ordinal >= 0", name="ck_effect_ordinal"),
         CheckConstraint(
             "effect_type IN ('advance_clock','move_entity','resource_adjusted',"
-            "'record_observation','record_memory')",
+            "'record_observation','record_memory','skill_progress')",
             name="ck_effect_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_effect_schema"),

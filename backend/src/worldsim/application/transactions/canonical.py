@@ -22,6 +22,7 @@ from worldsim.domain.effects import (
     DomainEffect,
     MoveEntityEffect,
     ResourceAdjustedEffect,
+    SkillProgressEffect,
 )
 from worldsim.domain.enums import (
     AttemptStatus,
@@ -34,7 +35,14 @@ from worldsim.domain.enums import (
 )
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.events import CommittedEffect, WorldEvent
+from worldsim.domain.ids import new_skill_id
 from worldsim.domain.perception import Observation, ObservationFact, RecentMemory
+from worldsim.domain.progress import (
+    CharacterSkill,
+    TrainingSession,
+    fold_progress,
+    session_gain,
+)
 from worldsim.domain.rules.projection import apply_character_effect, apply_world_effect
 from worldsim.domain.rules.randomness import RandomEvidence
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
@@ -276,6 +284,8 @@ class CanonicalTransaction:
                     current = await uow.worlds.get(target)
                 worlds[target] = apply_world_effect(current, effect)
                 clock[target] = effect
+            elif isinstance(effect, SkillProgressEffect):
+                await self._progress_skill(uow, request, effect)
             elif isinstance(effect, (MoveEntityEffect, ResourceAdjustedEffect)):
                 target = _primary_target(effect, request.world_id)
                 current = characters.get(target)
@@ -300,6 +310,61 @@ class CanonicalTransaction:
             await uow.worlds.set_clock(target, world.day, world.phase.value, last.to_index)
         for target, character in characters.items():
             await uow.characters.save_state(character, request.expected_versions[str(target)])
+
+    async def _progress_skill(
+        self, uow: UnitOfWork, request: CommitRequest, effect: SkillProgressEffect
+    ) -> None:
+        """Count one training session; repeats of the key add nothing."""
+        progress = uow.progress
+        if await progress.has_session(
+            request.world_id, effect.character_id, effect.skill_key, effect.session_key
+        ):
+            return
+        definition = await progress.ensure_skill(
+            request.world_id, effect.skill_key, effect.skill_key
+        )
+        current = await progress.get_skill(request.world_id, effect.character_id, effect.skill_key)
+        gain = session_gain(current.sessions if current else 0)
+        if current is None:
+            current = CharacterSkill(
+                id=new_skill_id(),
+                world_id=request.world_id,
+                character_id=effect.character_id,
+                skill_key=effect.skill_key,
+                sessions=1,
+                progress=fold_progress(0, gain, definition.max_progress),
+            )
+            await progress.add_session(
+                TrainingSession(
+                    id=new_skill_id(),
+                    world_id=request.world_id,
+                    character_id=effect.character_id,
+                    skill_key=effect.skill_key,
+                    session_key=effect.session_key,
+                    gain=gain,
+                )
+            )
+            await progress.add_skill(current)
+            return
+        await progress.add_session(
+            TrainingSession(
+                id=new_skill_id(),
+                world_id=request.world_id,
+                character_id=effect.character_id,
+                skill_key=effect.skill_key,
+                session_key=effect.session_key,
+                gain=gain,
+            )
+        )
+        await progress.save_skill(
+            current.model_copy(
+                update={
+                    "sessions": current.sessions + 1,
+                    "progress": fold_progress(current.progress, gain, definition.max_progress),
+                }
+            ),
+            current.version,
+        )
 
     async def _perceive(
         self, uow: UnitOfWork, request: CommitRequest, event_id: UUID

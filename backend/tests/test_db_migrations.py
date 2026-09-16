@@ -23,7 +23,7 @@ from worldsim.infrastructure.db.verify import (
 from worldsim.infrastructure.settings import Settings
 
 SCRATCH_DB = "worldsim_migtest"
-HEAD = "0014_s2_knowledge"
+HEAD = "0015_s2_progress"
 
 
 def _migrations_dir() -> Path:

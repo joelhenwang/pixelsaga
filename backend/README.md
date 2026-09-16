@@ -378,6 +378,17 @@ nothing is ever deleted. False claims touch no canon rows or
 events. Reads filter claims by what the viewer could hear;
 beliefs are holder- or watcher-only.
 
+## Inventory and skills (S2-PROGRESS-001)
+
+Item definitions are content (`content/definitions/items.json`);
+`item_instance` rows carry the single holder, moved version-guarded
+through audited give/transfer commands. Training sessions award
+diminishing progress (8, 7, ... floor 1, cap 100) through a
+`skill_progress` canonical effect: the same session key never
+counts twice, stamina spends atomically alongside, and the resolver
+allowlist excludes the effect so prose cannot award progression.
+Tables arrive in migration 0015.
+
 ## Relationships (S2-REL-001)
 
 `relationship_evidence` stores sourced directional deltas;

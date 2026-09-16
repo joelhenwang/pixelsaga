@@ -10,6 +10,7 @@ from worldsim.application.ports.repositories import (
     CharacterRepository,
     CommandRepository,
     EventRepository,
+    InventoryRepository,
     KnowledgeRepository,
     LocationRepository,
     MonsterRepository,
@@ -17,6 +18,7 @@ from worldsim.application.ports.repositories import (
     PartyRepository,
     PerceptionRepository,
     PhaseRepository,
+    ProgressRepository,
     RelationshipRepository,
     RouteRepository,
     SceneRepository,
@@ -49,6 +51,10 @@ class UnitOfWork(Protocol):
     def relationships(self) -> RelationshipRepository: ...
     @property
     def knowledge(self) -> KnowledgeRepository: ...
+    @property
+    def progress(self) -> ProgressRepository: ...
+    @property
+    def inventory(self) -> InventoryRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property

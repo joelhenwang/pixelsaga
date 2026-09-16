@@ -59,6 +59,7 @@ async def start(body: api.ActivityStartRequest, request: Request) -> api.Activit
             now,
             duration_phases=body.duration_phases,
             to_location_id=body.to_location_id,
+            skill=body.skill,
         )
     return _activity_view(activity)
 
