@@ -294,6 +294,7 @@ async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage
             for s in report.scenes
         ],
         duplicate=report.duplicate,
+        quiet=report.quiet,
     )
 
 

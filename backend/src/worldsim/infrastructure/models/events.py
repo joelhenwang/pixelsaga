@@ -60,7 +60,7 @@ class WorldEventRow(Base):
     __table_args__ = (
         CheckConstraint("sequence >= 1", name="ck_event_sequence"),
         CheckConstraint(
-            "event_type IN ('world_seeded','world_ticked','action_resolved')",
+            "event_type IN ('world_seeded','world_ticked','action_resolved','schedule_fired')",
             name="ck_event_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_event_schema"),

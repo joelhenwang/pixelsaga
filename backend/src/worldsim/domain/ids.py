@@ -14,6 +14,7 @@ CardId = UUID
 LocationId = UUID
 RouteId = UUID
 ActivityId = UUID
+ScheduleId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
 TaskId = UUID
@@ -63,6 +64,10 @@ def new_route_id() -> RouteId:
 
 
 def new_activity_id() -> ActivityId:
+    return uuid4()
+
+
+def new_schedule_id() -> ScheduleId:
     return uuid4()
 
 

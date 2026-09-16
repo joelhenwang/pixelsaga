@@ -313,6 +313,7 @@ class Stage1AdvanceResponse(BaseModel):
     snapshot_id: UUID
     scenes: list[Stage1SceneOutcome] = Field(default_factory=list)
     duplicate: bool = False
+    quiet: bool = False
 
 
 class RunIdRequest(BaseModel):

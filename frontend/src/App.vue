@@ -14,6 +14,7 @@ const scenes = ref<SceneSummary[]>([]);
 const currentId = ref<string>("");
 const detail = ref<SceneDetail | null>(null);
 const beats = ref<BeatView[]>([]);
+const quietPhase = ref<boolean>(false);
 const family = ref("wait");
 const topic = ref("");
 const targetId = ref("");
@@ -83,6 +84,7 @@ async function advance(): Promise<void> {
   notice.value = "";
   try {
     const report = await api.advance(worldId.value, nextIndex.value, headers.value);
+    quietPhase.value = report.quiet ?? false;
     nextIndex.value = report.absolute_index + 1;
     const summaries = await api.scenes(report.run_id, headers.value);
     scenes.value = summaries;
@@ -133,6 +135,7 @@ async function submitAction(): Promise<void> {
   busy.value = true;
   try {
     const report = await api.advance(worldId.value, nextIndex.value, headers.value, { [actor]: action });
+    quietPhase.value = report.quiet ?? false;
     nextIndex.value = report.absolute_index + 1;
     const summaries = await api.scenes(report.run_id, headers.value);
     scenes.value = summaries;
@@ -308,7 +311,7 @@ onUnmounted(() => {
       </template>
       <template v-else-if="detail">
 
-        <h1>scene {{ detail.id.slice(0, 8) }} · {{ detail.status }}</h1>
+        <h1>scene {{ detail.id.slice(0, 8) }} · {{ detail.status }}<span v-if="quietPhase" class="dim"> · quiet phase</span></h1>
         <p v-for="b in beats" :key="b.id" class="beat" :class="{ dialogue: b.speaker_id }">
           <span v-if="b.speaker_id" class="who">{{ b.speaker_id.slice(0, 8) }}:</span> {{ b.text }}
         </p>

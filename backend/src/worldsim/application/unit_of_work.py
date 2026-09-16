@@ -18,6 +18,7 @@ from worldsim.application.ports.repositories import (
     PhaseRepository,
     RouteRepository,
     SceneRepository,
+    ScheduleRepository,
     TaskRepository,
     VersionStore,
     WorldRepository,
@@ -40,6 +41,8 @@ class UnitOfWork(Protocol):
     def activities(self) -> ActivityRepository: ...
     @property
     def routes(self) -> RouteRepository: ...
+    @property
+    def schedules(self) -> ScheduleRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property

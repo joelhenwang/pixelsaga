@@ -1124,6 +1124,11 @@
             "title": "Duplicate",
             "type": "boolean"
           },
+          "quiet": {
+            "default": false,
+            "title": "Quiet",
+            "type": "boolean"
+          },
           "run_id": {
             "format": "uuid",
             "title": "Run Id",

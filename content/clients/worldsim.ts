@@ -108,6 +108,7 @@ export interface Stage1SceneOutcome {
 export interface Stage1AdvanceResponse {
   absolute_index: number;
   duplicate?: boolean | null;
+  quiet?: boolean | null;
   run_id: string;
   scenes?: Stage1SceneOutcome[] | null;
   snapshot_id: string;

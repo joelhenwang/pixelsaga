@@ -26,6 +26,7 @@ from worldsim.infrastructure.repositories.perception import (
 )
 from worldsim.infrastructure.repositories.phases import SqlAlchemyPhaseRepository
 from worldsim.infrastructure.repositories.scenes import SqlAlchemySceneRepository
+from worldsim.infrastructure.repositories.schedules import SqlAlchemyScheduleRepository
 from worldsim.infrastructure.repositories.tasks import SqlAlchemyTaskRepository
 from worldsim.infrastructure.repositories.traces import SqlAlchemyTraceRepository
 from worldsim.infrastructure.repositories.versions import SqlAlchemyVersionStore
@@ -54,6 +55,7 @@ class SqlAlchemyUnitOfWork:
         self._monsters: SqlAlchemyMonsterRepository | None = None
         self._activities: SqlAlchemyActivityRepository | None = None
         self._routes: SqlAlchemyRouteRepository | None = None
+        self._schedules: SqlAlchemyScheduleRepository | None = None
 
     def _require_session(self) -> AsyncSession:
         assert self._session is not None, "unit of work is not open"
@@ -144,6 +146,12 @@ class SqlAlchemyUnitOfWork:
         return self._routes
 
     @property
+    def schedules(self) -> SqlAlchemyScheduleRepository:
+        if self._schedules is None:
+            self._schedules = SqlAlchemyScheduleRepository(self._require_session())
+        return self._schedules
+
+    @property
     def monsters(self) -> SqlAlchemyMonsterRepository:
         if self._monsters is None:
             self._monsters = SqlAlchemyMonsterRepository(self._require_session())
@@ -184,6 +192,7 @@ class SqlAlchemyUnitOfWork:
             self._monsters = None
             self._activities = None
             self._routes = None
+            self._schedules = None
             self._outbox = None
             self._perception = None
             self._traces = None

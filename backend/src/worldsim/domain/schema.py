@@ -33,6 +33,7 @@ from worldsim.domain import (
 from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.rules.dnd import Sheet
+from worldsim.domain.schedules import ScheduledEffect
 
 SCHEMA_VERSION = 1
 
@@ -91,6 +92,7 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     Activity,
     Monster,
     PartyMember,
+    ScheduledEffect,
     Sheet,
     TravelRoute,
     tracing.ManifestSource,

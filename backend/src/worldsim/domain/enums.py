@@ -92,6 +92,7 @@ class EventType(StrEnum):
     WORLD_SEEDED = "world_seeded"
     WORLD_TICKED = "world_ticked"
     ACTION_RESOLVED = "action_resolved"
+    SCHEDULE_FIRED = "schedule_fired"
 
 
 class Visibility(StrEnum):
@@ -219,6 +220,12 @@ class FocusSlot(StrEnum):
     MAIN = "main"
     SUB = "sub"
     COMPANION = "companion"
+
+
+class ScheduleStatus(StrEnum):
+    PENDING = "pending"
+    APPLIED = "applied"
+    CANCELLED = "cancelled"
 
 
 class ParticipantRole(StrEnum):

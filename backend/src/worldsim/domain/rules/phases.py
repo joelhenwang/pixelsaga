@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from worldsim.domain.enums import PhaseName
+from collections.abc import Iterable
+
+from worldsim.domain.enums import ActionFamily, PhaseName
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.time import PHASE_ORDER, FictionalTime, absolute_index
 
@@ -36,3 +38,8 @@ def require_aligned(day: int, phase: PhaseName, absolute: int) -> None:
             "day/phase disagrees with the absolute phase index",
             {"day": day, "phase": phase.value, "absolute": absolute},
         )
+
+
+def is_quiet_phase(families: Iterable[ActionFamily]) -> bool:
+    """A phase is quiet when nobody attempts anything: empty or all WAIT."""
+    return all(family == ActionFamily.WAIT for family in families)

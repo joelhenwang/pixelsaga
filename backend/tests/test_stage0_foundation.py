@@ -293,7 +293,7 @@ def test_stage0_foundation_v1(migrated_db: None, monkeypatch: pytest.MonkeyPatch
             {
                 "scenario": "stage0-foundation-v1",
                 "world_id": str(world_id),
-                "migration_head": "0011_s2_activity_route_focus",
+                "migration_head": "0012_s2_schedules",
                 "seed_version": "stage0-v1",
                 "files": ["scenario.json", "security.json", "index.json"],
             },

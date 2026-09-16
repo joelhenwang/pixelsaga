@@ -5185,6 +5185,67 @@
       "title": "SceneParticipant",
       "type": "object"
     },
+    "ScheduledEffect": {
+      "$defs": {
+        "ScheduleStatus": {
+          "enum": [
+            "pending",
+            "applied",
+            "cancelled"
+          ],
+          "title": "ScheduleStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One due-date payload awaiting its phase.",
+      "properties": {
+        "due_absolute": {
+          "minimum": 0,
+          "title": "Due Absolute",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Kind",
+          "type": "string"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "status": {
+          "$ref": "#/$defs/ScheduleStatus",
+          "default": "pending"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "due_absolute",
+        "kind"
+      ],
+      "title": "ScheduledEffect",
+      "type": "object"
+    },
     "SeedWorldCommand": {
       "$defs": {
         "AuditMeta": {
@@ -5786,7 +5847,8 @@
           "enum": [
             "world_seeded",
             "world_ticked",
-            "action_resolved"
+            "action_resolved",
+            "schedule_fired"
           ],
           "title": "EventType",
           "type": "string"
@@ -6044,7 +6106,8 @@
           "enum": [
             "world_seeded",
             "world_ticked",
-            "action_resolved"
+            "action_resolved",
+            "schedule_fired"
           ],
           "title": "EventType",
           "type": "string"

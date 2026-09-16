@@ -367,6 +367,16 @@ backfilled by name order). Product decision 2026-09-16, recorded in
 the charter: the D&D HP engine is canonical; injuries arrive later
 as a complement.
 
+## Phase tick (S2-TIME-001)
+
+Advancing refuses a new phase while the prior run is incomplete and
+always fires due schedules, even on a resumed tick: each due row
+records one `schedule_fired` event and flips to applied, so retries
+never double-fire. `is_quiet_phase` (empty or all WAIT) marks the
+phase report and API response; the client labels quiet scenes.
+`scheduled_effect` arrives in migration 0012 alongside the widened
+event-type check.
+
 ## D&D surface reads (DND-Surface)
 
 `GET /api/v1/stage1/party` and `POST /api/v1/stage1/party/begin` project

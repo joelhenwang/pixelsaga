@@ -79,7 +79,13 @@ from worldsim.domain.characters import Character
 from worldsim.domain.commands import ActionIntent, CommunicateAction, MoveAction
 from worldsim.domain.context import ContextEnvelope, ContextRequest, SourceCandidate
 from worldsim.domain.effects import AdvanceClockEffect
-from worldsim.domain.enums import EventType, LifeStatus, PhaseRunState, Visibility
+from worldsim.domain.enums import (
+    EventType,
+    LifeStatus,
+    PhaseRunState,
+    ScheduleStatus,
+    Visibility,
+)
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.events import WorldEvent
 from worldsim.domain.ids import (
@@ -111,6 +117,7 @@ from worldsim.domain.rules.dnd import (
     resolve_narration_tags,
 )
 from worldsim.domain.rules.perception import permitted_facts
+from worldsim.domain.rules.phases import is_quiet_phase
 from worldsim.domain.rules.scenes import assemble_scenes
 from worldsim.domain.rules.views import WorldView
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
@@ -151,6 +158,7 @@ class Stage1PhaseReport:
     snapshot_id: UUID
     scenes: list[SceneOutcome] = field(default_factory=list)
     duplicate: bool = False
+    quiet: bool = False
 
 
 @dataclass(frozen=True)
@@ -252,10 +260,12 @@ class Stage1Orchestrator:
                 await uow.commit()
         except IntegrityError:
             pass
+        await self._require_previous_complete(world_id, index)
         await self._tick(world_id, run_id, index)
         sealed = await self._seal(world_id, run_id, index)
         intents = await self._decide_all(world_id, run_id, sealed, player_intents or {})
         await self._set_state(run_id, PhaseRunState.INTENTS_COMPLETE)
+        quiet = is_quiet_phase(intent.action.family for intent in intents)
         async with self._factory() as uow:
             characters = await uow.characters.list_for_world(world_id)
             locations = await uow.locations.list_for_world(world_id)
@@ -284,6 +294,7 @@ class Stage1Orchestrator:
             absolute_index=index,
             snapshot_id=sealed.snapshot_id,
             scenes=outcomes,
+            quiet=quiet,
         )
 
     async def advance_three_phases(
@@ -320,12 +331,60 @@ class Stage1Orchestrator:
                     f"provider unavailable for {role}: {probe.detail}",
                 )
 
+    async def _require_previous_complete(self, world_id: UUID, index: int) -> None:
+        """Refuse a new phase while the prior run is not completed."""
+        if index <= 1:
+            return
+        previous_id = derive_run_id(world_id, index - 1)
+        try:
+            async with self._factory() as uow:
+                previous = await uow.phases.get_run(previous_id)
+        except DomainError:
+            raise DomainError(
+                ErrorCode.PRECONDITION_FAILED,
+                f"previous phase {index - 1} never ran; advance consecutively",
+            ) from None
+        if previous.state.value != PhaseRunState.COMPLETED.value:
+            raise DomainError(
+                ErrorCode.PRECONDITION_FAILED,
+                f"previous phase {index - 1} is {previous.state.value}; reconcile first",
+            )
+
+    async def _fire_due_schedules(self, world_id: UUID, index: int) -> int:
+        """Record one event per due schedule; applied rows never refire."""
+        async with self._factory() as uow:
+            due = await uow.schedules.list_due(world_id, index)
+            for schedule in due:
+                sequence = await uow.events.max_sequence(world_id) + 1
+                await uow.events.append_event(
+                    WorldEvent(
+                        id=schedule.id,
+                        world_id=world_id,
+                        sequence=sequence,
+                        event_type=EventType.SCHEDULE_FIRED,
+                        absolute_index=index,
+                        phase_run_id=derive_run_id(world_id, index),
+                        participant_ids=[],
+                        summary={
+                            "kind": schedule.kind,
+                            "due": str(schedule.due_absolute),
+                        },
+                    )
+                )
+                await uow.schedules.save(
+                    schedule.model_copy(update={"status": ScheduleStatus.APPLIED}),
+                    schedule.version,
+                )
+            await uow.commit()
+            return len(due)
+
     async def _tick(self, world_id: UUID, run_id: UUID, index: int) -> None:
         async with self._factory() as uow:
             world = await uow.worlds.get(world_id)
             version = await uow.versions.get(world_id) or 0
         if absolute_index(world.day, world.phase) == index:
             await self._set_state(run_id, PhaseRunState.WORLD_TICKED)
+            await self._fire_due_schedules(world_id, index)
             return
         effect = AdvanceClockEffect(
             affected_ids=[world_id],
@@ -354,6 +413,7 @@ class Stage1Orchestrator:
             )
         )
         await self._set_state(run_id, PhaseRunState.WORLD_TICKED)
+        await self._fire_due_schedules(world_id, index)
 
     async def _seal(self, world_id: UUID, run_id: UUID, index: int) -> SealedPhase:
         """Seal the shared snapshot every character decides from."""
@@ -1190,4 +1250,5 @@ class Stage1Orchestrator:
             snapshot_id=snapshot.id,
             scenes=outcomes,
             duplicate=True,
+            quiet=is_quiet_phase(intent.action.family for intent in intents),
         )

@@ -19,6 +19,7 @@ from worldsim.domain.perception import Observation, RecentMemory
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
+from worldsim.domain.schedules import ScheduledEffect
 from worldsim.domain.tasks import Lease, OutboxMessage, TaskRun
 from worldsim.domain.world import Location, World
 
@@ -89,6 +90,12 @@ class RouteRepository(Protocol):
     async def add(self, route: TravelRoute) -> None: ...
     async def save(self, route: TravelRoute, expected_version: int) -> TravelRoute: ...
     async def remove(self, route_id: UUID) -> None: ...
+
+
+class ScheduleRepository(Protocol):
+    async def add(self, schedule: ScheduledEffect) -> None: ...
+    async def list_due(self, world_id: UUID, absolute: int) -> list[ScheduledEffect]: ...
+    async def save(self, schedule: ScheduledEffect, expected_version: int) -> ScheduledEffect: ...
 
 
 class PhaseRepository(Protocol):
