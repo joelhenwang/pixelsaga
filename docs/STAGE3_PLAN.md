@@ -166,13 +166,17 @@ against. No new features.
    include/exclude counts per section (the assembler already
    records these — the soak surfaces truncation volume).
 3. Add the **recall probe**, defined against actual assembly:
-   on day 2 the resolver records an observation with a
-   distinctive fact key for the Hearth character; on day 29
-   the audit runs that character's real assembly path and
-   records whether the fact is included, excluded-by-budget,
-   or absent, plus the source rows involved. Claims and
-   beliefs are *not* assembly candidates, so the probe must
-   not plant them.
+   in the opening phases Wren communicates the distinctive
+   topic "the north bridge is cursed" to Ash. Resolver effect
+   facts never become observation or memory rows (they feed
+   narration), so the probe must ride intent-derived content:
+   the attempt fact and the "Wren remembers: …" memory
+   summary. On day 29 the audit finds the probe memory row,
+   then scans day-29 manifests for its source ID and records
+   included, excluded-by-budget, or absent, plus a phases-3-5
+   baseline proving the probe entered assembly at all. Claims
+   and beliefs are *not* assembly candidates, so the probe
+   must not plant them.
 4. Keep wall-time practical: the 7-day gate runs about 100s
    (96.7s in the generated `scenario.json` vs 104.8s in the
    hand-written REPORT — run-to-run variance is unrecorded,
