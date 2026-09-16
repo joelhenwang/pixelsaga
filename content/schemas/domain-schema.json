@@ -7,7 +7,8 @@
             "travel",
             "rest",
             "train",
-            "work"
+            "work",
+            "patrol"
           ],
           "title": "ActivityKind",
           "type": "string"

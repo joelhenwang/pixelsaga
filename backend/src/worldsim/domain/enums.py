@@ -214,6 +214,7 @@ class ActivityKind(StrEnum):
     REST = "rest"
     TRAIN = "train"
     WORK = "work"
+    PATROL = "patrol"
 
 
 class FocusSlot(StrEnum):

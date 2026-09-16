@@ -367,6 +367,17 @@ backfilled by name order). Product decision 2026-09-16, recorded in
 the charter: the D&D HP engine is canonical; injuries arrive later
 as a complement.
 
+## Activities (S2-ACTIVITY-001)
+
+`POST /stage2/activities` starts one activity per character (travel
+resolves its leg first); interrupt bakes progress, resume restarts
+from the current phase, cancel is terminal, and repeats are no-ops.
+The tick completes due activities with one canonical commit each:
+travel moves and spends stamina (exhaustion stalls instead), rest
+recovers, patrol observes, train/work record evidence in the event
+summary. Progress derives from the clock, so quiet phases advance
+activities with no writes and no model calls.
+
 ## Phase tick (S2-TIME-001)
 
 Advancing refuses a new phase while the prior run is incomplete and

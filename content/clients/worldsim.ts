@@ -141,6 +141,31 @@ export interface PartyRosterResponse {
   world_id: string;
 }
 
+export interface ActivityStartRequest {
+  character_id: string;
+  duration_phases?: number | null;
+  kind: string;
+  to_location_id?: string | null;
+  world_id: string;
+}
+
+export interface ActivityView {
+  character_id: string;
+  duration_phases: number;
+  id: string;
+  kind: string;
+  progress_phases: number;
+  start_absolute: number;
+  status: string;
+  version: number;
+  world_id: string;
+}
+
+export interface ActivityListResponse {
+  members?: ActivityView[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -162,5 +187,10 @@ export const ROUTES = {
   resume: "POST /api/v1/stage1/resume",
   beginPartyMember: "POST /api/v1/stage1/party/begin",
   listParty: "GET /api/v1/stage1/party",
+  startActivity: "POST /api/v1/stage2/activities",
+  interruptActivity: "POST /api/v1/stage2/activities/{activity_id}/interrupt",
+  resumeActivity: "POST /api/v1/stage2/activities/{activity_id}/resume",
+  cancelActivity: "POST /api/v1/stage2/activities/{activity_id}/cancel",
+  listActivities: "GET /api/v1/stage2/activities",
   listEvents: "GET /api/v1/world/events",
 } as const;

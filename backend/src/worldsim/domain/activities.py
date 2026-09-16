@@ -55,3 +55,11 @@ def focus_for_seat(seated: int) -> FocusSlot:
     if seated < 4:
         return FocusSlot.SUB
     return FocusSlot.COMPANION
+
+
+def effective_progress(activity: Activity, absolute: int) -> int:
+    """Phases done: baked progress plus elapsed time while active, capped."""
+    if activity.status != ActivityStatus.ACTIVE:
+        return activity.progress_phases
+    elapsed = max(0, absolute - activity.start_absolute)
+    return min(activity.duration_phases, activity.progress_phases + elapsed)

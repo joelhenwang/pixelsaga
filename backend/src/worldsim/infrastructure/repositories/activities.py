@@ -72,6 +72,7 @@ class SqlAlchemyActivityRepository:
         if row.version != expected_version:
             raise version_conflict("activity", activity.id, expected_version, row.version)
         row.status = activity.status.value
+        row.start_absolute = activity.start_absolute
         row.progress_phases = activity.progress_phases
         row.payload = dict(activity.payload)
         row.version = expected_version + 1

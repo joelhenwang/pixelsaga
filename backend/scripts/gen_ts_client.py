@@ -37,6 +37,9 @@ WANTED = (
     "PartyBeginRequest",
     "PartyMemberView",
     "PartyRosterResponse",
+    "ActivityStartRequest",
+    "ActivityView",
+    "ActivityListResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -52,6 +55,11 @@ ROUTES = (
     ("post", "/api/v1/stage1/resume", "resume"),
     ("post", "/api/v1/stage1/party/begin", "beginPartyMember"),
     ("get", "/api/v1/stage1/party", "listParty"),
+    ("post", "/api/v1/stage2/activities", "startActivity"),
+    ("post", "/api/v1/stage2/activities/{activity_id}/interrupt", "interruptActivity"),
+    ("post", "/api/v1/stage2/activities/{activity_id}/resume", "resumeActivity"),
+    ("post", "/api/v1/stage2/activities/{activity_id}/cancel", "cancelActivity"),
+    ("get", "/api/v1/stage2/activities", "listActivities"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

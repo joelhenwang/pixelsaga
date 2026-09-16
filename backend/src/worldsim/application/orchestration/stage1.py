@@ -75,14 +75,23 @@ from worldsim.application.transactions.canonical import (
 )
 from worldsim.application.transactions.scenes import build_scene_commit, observation_spec
 from worldsim.application.unit_of_work import UnitOfWork
+from worldsim.domain.activities import Activity, effective_progress
 from worldsim.domain.characters import Character
 from worldsim.domain.commands import ActionIntent, CommunicateAction, MoveAction
 from worldsim.domain.context import ContextEnvelope, ContextRequest, SourceCandidate
-from worldsim.domain.effects import AdvanceClockEffect
+from worldsim.domain.effects import (
+    AdvanceClockEffect,
+    DomainEffect,
+    MoveEntityEffect,
+    ResourceAdjustedEffect,
+)
 from worldsim.domain.enums import (
+    ActivityKind,
+    ActivityStatus,
     EventType,
     LifeStatus,
     PhaseRunState,
+    ResourceKind,
     ScheduleStatus,
     Visibility,
 )
@@ -103,6 +112,7 @@ from worldsim.domain.perception import (
     FactChannel,
     FactVisibility,
     ObservableEvent,
+    ObservationFact,
     PerceivedFact,
 )
 from worldsim.domain.phases import PhaseRun, PhaseSnapshot, SnapshotCharacter
@@ -118,6 +128,7 @@ from worldsim.domain.rules.dnd import (
 )
 from worldsim.domain.rules.perception import permitted_facts
 from worldsim.domain.rules.phases import is_quiet_phase
+from worldsim.domain.rules.resources import rest_recovery, restore, spend
 from worldsim.domain.rules.scenes import assemble_scenes
 from worldsim.domain.rules.views import WorldView
 from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
@@ -385,6 +396,7 @@ class Stage1Orchestrator:
         if absolute_index(world.day, world.phase) == index:
             await self._set_state(run_id, PhaseRunState.WORLD_TICKED)
             await self._fire_due_schedules(world_id, index)
+            await self._advance_activities(world_id, run_id, index)
             return
         effect = AdvanceClockEffect(
             affected_ids=[world_id],
@@ -414,6 +426,146 @@ class Stage1Orchestrator:
         )
         await self._set_state(run_id, PhaseRunState.WORLD_TICKED)
         await self._fire_due_schedules(world_id, index)
+        await self._advance_activities(world_id, run_id, index)
+
+    async def _advance_activities(self, world_id: UUID, run_id: UUID, index: int) -> int:
+        """Progress due activities; completion commits once per activity.
+
+        Progress is derived from the clock, so this only writes when an
+        activity finishes. Exhausted travelers stall instead of moving.
+        """
+        async with self._factory() as uow:
+            due = [
+                activity
+                for activity in await uow.activities.list_active_for_world(world_id)
+                if effective_progress(activity, index) >= activity.duration_phases
+            ]
+        completed = 0
+        for activity in due:
+            if await self._complete_activity(world_id, run_id, index, activity):
+                completed += 1
+        return completed
+
+    async def _complete_activity(
+        self, world_id: UUID, run_id: UUID, index: int, activity: Activity
+    ) -> bool:
+        """Commit one activity's completion effects, then mark it done."""
+        async with self._factory() as uow:
+            character = await uow.characters.get(activity.character_id)
+        effects: list[DomainEffect] = []
+        observations: list[ObservationSpec] = []
+        try:
+            if activity.kind == ActivityKind.TRAVEL:
+                destination = UUID(str(activity.payload["to_location_id"]))
+                cost = int(activity.payload.get("stamina_cost", 0))
+                effects.append(
+                    MoveEntityEffect(
+                        affected_ids=[character.id],
+                        expected_versions={str(character.id): character.version},
+                        from_location_id=character.location_id,
+                        to_location_id=destination,
+                    )
+                )
+                remaining = spend(character.stamina, cost)
+                if remaining != character.stamina:
+                    effects.append(
+                        ResourceAdjustedEffect(
+                            affected_ids=[character.id],
+                            expected_versions={str(character.id): character.version},
+                            resource=ResourceKind.STAMINA,
+                            delta=remaining - character.stamina,
+                        )
+                    )
+            elif activity.kind == ActivityKind.REST:
+                stamina_gain, mana_gain = rest_recovery(activity.duration_phases)
+                rested_stamina = restore(character.stamina, stamina_gain)
+                if rested_stamina != character.stamina:
+                    effects.append(
+                        ResourceAdjustedEffect(
+                            affected_ids=[character.id],
+                            expected_versions={str(character.id): character.version},
+                            resource=ResourceKind.STAMINA,
+                            delta=rested_stamina - character.stamina,
+                        )
+                    )
+                rested_mana = restore(character.mana, mana_gain)
+                if rested_mana != character.mana:
+                    effects.append(
+                        ResourceAdjustedEffect(
+                            affected_ids=[character.id],
+                            expected_versions={str(character.id): character.version},
+                            resource=ResourceKind.MANA,
+                            delta=rested_mana - character.mana,
+                        )
+                    )
+            elif activity.kind == ActivityKind.PATROL:
+                async with self._factory() as uow:
+                    origin = await uow.locations.get(character.location_id)
+                observations.append(
+                    ObservationSpec(
+                        observer_id=character.id,
+                        facts=[
+                            ObservationFact(
+                                key=f"patrol:{origin.name}",
+                                value="quiet, no movement on the roads",
+                            )
+                        ],
+                    )
+                )
+        except DomainError:
+            await self._stall_activity(activity, index)
+            return False
+        key = f"activity_complete:{activity.id.hex}"
+        await self._canonical.commit(
+            CommitRequest(
+                command_id=uuid4(),
+                world_id=world_id,
+                idempotency_key=key,
+                actor_role="system",
+                command_type="complete_activity",
+                expected_versions={str(character.id): character.version},
+                payload={"activity_id": str(activity.id), "kind": activity.kind.value},
+                input_hash=canonical_input_hash(
+                    {
+                        "key": key,
+                        "activity": str(activity.id),
+                        "effects": [e.model_dump(mode="json") for e in effects],
+                    }
+                ),
+                absolute_index=index,
+                phase_run_id=run_id,
+                event_type=EventType.ACTION_RESOLVED,
+                effects=effects,
+                observations=observations,
+            )
+        )
+        async with self._factory() as uow:
+            try:
+                await uow.activities.save(
+                    activity.model_copy(update={"status": ActivityStatus.COMPLETED}),
+                    activity.version,
+                )
+                await uow.commit()
+            except DomainError:
+                pass
+        return True
+
+    async def _stall_activity(self, activity: Activity, index: int) -> None:
+        """Exhausted traveler: bake progress and freeze without moving."""
+        async with self._factory() as uow:
+            try:
+                await uow.activities.save(
+                    activity.model_copy(
+                        update={
+                            "status": ActivityStatus.INTERRUPTED,
+                            "progress_phases": effective_progress(activity, index),
+                        }
+                    ),
+                    activity.version,
+                )
+                await uow.commit()
+            except DomainError:
+                pass
 
     async def _seal(self, world_id: UUID, run_id: UUID, index: int) -> SealedPhase:
         """Seal the shared snapshot every character decides from."""

@@ -347,6 +347,37 @@ class PartyMemberView(BaseModel):
     version: int
 
 
+class ActivityStartRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    character_id: UUID
+    kind: str = Field(max_length=32)
+    duration_phases: int | None = Field(default=None, ge=1, le=100)
+    to_location_id: UUID | None = None
+
+
+class ActivityView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    character_id: UUID
+    kind: str
+    status: str
+    start_absolute: int
+    duration_phases: int
+    progress_phases: int
+    version: int
+
+
+class ActivityListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    members: list[ActivityView] = Field(default_factory=list)
+
+
 class PartyRosterResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
