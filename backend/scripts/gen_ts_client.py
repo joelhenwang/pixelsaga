@@ -54,6 +54,12 @@ WANTED = (
     "ItemListResponse",
     "SkillView",
     "SkillListResponse",
+    "RoleSelectRequest",
+    "RoleGrantView",
+    "DirectorProposalRequest",
+    "DirectorProposalView",
+    "DeityOverrideRequest",
+    "DeityOverrideView",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -83,6 +89,10 @@ ROUTES = (
     ("post", "/api/v1/stage2/items/{item_id}/transfer", "transferItem"),
     ("get", "/api/v1/stage2/items", "listItems"),
     ("get", "/api/v1/stage2/skills", "listSkills"),
+    ("post", "/api/v1/stage2/roles/select", "selectRole"),
+    ("get", "/api/v1/stage2/roles", "readRole"),
+    ("post", "/api/v1/stage2/director/proposals", "proposeDirectorHook"),
+    ("post", "/api/v1/stage2/deity/overrides", "applyDeityOverride"),
     ("get", "/api/v1/world/events", "listEvents"),
 )
 

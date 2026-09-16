@@ -514,6 +514,67 @@ class BeliefListResponse(BaseModel):
     members: list[BeliefView] = Field(default_factory=list)
 
 
+class RoleSelectRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    role: str = Field(max_length=16)
+    character_id: UUID | None = None
+
+
+class RoleGrantView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    role: str
+    character_id: UUID | None
+    granted_absolute: int
+    version: int
+
+
+class DirectorProposalRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    kind: str = Field(pattern="^(hook|arc)$")
+    title: str = Field(min_length=1, max_length=128)
+    purpose: str = Field(default="", max_length=1024)
+    requested_powers: list[str] = Field(default_factory=list)
+    participant_ids: list[UUID] = Field(default_factory=list)
+
+
+class DirectorProposalView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    kind: str
+    title: str
+    reason: str
+
+
+class DeityOverrideRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    character_id: UUID
+    stamina: int | None = Field(default=None, ge=0, le=100)
+    mana: int | None = Field(default=None, ge=0, le=100)
+    life_status: str | None = Field(default=None, max_length=16)
+    conditions: list[str] | None = None
+    retcon: bool = False
+
+
+class DeityOverrideView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    event_id: UUID
+    world_id: UUID
+    character_id: UUID
+    retcon: bool
+
+
 class PartyRosterResponse(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 

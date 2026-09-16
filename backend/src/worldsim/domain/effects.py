@@ -12,7 +12,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from worldsim.domain.enums import EffectType, ResourceKind
+from worldsim.domain.enums import EffectType, LifeStatus, ResourceKind
 from worldsim.domain.ids import LocationId, RouteId
 from worldsim.domain.perception import ObservationFact
 
@@ -84,6 +84,16 @@ class SkillProgressEffect(EffectBase):
     session_key: str = Field(min_length=1, max_length=128)
 
 
+class DeityOverrideEffect(EffectBase):
+    effect_type: Literal[EffectType.DEITY_OVERRIDE] = EffectType.DEITY_OVERRIDE
+    character_id: UUID
+    stamina: int | None = Field(default=None, ge=0, le=100)
+    mana: int | None = Field(default=None, ge=0, le=100)
+    life_status: LifeStatus | None = None
+    conditions: list[str] | None = Field(default=None, max_length=8)
+    retcon: bool = False
+
+
 class MemoryRecordedEffect(EffectBase):
     effect_type: Literal[EffectType.RECORD_MEMORY] = EffectType.RECORD_MEMORY
     owner_character_id: UUID
@@ -96,6 +106,7 @@ DomainEffect = Annotated[
     | ResourceAdjustedEffect
     | ObservationRecordedEffect
     | MemoryRecordedEffect
-    | SkillProgressEffect,
+    | SkillProgressEffect
+    | DeityOverrideEffect,
     Field(discriminator="effect_type"),
 ]

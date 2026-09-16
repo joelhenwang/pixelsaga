@@ -21,6 +21,7 @@ from worldsim.application.ports.repositories import (
     PhaseRepository,
     ProgressRepository,
     RelationshipRepository,
+    RoleRepository,
     RouteRepository,
     SceneRepository,
     ScheduleRepository,
@@ -57,6 +58,8 @@ class UnitOfWork(Protocol):
     def narrative(self) -> NarrativeRepository: ...
     @property
     def summaries(self) -> SummaryRepository: ...
+    @property
+    def roles(self) -> RoleRepository: ...
     @property
     def progress(self) -> ProgressRepository: ...
     @property

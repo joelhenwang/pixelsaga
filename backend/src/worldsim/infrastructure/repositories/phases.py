@@ -77,6 +77,18 @@ class SqlAlchemyPhaseRepository:
             )
         return _to_run(found[0]) if found else None
 
+    async def latest_run(self, world_id: UUID) -> PhaseRun | None:
+        rows = (
+            await self._session.execute(
+                select(PhaseRunRow)
+                .where(PhaseRunRow.world_id == world_id)
+                .order_by(PhaseRunRow.absolute_index.desc())
+                .limit(1)
+            )
+        ).scalars()
+        found = list(rows)
+        return _to_run(found[0]) if found else None
+
     async def set_run_state(self, run_id: UUID, state: str) -> None:
         row = await self._session.get(PhaseRunRow, run_id)
         if row is None:

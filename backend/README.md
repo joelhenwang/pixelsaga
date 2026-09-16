@@ -365,6 +365,17 @@ and malformed output fall back to structural counts. Versions
 accumulate per (world, owner, day); raw observations and memories
 are never touched, and summary failures never fail the phase.
 
+## Roles (S2-ROLE-001)
+
+One active grant per world selects the operating role at safe
+boundaries (never mid-run); player grants bind a character. The
+grant governs every caller, falling back to request headers only
+where no grant exists. Director users propose through the same
+validation as model proposals; deity patches one character per
+audited canonical commit (`deity_override` event), with retcon
+overrides additionally enqueueing a consistency-audit message.
+Player-scoped reads stay header-bound as in Stage 1.
+
 ## Director (S2-DIRECTOR-001)
 
 `narrative_hook` and `narrative_arc` rows hold opportunities, never

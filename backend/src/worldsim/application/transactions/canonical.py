@@ -19,6 +19,7 @@ from worldsim.application.unit_of_work import UnitOfWork
 from worldsim.domain.characters import Character
 from worldsim.domain.effects import (
     AdvanceClockEffect,
+    DeityOverrideEffect,
     DomainEffect,
     MoveEntityEffect,
     ResourceAdjustedEffect,
@@ -286,6 +287,12 @@ class CanonicalTransaction:
                 clock[target] = effect
             elif isinstance(effect, SkillProgressEffect):
                 await self._progress_skill(uow, request, effect)
+            elif isinstance(effect, DeityOverrideEffect):
+                target = _primary_target(effect, request.world_id)
+                current = characters.get(target)
+                if current is None:
+                    current = await uow.characters.get(target)
+                characters[target] = self._override_character(current, effect)
             elif isinstance(effect, (MoveEntityEffect, ResourceAdjustedEffect)):
                 target = _primary_target(effect, request.world_id)
                 current = characters.get(target)
@@ -365,6 +372,20 @@ class CanonicalTransaction:
             ),
             current.version,
         )
+
+    @staticmethod
+    def _override_character(current: Character, effect: DeityOverrideEffect) -> Character:
+        """Apply a typed deity patch; unset fields stay untouched."""
+        patch: dict[str, object] = {}
+        if effect.stamina is not None:
+            patch["stamina"] = effect.stamina
+        if effect.mana is not None:
+            patch["mana"] = effect.mana
+        if effect.life_status is not None:
+            patch["life_status"] = effect.life_status
+        if effect.conditions is not None:
+            patch["conditions"] = list(effect.conditions)
+        return current.model_copy(update=patch)
 
     async def _perceive(
         self, uow: UnitOfWork, request: CommitRequest, event_id: UUID

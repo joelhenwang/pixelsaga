@@ -38,6 +38,7 @@ from worldsim.domain.narrative import NarrativeArc, NarrativeHook
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.progress import CharacterSkill, ItemInstance, SkillDefinition, TrainingSession
 from worldsim.domain.relationships import Relationship, RelationshipEvidence
+from worldsim.domain.roles import RoleGrant
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.schedules import ScheduledEffect
 
@@ -111,6 +112,7 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     TrainingSession,
     Relationship,
     RelationshipEvidence,
+    RoleGrant,
     ScheduledEffect,
     Sheet,
     TravelRoute,

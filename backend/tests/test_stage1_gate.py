@@ -492,7 +492,7 @@ def _write_evidence(
             {
                 "scenario": "stage1-three-phase-v1",
                 "world_id": str(WORLD_ID),
-                "migration_head": "0017_s2_summaries",
+                "migration_head": "0018_s2_roles",
                 "files": [
                     "scenario.json",
                     "audit.json",

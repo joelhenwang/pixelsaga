@@ -60,7 +60,8 @@ class WorldEventRow(Base):
     __table_args__ = (
         CheckConstraint("sequence >= 1", name="ck_event_sequence"),
         CheckConstraint(
-            "event_type IN ('world_seeded','world_ticked','action_resolved','schedule_fired')",
+            "event_type IN ('world_seeded','world_ticked','action_resolved',"
+            "'schedule_fired','deity_override')",
             name="ck_event_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_event_schema"),
@@ -87,7 +88,7 @@ class EventEffectRow(Base):
         CheckConstraint("ordinal >= 0", name="ck_effect_ordinal"),
         CheckConstraint(
             "effect_type IN ('advance_clock','move_entity','resource_adjusted',"
-            "'record_observation','record_memory','skill_progress')",
+            "'record_observation','record_memory','skill_progress','deity_override')",
             name="ck_effect_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_effect_schema"),

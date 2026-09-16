@@ -230,6 +230,118 @@
           "title": "AdvanceClockEffect",
           "type": "object"
         },
+        "DeityOverrideEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "effect_type": {
+              "const": "deity_override",
+              "default": "deity_override",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "life_status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LifeStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mana": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Mana"
+            },
+            "retcon": {
+              "default": false,
+              "title": "Retcon",
+              "type": "boolean"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "stamina": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Stamina"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id"
+          ],
+          "title": "DeityOverrideEffect",
+          "type": "object"
+        },
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
+        },
         "MemoryRecordedEffect": {
           "additionalProperties": false,
           "properties": {
@@ -567,6 +679,7 @@
             "discriminator": {
               "mapping": {
                 "advance_clock": "#/$defs/AdvanceClockEffect",
+                "deity_override": "#/$defs/DeityOverrideEffect",
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
@@ -593,6 +706,9 @@
               },
               {
                 "$ref": "#/$defs/SkillProgressEffect"
+              },
+              {
+                "$ref": "#/$defs/DeityOverrideEffect"
               }
             ]
           },
@@ -1199,6 +1315,118 @@
           "title": "AdvanceClockEffect",
           "type": "object"
         },
+        "DeityOverrideEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "effect_type": {
+              "const": "deity_override",
+              "default": "deity_override",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "life_status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LifeStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mana": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Mana"
+            },
+            "retcon": {
+              "default": false,
+              "title": "Retcon",
+              "type": "boolean"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "stamina": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Stamina"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id"
+          ],
+          "title": "DeityOverrideEffect",
+          "type": "object"
+        },
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
+        },
         "MemoryRecordedEffect": {
           "additionalProperties": false,
           "properties": {
@@ -1509,6 +1737,7 @@
           "discriminator": {
             "mapping": {
               "advance_clock": "#/$defs/AdvanceClockEffect",
+              "deity_override": "#/$defs/DeityOverrideEffect",
               "move_entity": "#/$defs/MoveEntityEffect",
               "record_memory": "#/$defs/MemoryRecordedEffect",
               "record_observation": "#/$defs/ObservationRecordedEffect",
@@ -1535,6 +1764,9 @@
             },
             {
               "$ref": "#/$defs/SkillProgressEffect"
+            },
+            {
+              "$ref": "#/$defs/DeityOverrideEffect"
             }
           ],
           "title": "Effect"
@@ -4972,6 +5204,118 @@
           "title": "AdvanceClockEffect",
           "type": "object"
         },
+        "DeityOverrideEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "effect_type": {
+              "const": "deity_override",
+              "default": "deity_override",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "life_status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LifeStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mana": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Mana"
+            },
+            "retcon": {
+              "default": false,
+              "title": "Retcon",
+              "type": "boolean"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "stamina": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Stamina"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id"
+          ],
+          "title": "DeityOverrideEffect",
+          "type": "object"
+        },
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
+        },
         "MemoryRecordedEffect": {
           "additionalProperties": false,
           "properties": {
@@ -5307,6 +5651,7 @@
             "discriminator": {
               "mapping": {
                 "advance_clock": "#/$defs/AdvanceClockEffect",
+                "deity_override": "#/$defs/DeityOverrideEffect",
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
@@ -5333,6 +5678,9 @@
               },
               {
                 "$ref": "#/$defs/SkillProgressEffect"
+              },
+              {
+                "$ref": "#/$defs/DeityOverrideEffect"
               }
             ]
           },
@@ -5440,6 +5788,118 @@
           ],
           "title": "AdvanceClockEffect",
           "type": "object"
+        },
+        "DeityOverrideEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "effect_type": {
+              "const": "deity_override",
+              "default": "deity_override",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "life_status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LifeStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mana": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Mana"
+            },
+            "retcon": {
+              "default": false,
+              "title": "Retcon",
+              "type": "boolean"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "stamina": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Stamina"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id"
+          ],
+          "title": "DeityOverrideEffect",
+          "type": "object"
+        },
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
         },
         "MemoryRecordedEffect": {
           "additionalProperties": false,
@@ -5763,6 +6223,7 @@
             "discriminator": {
               "mapping": {
                 "advance_clock": "#/$defs/AdvanceClockEffect",
+                "deity_override": "#/$defs/DeityOverrideEffect",
                 "move_entity": "#/$defs/MoveEntityEffect",
                 "record_memory": "#/$defs/MemoryRecordedEffect",
                 "record_observation": "#/$defs/ObservationRecordedEffect",
@@ -5789,6 +6250,9 @@
               },
               {
                 "$ref": "#/$defs/SkillProgressEffect"
+              },
+              {
+                "$ref": "#/$defs/DeityOverrideEffect"
               }
             ]
           },
@@ -5989,6 +6453,70 @@
         "audit"
       ],
       "title": "ResumeSimulationCommand",
+      "type": "object"
+    },
+    "RoleGrant": {
+      "$defs": {
+        "UserRole": {
+          "enum": [
+            "watcher",
+            "director",
+            "deity",
+            "player",
+            "system"
+          ],
+          "title": "UserRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "The selected operating role for a world.",
+      "properties": {
+        "character_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Character Id"
+        },
+        "granted_absolute": {
+          "minimum": 0,
+          "title": "Granted Absolute",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/UserRole"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "role",
+        "granted_absolute"
+      ],
+      "title": "RoleGrant",
       "type": "object"
     },
     "Route": {
@@ -6971,6 +7499,7 @@
             "world_seeded",
             "world_ticked",
             "action_resolved",
+            "deity_override",
             "schedule_fired"
           ],
           "title": "EventType",
@@ -7180,6 +7709,7 @@
               "discriminator": {
                 "mapping": {
                   "advance_clock": "#/$defs/AdvanceClockEffect",
+                  "deity_override": "#/$defs/DeityOverrideEffect",
                   "move_entity": "#/$defs/MoveEntityEffect",
                   "record_memory": "#/$defs/MemoryRecordedEffect",
                   "record_observation": "#/$defs/ObservationRecordedEffect",
@@ -7206,6 +7736,9 @@
                 },
                 {
                   "$ref": "#/$defs/SkillProgressEffect"
+                },
+                {
+                  "$ref": "#/$defs/DeityOverrideEffect"
                 }
               ],
               "title": "Effect"
@@ -7229,14 +7762,127 @@
           "title": "CommittedEffect",
           "type": "object"
         },
+        "DeityOverrideEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "conditions": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 8,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Conditions"
+            },
+            "effect_type": {
+              "const": "deity_override",
+              "default": "deity_override",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "life_status": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/LifeStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "mana": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Mana"
+            },
+            "retcon": {
+              "default": false,
+              "title": "Retcon",
+              "type": "boolean"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "stamina": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Stamina"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "character_id"
+          ],
+          "title": "DeityOverrideEffect",
+          "type": "object"
+        },
         "EventType": {
           "enum": [
             "world_seeded",
             "world_ticked",
             "action_resolved",
+            "deity_override",
             "schedule_fired"
           ],
           "title": "EventType",
+          "type": "string"
+        },
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
           "type": "string"
         },
         "MemoryRecordedEffect": {

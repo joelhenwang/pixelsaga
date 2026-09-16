@@ -274,6 +274,55 @@ export interface SkillListResponse {
   world_id: string;
 }
 
+export interface RoleSelectRequest {
+  character_id?: string | null;
+  role: string;
+  world_id: string;
+}
+
+export interface RoleGrantView {
+  character_id: string;
+  granted_absolute: number;
+  id: string;
+  role: string;
+  version: number;
+  world_id: string;
+}
+
+export interface DirectorProposalRequest {
+  kind: string;
+  participant_ids?: string[] | null;
+  purpose?: string | null;
+  requested_powers?: string[] | null;
+  title: string;
+  world_id: string;
+}
+
+export interface DirectorProposalView {
+  id: string;
+  kind: string;
+  reason: string;
+  title: string;
+  world_id: string;
+}
+
+export interface DeityOverrideRequest {
+  character_id: string;
+  conditions?: string[] | null;
+  life_status?: string | null;
+  mana?: number | null;
+  retcon?: boolean | null;
+  stamina?: number | null;
+  world_id: string;
+}
+
+export interface DeityOverrideView {
+  character_id: string;
+  event_id: string;
+  retcon: boolean;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -309,5 +358,9 @@ export const ROUTES = {
   transferItem: "POST /api/v1/stage2/items/{item_id}/transfer",
   listItems: "GET /api/v1/stage2/items",
   listSkills: "GET /api/v1/stage2/skills",
+  selectRole: "POST /api/v1/stage2/roles/select",
+  readRole: "GET /api/v1/stage2/roles",
+  proposeDirectorHook: "POST /api/v1/stage2/director/proposals",
+  applyDeityOverride: "POST /api/v1/stage2/deity/overrides",
   listEvents: "GET /api/v1/world/events",
 } as const;

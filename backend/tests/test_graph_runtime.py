@@ -14,7 +14,6 @@ from langgraph.types import Command, interrupt
 
 from worldsim.application.graphs.character import CharacterGraphDeps
 from worldsim.application.graphs.director import DirectorGraphDeps
-from worldsim.application.graphs.summary import SummaryGraphDeps
 from worldsim.application.graphs.narrate import NarratorGraphDeps
 from worldsim.application.graphs.reaction import ReactionGraphDeps
 from worldsim.application.graphs.resolve import ResolverGraphDeps
@@ -26,6 +25,7 @@ from worldsim.application.graphs.state import (
     config_for,
     thread_id_for,
 )
+from worldsim.application.graphs.summary import SummaryGraphDeps
 from worldsim.infrastructure.db.engine import create_engine, session_factory
 from worldsim.infrastructure.models.world import WorldRow
 from worldsim.infrastructure.settings import Settings

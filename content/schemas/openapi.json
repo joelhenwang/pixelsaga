@@ -682,6 +682,116 @@
         "title": "CurrentPhaseResponse",
         "type": "object"
       },
+      "DeityOverrideRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "conditions": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conditions"
+          },
+          "life_status": {
+            "anyOf": [
+              {
+                "maxLength": 16,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Life Status"
+          },
+          "mana": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mana"
+          },
+          "retcon": {
+            "default": false,
+            "title": "Retcon",
+            "type": "boolean"
+          },
+          "stamina": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stamina"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "character_id"
+        ],
+        "title": "DeityOverrideRequest",
+        "type": "object"
+      },
+      "DeityOverrideView": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "retcon": {
+            "title": "Retcon",
+            "type": "boolean"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "world_id",
+          "character_id",
+          "retcon"
+        ],
+        "title": "DeityOverrideView",
+        "type": "object"
+      },
       "DependencyCheck": {
         "additionalProperties": false,
         "properties": {
@@ -709,6 +819,91 @@
           "status"
         ],
         "title": "DependencyCheck",
+        "type": "object"
+      },
+      "DirectorProposalRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "pattern": "^(hook|arc)$",
+            "title": "Kind",
+            "type": "string"
+          },
+          "participant_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Participant Ids",
+            "type": "array"
+          },
+          "purpose": {
+            "default": "",
+            "maxLength": 1024,
+            "title": "Purpose",
+            "type": "string"
+          },
+          "requested_powers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Requested Powers",
+            "type": "array"
+          },
+          "title": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "kind",
+          "title"
+        ],
+        "title": "DirectorProposalRequest",
+        "type": "object"
+      },
+      "DirectorProposalView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "kind",
+          "title",
+          "reason"
+        ],
+        "title": "DirectorProposalView",
         "type": "object"
       },
       "EventEntry": {
@@ -1548,6 +1743,88 @@
           "rationale"
         ],
         "title": "ResolutionView",
+        "type": "object"
+      },
+      "RoleGrantView": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
+          },
+          "granted_absolute": {
+            "title": "Granted Absolute",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "role",
+          "character_id",
+          "granted_absolute",
+          "version"
+        ],
+        "title": "RoleGrantView",
+        "type": "object"
+      },
+      "RoleSelectRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
+          },
+          "role": {
+            "maxLength": 16,
+            "title": "Role",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "role"
+        ],
+        "title": "RoleSelectRequest",
         "type": "object"
       },
       "RunIdRequest": {
@@ -3057,6 +3334,90 @@
         ]
       }
     },
+    "/api/v1/stage2/deity/overrides": {
+      "post": {
+        "description": "A typed deity patch through one audited canonical commit.",
+        "operationId": "override_api_v1_stage2_deity_overrides_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeityOverrideRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeityOverrideView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Override",
+        "tags": [
+          "roles"
+        ]
+      }
+    },
+    "/api/v1/stage2/director/proposals": {
+      "post": {
+        "description": "A user Director proposal through the same validation as model ones.",
+        "operationId": "propose_api_v1_stage2_director_proposals_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DirectorProposalRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DirectorProposalView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Propose",
+        "tags": [
+          "roles"
+        ]
+      }
+    },
     "/api/v1/stage2/items": {
       "get": {
         "description": "Instances held by one holder (or lying on the ground).",
@@ -3307,6 +3668,100 @@
         "summary": "Record",
         "tags": [
           "relationships"
+        ]
+      }
+    },
+    "/api/v1/stage2/roles": {
+      "get": {
+        "description": "The active grant, if one was selected.",
+        "operationId": "read_role_api_v1_stage2_roles_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RoleGrantView"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Read Role Api V1 Stage2 Roles Get"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Role",
+        "tags": [
+          "roles"
+        ]
+      }
+    },
+    "/api/v1/stage2/roles/select": {
+      "post": {
+        "description": "Select the operating role at a safe boundary (no open run).",
+        "operationId": "select_role_api_v1_stage2_roles_select_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoleSelectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleGrantView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Select Role",
+        "tags": [
+          "roles"
         ]
       }
     },

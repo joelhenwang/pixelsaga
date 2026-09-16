@@ -82,6 +82,7 @@ class EffectType(StrEnum):
     RECORD_OBSERVATION = "record_observation"
     RECORD_MEMORY = "record_memory"
     SKILL_PROGRESS = "skill_progress"
+    DEITY_OVERRIDE = "deity_override"
 
 
 class ResourceKind(StrEnum):
@@ -93,6 +94,7 @@ class EventType(StrEnum):
     WORLD_SEEDED = "world_seeded"
     WORLD_TICKED = "world_ticked"
     ACTION_RESOLVED = "action_resolved"
+    DEITY_OVERRIDE = "deity_override"
     SCHEDULE_FIRED = "schedule_fired"
 
 

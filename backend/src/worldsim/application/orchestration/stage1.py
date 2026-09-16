@@ -32,6 +32,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.exc import IntegrityError
 
+from worldsim.application.commands.director import accept_decision
 from worldsim.application.commands.party import recruit_companion
 from worldsim.application.context.assembler import assemble, to_manifest_dict
 from worldsim.application.graphs.character import (
@@ -895,23 +896,14 @@ class Stage1Orchestrator:
         decision = DirectorDecision.model_validate(result.get("decision") or {})
         status = str(result.get("status", "noop"))
         async with self._factory() as uow:
-            await uow.worlds.put_config(world_id, "director.last_absolute", index)
-            if decision.accepted:
-                if decision.hook is not None:
-                    await uow.narrative.add_hook(decision.hook)
-                if decision.arc is not None:
-                    await uow.narrative.add_arc(decision.arc)
-                await uow.commands.add(
-                    command_id=uuid4(),
-                    world_id=world_id,
-                    key=f"director:{run_id.hex}:{index}",
-                    actor_role="system",
-                    command_type="director_proposal",
-                    expected_versions={},
-                    payload={"status": status},
-                    input_hash=canonical_input_hash({"key": f"director:{run_id.hex}"}),
-                )
-            await uow.commit()
+            await accept_decision(
+                uow,
+                world_id,
+                decision,
+                "system",
+                f"director:{run_id.hex}:{index}",
+                index,
+            )
         await self._set_state(run_id, PhaseRunState.DIRECTOR_COMPLETE)
         if decision.accepted:
             return "proposed"
