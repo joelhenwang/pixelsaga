@@ -236,6 +236,12 @@ class RelationshipDimension(StrEnum):
     RESPECT = "respect"
 
 
+class NarrativeStatus(StrEnum):
+    PROPOSED = "proposed"
+    ACTIVE = "active"
+    CLOSED = "closed"
+
+
 class ParticipantRole(StrEnum):
     INITIATOR = "initiator"
     REACTOR = "reactor"

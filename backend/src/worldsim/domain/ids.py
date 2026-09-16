@@ -21,6 +21,8 @@ ClaimId = UUID
 BeliefId = UUID
 SkillId = UUID
 ItemInstanceId = UUID
+HookId = UUID
+ArcId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
 TaskId = UUID
@@ -98,6 +100,14 @@ def new_skill_id() -> SkillId:
 
 
 def new_item_instance_id() -> ItemInstanceId:
+    return uuid4()
+
+
+def new_hook_id() -> HookId:
+    return uuid4()
+
+
+def new_arc_id() -> ArcId:
     return uuid4()
 
 

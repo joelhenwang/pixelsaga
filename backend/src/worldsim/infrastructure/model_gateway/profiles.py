@@ -57,6 +57,15 @@ NARRATOR_FAKE_PROFILE = ModelProfile(
     max_context_tokens=8192,
     capabilities=["chat", "json_mode"],
 )
+
+DIRECTOR_FAKE_PROFILE = ModelProfile(
+    name="director",
+    version="direct-fake-v1",
+    adapter="fake",
+    model_id="fake-director",
+    max_context_tokens=4096,
+    capabilities=["chat", "json_mode"],
+)
 OPENROUTER_CHAT_PROFILE = ModelProfile(
     name="openrouter",
     version="chat-v1",

@@ -1956,6 +1956,214 @@
       "title": "DesiredEffect",
       "type": "object"
     },
+    "DirectorDecision": {
+      "$defs": {
+        "NarrativeArc": {
+          "additionalProperties": false,
+          "description": "One longer purpose spanning several phases.",
+          "properties": {
+            "id": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            },
+            "purpose": {
+              "default": "",
+              "maxLength": 1024,
+              "title": "Purpose",
+              "type": "string"
+            },
+            "status": {
+              "$ref": "#/$defs/NarrativeStatus",
+              "default": "proposed"
+            },
+            "title": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            },
+            "version": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            },
+            "world_id": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "world_id",
+            "title"
+          ],
+          "title": "NarrativeArc",
+          "type": "object"
+        },
+        "NarrativeHook": {
+          "additionalProperties": false,
+          "description": "One situational opening with explicit requested powers.",
+          "properties": {
+            "id": {
+              "format": "uuid",
+              "title": "Id",
+              "type": "string"
+            },
+            "participant_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "title": "Participant Ids",
+              "type": "array"
+            },
+            "purpose": {
+              "default": "",
+              "maxLength": 1024,
+              "title": "Purpose",
+              "type": "string"
+            },
+            "requested_powers": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Requested Powers",
+              "type": "array"
+            },
+            "status": {
+              "$ref": "#/$defs/NarrativeStatus",
+              "default": "proposed"
+            },
+            "title": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Title",
+              "type": "string"
+            },
+            "version": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Version",
+              "type": "integer"
+            },
+            "world_id": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "world_id",
+            "title"
+          ],
+          "title": "NarrativeHook",
+          "type": "object"
+        },
+        "NarrativeStatus": {
+          "enum": [
+            "proposed",
+            "active",
+            "closed"
+          ],
+          "title": "NarrativeStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Validated outcome: accepted rows or a rejection reason.",
+      "properties": {
+        "accepted": {
+          "title": "Accepted",
+          "type": "boolean"
+        },
+        "arc": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NarrativeArc"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "hook": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NarrativeHook"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "reason": {
+          "default": "",
+          "maxLength": 512,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "accepted"
+      ],
+      "title": "DirectorDecision",
+      "type": "object"
+    },
+    "DirectorProposal": {
+      "additionalProperties": false,
+      "description": "One model-proposed opportunity (or an explicit no-op).",
+      "properties": {
+        "action": {
+          "pattern": "^(propose_hook|propose_arc|noop)$",
+          "title": "Action",
+          "type": "string"
+        },
+        "participant_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "purpose": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "reason": {
+          "default": "",
+          "maxLength": 512,
+          "title": "Reason",
+          "type": "string"
+        },
+        "requested_powers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requested Powers",
+          "type": "array"
+        },
+        "title": {
+          "default": "",
+          "maxLength": 128,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "DirectorProposal",
+      "type": "object"
+    },
     "Disclosure": {
       "additionalProperties": false,
       "description": "Explicit disclosure of one fact key to named recipients.",
@@ -3129,6 +3337,133 @@
         "text"
       ],
       "title": "NarrationBeat",
+      "type": "object"
+    },
+    "NarrativeArc": {
+      "$defs": {
+        "NarrativeStatus": {
+          "enum": [
+            "proposed",
+            "active",
+            "closed"
+          ],
+          "title": "NarrativeStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One longer purpose spanning several phases.",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "purpose": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/NarrativeStatus",
+          "default": "proposed"
+        },
+        "title": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "title"
+      ],
+      "title": "NarrativeArc",
+      "type": "object"
+    },
+    "NarrativeHook": {
+      "$defs": {
+        "NarrativeStatus": {
+          "enum": [
+            "proposed",
+            "active",
+            "closed"
+          ],
+          "title": "NarrativeStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One situational opening with explicit requested powers.",
+      "properties": {
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "participant_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "purpose": {
+          "default": "",
+          "maxLength": 1024,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "requested_powers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requested Powers",
+          "type": "array"
+        },
+        "status": {
+          "$ref": "#/$defs/NarrativeStatus",
+          "default": "proposed"
+        },
+        "title": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "title"
+      ],
+      "title": "NarrativeHook",
       "type": "object"
     },
     "ObservableEvent": {

@@ -91,6 +91,7 @@ class AppState:
         """Stage 1 orchestrator with per-role gateways and fake profiles."""
         from worldsim.infrastructure.model_gateway.profiles import (
             CHARACTER_FAKE_PROFILE,
+            DIRECTOR_FAKE_PROFILE,
             NARRATOR_FAKE_PROFILE,
             REACTION_FAKE_PROFILE,
             RESOLVER_FAKE_PROFILE,
@@ -99,7 +100,7 @@ class AppState:
         factory = self.uow_factory()
         gateways = {
             role: self.gateway_factory()
-            for role in ("character", "reaction", "resolver", "narrator")
+            for role in ("character", "reaction", "resolver", "narrator", "director")
         }
 
         def _for_role(role: str) -> FakeGateway:
@@ -116,6 +117,7 @@ class AppState:
                 "reaction": REACTION_FAKE_PROFILE,
                 "resolver": RESOLVER_FAKE_PROFILE,
                 "narrator": NARRATOR_FAKE_PROFILE,
+                "director": DIRECTOR_FAKE_PROFILE,
             },
         )
 

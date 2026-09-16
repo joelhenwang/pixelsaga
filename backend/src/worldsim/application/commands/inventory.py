@@ -40,7 +40,8 @@ async def give_item(
         owner = await uow.characters.get(owner_id)
         if owner.world_id != world_id:
             raise DomainError(ErrorCode.NOT_FOUND, "holder is not in this world")
-    key = f"item-give:{world_id.hex}:{item_key}:{owner_id.hex if owner_id else 'ground'}:{uuid4().hex}"
+    holder = owner_id.hex if owner_id else "ground"
+    key = f"item-give:{world_id.hex}:{item_key}:{holder}:{uuid4().hex}"
     payload: dict[str, object] = {
         "item_key": item_key,
         "owner_id": str(owner_id) if owner_id else None,

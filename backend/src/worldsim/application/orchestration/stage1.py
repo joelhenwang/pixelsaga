@@ -41,6 +41,12 @@ from worldsim.application.graphs.character import (
     load_character_prompt,
     precheck_action,
 )
+from worldsim.application.graphs.director import (
+    DIRECTOR_PROMPT_VERSION,
+    DirectorGraphDeps,
+    build_director_graph,
+    load_director_prompt,
+)
 from worldsim.application.graphs.narrate import (
     NARRATOR_PROMPT_VERSION,
     NarratorGraphDeps,
@@ -79,6 +85,11 @@ from worldsim.domain.activities import Activity, effective_progress
 from worldsim.domain.characters import Character
 from worldsim.domain.commands import ActionIntent, CommunicateAction, MoveAction
 from worldsim.domain.context import ContextEnvelope, ContextRequest, SourceCandidate
+from worldsim.domain.director import (
+    DIRECTOR_COOLDOWN_PHASES,
+    DirectorDecision,
+    should_trigger,
+)
 from worldsim.domain.effects import (
     AdvanceClockEffect,
     DomainEffect,
@@ -91,6 +102,7 @@ from worldsim.domain.enums import (
     ActivityStatus,
     EventType,
     LifeStatus,
+    NarrativeStatus,
     PhaseRunState,
     ResourceKind,
     ScheduleStatus,
@@ -103,6 +115,8 @@ from worldsim.domain.ids import (
     derive_combat_event_id,
     derive_intent_id,
     derive_task_id,
+    new_arc_id,
+    new_hook_id,
     new_monster_id,
     new_narration_id,
 )
@@ -277,6 +291,7 @@ class Stage1Orchestrator:
         await self._require_previous_complete(world_id, index)
         await self._tick(world_id, run_id, index)
         sealed = await self._seal(world_id, run_id, index)
+        await self._director_phase(world_id, run_id, index, sealed)
         intents = await self._decide_all(world_id, run_id, sealed, player_intents or {})
         await self._set_state(run_id, PhaseRunState.INTENTS_COMPLETE)
         quiet = is_quiet_phase(intent.action.family for intent in intents)
@@ -648,6 +663,122 @@ class Stage1Orchestrator:
             versions=sealed_versions,
             locations={c.id: c.location_id for c in characters},
         )
+
+    async def _director_phase(
+        self, world_id: UUID, run_id: UUID, index: int, sealed: SealedPhase
+    ) -> str:
+        """Run the Director when the cooldown elapsed; phases never block on it.
+
+        The trigger is deterministic (world config); the model proposes at
+        most one opportunity; validation enforces privileges and budgets.
+        Every path sets DIRECTOR_COMPLETE. Outage leaves last-run
+        untouched so the next phase retries; runs and rejections advance it.
+        """
+        async with self._factory() as uow:
+            config = await uow.worlds.get_config(world_id)
+            characters = await uow.characters.list_for_world(world_id)
+            locations = await uow.locations.list_for_world(world_id)
+            hooks = await uow.narrative.list_hooks_for_world(world_id)
+            arcs = await uow.narrative.list_arcs_for_world(world_id)
+        last_raw = config.get("director.last_absolute")
+        last = int(last_raw) if isinstance(last_raw, int) else None
+        cooldown_raw = config.get("director.cooldown_phases")
+        cooldown = int(cooldown_raw) if isinstance(cooldown_raw, int) else DIRECTOR_COOLDOWN_PHASES
+        if not should_trigger(index, last, cooldown):
+            await self._set_state(run_id, PhaseRunState.DIRECTOR_COMPLETE)
+            return "skipped"
+        task_run_id = derive_task_id(run_id, "director", world_id)
+        owner = f"s1dir:{run_id.hex[:8]}"
+        await self._track_task(world_id, task_run_id, owner)
+        known = [c.id for c in characters if c.life_status == LifeStatus.ALIVE]
+        active_hooks = sum(1 for h in hooks if h.status != NarrativeStatus.CLOSED)
+        active_arcs = sum(1 for a in arcs if a.status != NarrativeStatus.CLOSED)
+        summary = (
+            f"Phase {index}. Characters: "
+            + ", ".join(c.name for c in characters)
+            + ". Places: "
+            + ", ".join(loc.name for loc in locations)
+            + ". Open hooks: "
+            + ", ".join(h.title for h in hooks if h.status != NarrativeStatus.CLOSED)
+            + ". Open arcs: "
+            + ", ".join(a.title for a in arcs if a.status != NarrativeStatus.CLOSED)
+        )
+        hook_id = new_hook_id()
+        arc_id = new_arc_id()
+        spec = ManifestSpec(
+            role="director",
+            profile=self._profiles["director"],  # type: ignore[arg-type]
+            prompt_version=DIRECTOR_PROMPT_VERSION,
+            world_id=world_id,
+            phase_run_id=run_id,
+            task_run_id=task_run_id,
+            actor_id=world_id,
+            sources=[],
+            budgets={},
+            tokens={},
+            dropped=[],
+        )
+        traced = TracedGateway(self._gateways("director"), self._traces, spec)
+        invocation = GraphInvocation(
+            graph_name="director-proposal",
+            graph_version="v1",
+            task_run_id=task_run_id,
+            world_id=world_id,
+            phase_run_id=run_id,
+            snapshot_id=sealed.snapshot_id,
+            role="director",
+            profile_version=traced.profile.version,
+            prompt_version=DIRECTOR_PROMPT_VERSION,
+            input={
+                "world_summary": summary,
+                "trigger_ok": True,
+                "trigger_reason": "cooldown elapsed",
+                "known_character_ids": [str(c) for c in known],
+                "active_hooks": active_hooks,
+                "active_arcs": active_arcs,
+                "hook_id": str(hook_id),
+                "arc_id": str(arc_id),
+                "world_id": str(world_id),
+            },
+        )
+        graph = build_director_graph(
+            DirectorGraphDeps(
+                gateway=traced,
+                profile=self._profiles["director"],  # type: ignore[arg-type]
+                system_template=load_director_prompt(),
+            )
+        )
+        try:
+            result = await invoke(graph, invocation)
+        except Exception:
+            await self._finish_task(task_run_id, owner, False)
+            await self._set_state(run_id, PhaseRunState.DIRECTOR_COMPLETE)
+            return "unavailable"
+        await self._finish_task(task_run_id, owner, True)
+        decision = DirectorDecision.model_validate(result.get("decision") or {})
+        status = str(result.get("status", "noop"))
+        async with self._factory() as uow:
+            await uow.worlds.put_config(world_id, "director.last_absolute", index)
+            if decision.accepted:
+                if decision.hook is not None:
+                    await uow.narrative.add_hook(decision.hook)
+                if decision.arc is not None:
+                    await uow.narrative.add_arc(decision.arc)
+                await uow.commands.add(
+                    command_id=uuid4(),
+                    world_id=world_id,
+                    key=f"director:{run_id.hex}:{index}",
+                    actor_role="system",
+                    command_type="director_proposal",
+                    expected_versions={},
+                    payload={"status": status},
+                    input_hash=canonical_input_hash({"key": f"director:{run_id.hex}"}),
+                )
+            await uow.commit()
+        await self._set_state(run_id, PhaseRunState.DIRECTOR_COMPLETE)
+        if decision.accepted:
+            return "proposed"
+        return status
 
     async def _decide_all(
         self,

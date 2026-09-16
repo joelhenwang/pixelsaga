@@ -34,6 +34,7 @@ from worldsim.infrastructure.db.engine import create_engine
 from worldsim.infrastructure.model_gateway.fake import FakeGateway
 from worldsim.infrastructure.model_gateway.profiles import (
     CHARACTER_FAKE_PROFILE,
+    DIRECTOR_FAKE_PROFILE,
     NARRATOR_FAKE_PROFILE,
     REACTION_FAKE_PROFILE,
     RESOLVER_FAKE_PROFILE,
@@ -47,6 +48,7 @@ PROFILES = {
     "reaction": REACTION_FAKE_PROFILE,
     "resolver": RESOLVER_FAKE_PROFILE,
     "narrator": NARRATOR_FAKE_PROFILE,
+    "director": DIRECTOR_FAKE_PROFILE,
 }
 
 
@@ -151,11 +153,13 @@ def _role_gateways(
     narrator = FakeGateway(
         profile=NARRATOR_FAKE_PROFILE, default_text=narrator_text or _beats_json()
     )
+    director = FakeGateway(profile=DIRECTOR_FAKE_PROFILE)
     return {
         "character": character,
         "reaction": reaction,
         "resolver": resolver,
         "narrator": narrator,
+        "director": director,
     }
 
 

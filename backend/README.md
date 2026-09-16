@@ -356,6 +356,19 @@ Stage 3, ComfyUI in Stage 4). The Vue surface draws deterministic
 `Portrait.vue`); `portraitFor` is the seam the gateway replaces.
 No backend surface: fixtures need none.
 
+## Director (S2-DIRECTOR-001)
+
+`narrative_hook` and `narrative_arc` rows hold opportunities, never
+outcomes (migration 0016). Each advance runs the Director phase
+after the seal: a deterministic cooldown trigger (world config,
+default 3 phases) decides whether the model runs at all, and a
+bounded proposal graph validates privileges (only `spawn_npc` and
+`new_location` may be requested) and budgets (3 hooks, 2 arcs).
+Rejections, no-ops, and outages all set `DIRECTOR_COMPLETE` and
+let the phase continue; only runs advance the cooldown, so outages
+retry next phase. The trigger check lives in the orchestrator
+because graphs never touch repositories.
+
 ## Stage 2 contracts (S2-CONTRACT-001a)
 
 `activity` tracks persistent undertakings (travel, rest, train,

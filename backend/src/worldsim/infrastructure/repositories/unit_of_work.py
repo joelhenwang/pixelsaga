@@ -20,6 +20,7 @@ from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepositor
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
 from worldsim.infrastructure.repositories.monsters import SqlAlchemyMonsterRepository
+from worldsim.infrastructure.repositories.narrative import SqlAlchemyNarrativeRepository
 from worldsim.infrastructure.repositories.outbox import SqlAlchemyOutboxRepository
 from worldsim.infrastructure.repositories.party import SqlAlchemyPartyRepository
 from worldsim.infrastructure.repositories.perception import (
@@ -65,6 +66,7 @@ class SqlAlchemyUnitOfWork:
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
+        self._narrative: SqlAlchemyNarrativeRepository | None = None
         self._activities: SqlAlchemyActivityRepository | None = None
         self._routes: SqlAlchemyRouteRepository | None = None
         self._schedules: SqlAlchemyScheduleRepository | None = None
@@ -194,6 +196,12 @@ class SqlAlchemyUnitOfWork:
         return self._monsters
 
     @property
+    def narrative(self) -> SqlAlchemyNarrativeRepository:
+        if self._narrative is None:
+            self._narrative = SqlAlchemyNarrativeRepository(self._require_session())
+        return self._narrative
+
+    @property
     def party(self) -> SqlAlchemyPartyRepository:
         if self._party is None:
             self._party = SqlAlchemyPartyRepository(self._require_session())
@@ -226,6 +234,7 @@ class SqlAlchemyUnitOfWork:
             self._tasks = None
             self._party = None
             self._monsters = None
+            self._narrative = None
             self._activities = None
             self._routes = None
             self._schedules = None

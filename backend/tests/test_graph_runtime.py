@@ -13,6 +13,7 @@ from langgraph.graph import StateGraph
 from langgraph.types import Command, interrupt
 
 from worldsim.application.graphs.character import CharacterGraphDeps
+from worldsim.application.graphs.director import DirectorGraphDeps
 from worldsim.application.graphs.narrate import NarratorGraphDeps
 from worldsim.application.graphs.reaction import ReactionGraphDeps
 from worldsim.application.graphs.resolve import ResolverGraphDeps
@@ -153,7 +154,13 @@ def test_graph_deps_carry_no_repositories() -> None:
     import dataclasses
 
     forbidden = ("repositor", "session", "unit_of_work", "uow", "engine")
-    for deps in (CharacterGraphDeps, ReactionGraphDeps, ResolverGraphDeps, NarratorGraphDeps):
+    for deps in (
+        CharacterGraphDeps,
+        ReactionGraphDeps,
+        ResolverGraphDeps,
+        NarratorGraphDeps,
+        DirectorGraphDeps,
+    ):
         assert dataclasses.is_dataclass(deps), deps
         for field in dataclasses.fields(deps):
             blob = f"{field.name} {field.type}".lower()

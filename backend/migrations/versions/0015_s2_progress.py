@@ -17,14 +17,15 @@ _EFFECT_TYPES = (
     "'record_observation','record_memory','skill_progress'"
 )
 _EFFECT_TYPES_DOWN = (
-    "'advance_clock','move_entity','resource_adjusted',"
-    "'record_observation','record_memory'"
+    "'advance_clock','move_entity','resource_adjusted','record_observation','record_memory'"
 )
 
 
 def upgrade() -> None:
     op.drop_constraint("ck_effect_type", "event_effect", type_="check")
-    op.create_check_constraint("ck_effect_type", "event_effect", f"effect_type IN ({_EFFECT_TYPES})")
+    op.create_check_constraint(
+        "ck_effect_type", "event_effect", f"effect_type IN ({_EFFECT_TYPES})"
+    )
     op.create_table(
         "skill_definition",
         sa.Column("id", PG_UUID(as_uuid=True), primary_key=True),

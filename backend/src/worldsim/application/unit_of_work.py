@@ -14,6 +14,7 @@ from worldsim.application.ports.repositories import (
     KnowledgeRepository,
     LocationRepository,
     MonsterRepository,
+    NarrativeRepository,
     OutboxRepository,
     PartyRepository,
     PerceptionRepository,
@@ -51,6 +52,8 @@ class UnitOfWork(Protocol):
     def relationships(self) -> RelationshipRepository: ...
     @property
     def knowledge(self) -> KnowledgeRepository: ...
+    @property
+    def narrative(self) -> NarrativeRepository: ...
     @property
     def progress(self) -> ProgressRepository: ...
     @property

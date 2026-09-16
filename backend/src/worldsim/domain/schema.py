@@ -31,8 +31,10 @@ from worldsim.domain import (
     world,
 )
 from worldsim.domain.activities import Activity, TravelRoute
+from worldsim.domain.director import DirectorDecision, DirectorProposal
 from worldsim.domain.items import ItemDefinition
 from worldsim.domain.knowledge import Belief, Claim
+from worldsim.domain.narrative import NarrativeArc, NarrativeHook
 from worldsim.domain.party import Monster, PartyMember
 from worldsim.domain.progress import CharacterSkill, ItemInstance, SkillDefinition, TrainingSession
 from worldsim.domain.relationships import Relationship, RelationshipEvidence
@@ -99,6 +101,10 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     Belief,
     CharacterSkill,
     Claim,
+    DirectorDecision,
+    DirectorProposal,
+    NarrativeArc,
+    NarrativeHook,
     ItemDefinition,
     ItemInstance,
     SkillDefinition,
