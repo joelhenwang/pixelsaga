@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga Stage 2: Direction E: Ledger (desktop)</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.5 system-ui, sans-serif; margin: 0; }
+#top { display: flex; gap: 0; border-bottom: 1px solid var(--line); font-size: 12px; position: sticky; top: 0; background: var(--bg); }
+#top button { background: none; border: 0; border-right: 1px solid var(--line); color: var(--dim); padding: 9px 14px; cursor: pointer; font: inherit; }
+#top button[aria-current="true"] { color: var(--fg); box-shadow: inset 0 -2px 0 var(--acc); }
+#clock { margin-left: auto; padding: 9px 14px; color: var(--dim); white-space: nowrap; }
+#theme { border-left: 1px solid var(--line); }
+#wrap { max-width: 900px; margin: 0 auto; padding: 16px; }
+h1 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 0 0 8px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; color: var(--dim); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--line); padding: 6px 8px 6px 0; }
+td { border-bottom: 1px solid var(--line); padding: 7px 8px 7px 0; vertical-align: top; }
+.dim { color: var(--dim); }
+.acc { color: var(--acc); }
+.warn { color: var(--warn); }
+.hp { font-family: ui-monospace, monospace; white-space: nowrap; }
+.beat { font-size: 16px; margin: 10px 0; }
+.beat .who { color: var(--acc); }
+.maprow { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.dot { width: 12px; height: 12px; background: var(--acc); flex: none; }
+.dot.dimdot { background: var(--dim); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<nav id="top" aria-label="Views">
+<button data-v="timeline" aria-current="true">timeline</button><button data-v="party" aria-current="false">party</button><button data-v="map" aria-current="false">map</button><button data-v="diary" aria-current="false">diary</button><button data-v="ops" aria-current="false">ops</button>
+<span id="clock">day 3, morning · phase 21 · online</span>
+<button id="theme">light</button>
+</nav>
+<div id="wrap"><main id="view" aria-live="polite"></main></div>
+<script>
+"use strict";
+// Fixture mirrors Stage 2 reads: timeline entries, roster with HP,
+// map places, diary kinds, operations counts.
+const S2 = {
+  timeline: [
+    { seq: 41, type: "world_ticked", abs: 20, text: "dawn breaks over the Vale. day 3 begins." },
+    { seq: 42, type: "action_resolved", abs: 21, text: "Borin hits Goblin for 6 slashing. (4->0 HP)" },
+    { seq: 43, type: "schedule_fired", abs: 21, text: "note: market opens" }
+  ],
+  party: [
+    { name: "Borin", meta: "lv 1 dwarf fighter · AC 18", hp: [8, 12], conds: ["Poisoned"] },
+    { name: "Lyra", meta: "lv 3 elf ranger · AC 14", hp: [25, 25], conds: [] }
+  ],
+  map: [
+    { name: "Hearth", region: "Vale", who: ["Borin", "Wren"], known: true, routes: ["Market (2)"] },
+    { name: "Market", region: "Vale", who: ["Lyra", "Ash"], known: true, routes: ["Hearth (2)"] },
+    { name: "Old Mill", region: "Vale", who: [], known: false, routes: [] }
+  ],
+  diary: [
+    { kind: "observation", phase: 20, text: "road: quiet at dawn" },
+    { kind: "memory", phase: 18, text: "Ash trusts Borin's watch." },
+    { kind: "summary", phase: 19, text: "Day 2 passed in patrols and rumor." }
+  ],
+  ops: [
+    ["open run", "phase 21 · committed"],
+    ["pending outbox", "0"],
+    ["total events", "43"],
+    ["model budget", "6 / 32 calls this phase"],
+    ["director", "last ran phase 19 · next no earlier than 22"]
+  ]
+};
+function hpbar(cur, max) {
+  const f = Math.round((cur / max) * 10);
+  return "■".repeat(f) + "□".repeat(10 - f);
+}
+const VIEWS = {
+  timeline() {
+    return `<h1>timeline · 43 events</h1><table><tr><th>seq</th><th>type</th><th>phase</th><th>what happened</th></tr>` +
+      S2.timeline.map((e) => `<tr><td class="dim">${e.seq}</td><td>${e.type}</td><td class="dim">${e.abs}</td><td>${e.text}</td></tr>`).join("") + `</table>`;
+  },
+  party() {
+    return `<h1>party · 2 seated</h1><table><tr><th>who</th><th>hp</th><th>state</th></tr>` +
+      S2.party.map((m) => `<tr><td><b>${m.name}</b><br><span class="dim">${m.meta}</span></td><td class="hp"><span class="acc">${hpbar(m.hp[0], m.hp[1])}</span> ${m.hp[0]}/${m.hp[1]}</td><td class="${m.conds.length ? "warn" : "dim"}">${m.conds.join(" · ") || "healthy"}</td></tr>`).join("") + `</table>`;
+  },
+  map() {
+    return `<h1>map · the Vale</h1>` + S2.map.map((p) =>
+      `<div class="maprow"><span class="dot${p.known ? "" : " dimdot"}"></span><span><b>${p.known ? p.name : "unknown ground"}</b> <span class="dim">${p.region}${p.routes.length ? " · to " + p.routes.join(", ") : ""}</span><br><span class="dim">${p.who.join(", ") || "empty"}</span></span></div>`).join("");
+  },
+  diary() {
+    return `<h1>diary · Wren</h1><table><tr><th>kind</th><th>phase</th><th>entry</th></tr>` +
+      S2.diary.map((d) => `<tr><td>${d.kind}</td><td class="dim">${d.phase}</td><td>${d.text}</td></tr>`).join("") + `</table>`;
+  },
+  ops() {
+    return `<h1>operations</h1><table>` +
+      S2.ops.map(([k, v]) => `<tr><td class="dim">${k}</td><td>${v}</td></tr>`).join("") + `</table>`;
+  }
+};
+let cur = "timeline";
+function render() {
+  document.querySelectorAll("#top button[data-v]").forEach((b) =>
+    b.setAttribute("aria-current", b.dataset.v === cur ? "true" : "false"));
+  document.querySelector("#view").innerHTML = VIEWS[cur]();
+}
+document.querySelectorAll("#top button[data-v]").forEach((b) =>
+  b.onclick = () => { cur = b.dataset.v; render(); });
+document.querySelector("#theme").onclick = (e) => {
+  const root = document.documentElement;
+  root.classList.toggle("light");
+  e.target.textContent = root.classList.contains("light") ? "dark" : "light";
+};
+render();
+</script>
+</body>
+</html>

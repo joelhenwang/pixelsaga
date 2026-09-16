@@ -1,0 +1,22 @@
+import { createRouter, createWebHistory } from "vue-router";
+import DiaryView from "./views/DiaryView.vue";
+import MapView from "./views/MapView.vue";
+import OpsView from "./views/OpsView.vue";
+import PartyView from "./views/PartyView.vue";
+import RelationsView from "./views/RelationsView.vue";
+import SceneView from "./views/SceneView.vue";
+import TimelineView from "./views/TimelineView.vue";
+
+export const router = createRouter({
+  history: createWebHistory(),
+  routes: [
+    { path: "/", redirect: "/scene" },
+    { path: "/scene", component: SceneView },
+    { path: "/party", component: PartyView },
+    { path: "/timeline", component: TimelineView },
+    { path: "/map", component: MapView },
+    { path: "/diary", component: DiaryView },
+    { path: "/relations", component: RelationsView },
+    { path: "/ops", component: OpsView },
+  ],
+});

@@ -1,14 +1,21 @@
 import type {
+  ActivityListResponse,
   BeatView,
   CharacterDetail,
   CharacterSummary,
+  DiaryResponse,
+  HookListResponse,
+  MapResponse,
+  OperationsStatus,
   PartyBeginRequest,
   PartyMemberView,
   PartyRosterResponse,
   PlayerHeaders,
+  RelationshipListResponse,
   SceneDetail,
   SceneSummary,
   Stage1AdvanceResponse,
+  TimelineResponse,
   WatcherHeaders,
 } from "@gen";
 
@@ -108,6 +115,29 @@ export const api = {
   },
   world(headers: Record<string, string>): Promise<{ id: string; day: number; phase: string }> {
     return request("/api/v1/world", {}, headers);
+  },
+  timeline(worldId: string, headers: Record<string, string>): Promise<TimelineResponse> {
+    return request<TimelineResponse>(`/api/v1/stage2/timeline?world_id=${worldId}`, {}, headers);
+  },
+  map(worldId: string, headers: Record<string, string>): Promise<MapResponse> {
+    return request<MapResponse>(`/api/v1/stage2/map?world_id=${worldId}`, {}, headers);
+  },
+  diary(characterId: string, headers: Record<string, string>): Promise<DiaryResponse> {
+    return request<DiaryResponse>(`/api/v1/stage2/characters/${characterId}/diary`, {}, headers);
+  },
+  characterActivities(characterId: string, headers: Record<string, string>): Promise<ActivityListResponse> {
+    return request<ActivityListResponse>(`/api/v1/stage2/characters/${characterId}/activities`, {}, headers);
+  },
+  relationships(worldId: string, characterId: string, headers: Record<string, string>): Promise<RelationshipListResponse> {
+    return request<RelationshipListResponse>(
+      `/api/v1/stage2/relationships?world_id=${worldId}&character_id=${characterId}`, {}, headers,
+    );
+  },
+  hooks(worldId: string, headers: Record<string, string>): Promise<HookListResponse> {
+    return request<HookListResponse>(`/api/v1/stage2/director/hooks?world_id=${worldId}`, {}, headers);
+  },
+  operations(worldId: string, headers: Record<string, string>): Promise<OperationsStatus> {
+    return request<OperationsStatus>(`/api/v1/stage2/operations/status?world_id=${worldId}`, {}, headers);
   },
   party(worldId: string, headers: Record<string, string>): Promise<PartyRosterResponse> {
     return request<PartyRosterResponse>(`/api/v1/stage1/party?world_id=${worldId}`, {}, headers);

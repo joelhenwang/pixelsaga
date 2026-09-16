@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga Stage 2: Direction F: Stage (mobile)</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+#wrap { max-width: 430px; margin: 0 auto; width: 100%; padding: 14px 12px 90px; flex: 1; }
+h1 { font-size: 12px; color: var(--dim); font-weight: 600; margin: 0 0 8px; }
+#clock { font-size: 12px; color: var(--dim); margin-bottom: 10px; display: flex; justify-content: space-between; }
+#clock button { background: none; border: 1px solid var(--line); color: var(--fg); font: inherit; padding: 2px 10px; cursor: pointer; }
+.beat { font-size: 18px; margin: 10px 0; }
+.beat .who { color: var(--acc); }
+.cast { display: flex; gap: 8px; margin: 12px 0; }
+.person { border: 1px solid var(--line); padding: 6px 8px; display: flex; gap: 8px; align-items: center; flex: 1; min-width: 0; }
+.avatar { width: 36px; height: 36px; border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
+.nm { font-size: 13px; } .rl { font-size: 11px; color: var(--dim); }
+.hp { font-family: ui-monospace, monospace; font-size: 11px; color: var(--dim); }
+#nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; display: flex; border-top: 1px solid var(--line); background: var(--bg); padding-bottom: env(safe-area-inset-bottom); }
+#nav button { flex: 1; background: none; border: 0; border-right: 1px solid var(--line); color: var(--dim); padding: 12px 0; font: inherit; cursor: pointer; }
+#nav button:last-child { border-right: 0; }
+#nav button[aria-current="true"] { color: var(--fg); box-shadow: inset 0 2px 0 var(--acc); }
+.row { border-top: 1px solid var(--line); padding: 8px 0; font-size: 14px; }
+.row:last-child { border-bottom: 1px solid var(--line); }
+.dim { color: var(--dim); } .warn { color: var(--warn); } .acc { color: var(--acc); }
+#act { display: flex; gap: 8px; margin-top: 12px; }
+#act select, #act button { background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 9px; font: inherit; }
+#act select { flex: 1; }
+#act button { background: var(--fg); color: var(--bg); border: 0; padding: 9px 16px; cursor: pointer; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="clock"><span>day 3, morning · online</span><button id="theme" type="button">light</button></div>
+<main id="view" aria-live="polite"></main>
+</div>
+<nav id="nav" aria-label="Views">
+<button data-v="scene" aria-current="true">scene</button><button data-v="party" aria-current="false">party</button><button data-v="map" aria-current="false">map</button><button data-v="more" aria-current="false">more</button>
+</nav>
+<script>
+"use strict";
+// Same Stage 2 fixture as Direction E, staged mobile-first: the scene
+// leads, everything else tucks behind the bottom nav.
+const S2 = {
+  scene: {
+    title: "scene 4047c1df · committed",
+    beats: [
+      { who: null, text: "Embers settle in the Hearth." },
+      { who: "Borin", text: "Goblin down. Lyra, the road?" },
+      { who: "Lyra", text: "Quiet past the mill. For now." }
+    ],
+    cast: [
+      { mark: "B", name: "Borin", hp: "8/12" },
+      { mark: "L", name: "Lyra", hp: "25/25" }
+    ]
+  },
+  party: [
+    { name: "Borin", hp: "8/12 · Poisoned", warn: true },
+    { name: "Lyra", hp: "25/25 · healthy", warn: false }
+  ],
+  map: [
+    { name: "Hearth", sub: "Vale · Borin, Wren" },
+    { name: "Market (2)", sub: "Vale · Lyra, Ash" },
+    { name: "unknown ground", sub: "unexplored", dim: true }
+  ],
+  more: [
+    { k: "diary · Wren", v: "road: quiet at dawn" },
+    { k: "timeline #43", v: "schedule_fired: market opens" },
+    { k: "ops", v: "phase 21 · 0 queued · 6/32 calls" }
+  ]
+};
+function hpbar(cur, max) {
+  const f = Math.round((cur / max) * 8);
+  return "■".repeat(f) + "□".repeat(8 - f);
+}
+const VIEWS = {
+  scene() {
+    const s = S2.scene;
+    return `<h1>${s.title}</h1>` +
+      s.beats.map((b) => `<p class="beat">${b.who ? `<span class="who">${b.who}:</span> ` : ""}${b.text}</p>`).join("") +
+      `<div class="cast">` + s.cast.map((c) =>
+        `<div class="person"><span class="avatar">${c.mark}</span><span><span class="nm">${c.name}</span><br><span class="hp">${c.hp}</span></span></div>`).join("") + `</div>` +
+      `<div id="act"><select aria-label="Action"><option>wait</option><option>observe</option><option>rest</option><option>move</option></select><button type="button">Act</button></div>`;
+  },
+  party() {
+    return `<h1>party · 2 seated</h1>` + S2.party.map((m) =>
+      `<div class="row"><b>${m.name}</b><br><span class="${m.warn ? "warn" : "dim"}">${m.hp}</span></div>`).join("");
+  },
+  map() {
+    return `<h1>map · the Vale</h1>` + S2.map.map((p) =>
+      `<div class="row"><b class="${p.dim ? "dim" : ""}">${p.name}</b><br><span class="dim">${p.sub}</span></div>`).join("");
+  },
+  more() {
+    return `<h1>diary · timeline · ops</h1>` + S2.more.map((m) =>
+      `<div class="row"><span class="dim">${m.k}</span><br>${m.v}</div>`).join("");
+  }
+};
+let cur = "scene";
+function render() {
+  document.querySelectorAll("#nav button").forEach((b) =>
+    b.setAttribute("aria-current", b.dataset.v === cur ? "true" : "false"));
+  document.querySelector("#view").innerHTML = VIEWS[cur]();
+}
+document.querySelectorAll("#nav button").forEach((b) =>
+  b.onclick = () => { cur = b.dataset.v; render(); window.scrollTo(0, 0); });
+document.querySelector("#theme").onclick = (e) => {
+  const root = document.documentElement;
+  root.classList.toggle("light");
+  e.target.textContent = root.classList.contains("light") ? "dark" : "light";
+};
+render();
+</script>
+</body>
+</html>
