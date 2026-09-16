@@ -22,6 +22,41 @@ STAGE0_SCRIPTED_PROFILE = ModelProfile(
     capabilities=["chat"],
 )
 
+CHARACTER_FAKE_PROFILE = ModelProfile(
+    name="character",
+    version="decision-fake-v1",
+    adapter="fake",
+    model_id="fake-character-decision",
+    max_context_tokens=4096,
+    capabilities=["chat", "json_mode"],
+)
+
+REACTION_FAKE_PROFILE = ModelProfile(
+    name="reaction",
+    version="react-fake-v1",
+    adapter="fake",
+    model_id="fake-reaction",
+    max_context_tokens=4096,
+    capabilities=["chat", "json_mode"],
+)
+
+RESOLVER_FAKE_PROFILE = ModelProfile(
+    name="resolver",
+    version="resolve-fake-v1",
+    adapter="fake",
+    model_id="fake-resolver",
+    max_context_tokens=8192,
+    capabilities=["chat", "json_mode"],
+)
+
+NARRATOR_FAKE_PROFILE = ModelProfile(
+    name="narrator",
+    version="narrate-fake-v1",
+    adapter="fake",
+    model_id="fake-narrator",
+    max_context_tokens=8192,
+    capabilities=["chat", "json_mode"],
+)
 OPENROUTER_CHAT_PROFILE = ModelProfile(
     name="openrouter",
     version="chat-v1",
@@ -45,6 +80,10 @@ PROFILES: dict[tuple[str, str], ModelProfile] = {
     for profile in (
         FAKE_TEST_PROFILE,
         STAGE0_SCRIPTED_PROFILE,
+        CHARACTER_FAKE_PROFILE,
+        REACTION_FAKE_PROFILE,
+        RESOLVER_FAKE_PROFILE,
+        NARRATOR_FAKE_PROFILE,
         OPENROUTER_CHAT_PROFILE,
         OPENROUTER_EMBED_PROFILE,
     )

@@ -15,10 +15,12 @@ from worldsim.infrastructure.repositories.commands import SqlAlchemyCommandRepos
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
 from worldsim.infrastructure.repositories.outbox import SqlAlchemyOutboxRepository
+from worldsim.infrastructure.repositories.party import SqlAlchemyPartyRepository
 from worldsim.infrastructure.repositories.perception import (
     SqlAlchemyPerceptionRepository,
 )
 from worldsim.infrastructure.repositories.phases import SqlAlchemyPhaseRepository
+from worldsim.infrastructure.repositories.scenes import SqlAlchemySceneRepository
 from worldsim.infrastructure.repositories.tasks import SqlAlchemyTaskRepository
 from worldsim.infrastructure.repositories.traces import SqlAlchemyTraceRepository
 from worldsim.infrastructure.repositories.versions import SqlAlchemyVersionStore
@@ -42,6 +44,8 @@ class SqlAlchemyUnitOfWork:
         self._outbox: SqlAlchemyOutboxRepository | None = None
         self._perception: SqlAlchemyPerceptionRepository | None = None
         self._traces: SqlAlchemyTraceRepository | None = None
+        self._scenes: SqlAlchemySceneRepository | None = None
+        self._party: SqlAlchemyPartyRepository | None = None
 
     def _require_session(self) -> AsyncSession:
         assert self._session is not None, "unit of work is not open"
@@ -113,6 +117,18 @@ class SqlAlchemyUnitOfWork:
             self._traces = SqlAlchemyTraceRepository(self._require_session())
         return self._traces
 
+    @property
+    def scenes(self) -> SqlAlchemySceneRepository:
+        if self._scenes is None:
+            self._scenes = SqlAlchemySceneRepository(self._require_session())
+        return self._scenes
+
+    @property
+    def party(self) -> SqlAlchemyPartyRepository:
+        if self._party is None:
+            self._party = SqlAlchemyPartyRepository(self._require_session())
+        return self._party
+
     async def __aenter__(self) -> Self:
         self._session = self._sessions()
         return self
@@ -138,9 +154,11 @@ class SqlAlchemyUnitOfWork:
             self._commands = None
             self._versions = None
             self._tasks = None
+            self._party = None
             self._outbox = None
             self._perception = None
             self._traces = None
+            self._scenes = None
 
     async def commit(self) -> None:
         await self._require_session().commit()

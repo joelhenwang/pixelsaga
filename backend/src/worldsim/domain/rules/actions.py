@@ -9,6 +9,7 @@ from __future__ import annotations
 from worldsim.domain.characters import Character
 from worldsim.domain.commands import (
     ActionIntent,
+    CommunicateAction,
     MoveAction,
     ObserveAction,
     RestAction,
@@ -53,6 +54,16 @@ def check_observe(character: Character, action: ObserveAction) -> None:
     require_alive(character)
     if not action.focus.strip():
         raise DomainError(ErrorCode.VALIDATION_FAILED, "observe needs a focus")
+
+
+def check_communicate(character: Character, action: CommunicateAction) -> None:
+    """Schema-level dialogue checks. Target presence and shared-scene
+    eligibility arrive with S1-CHAR-001 and S1-SCENE-001."""
+    require_alive(character)
+    if action.target_character_id == character.id:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "dialogue needs another character")
+    if not action.topic.strip():
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "dialogue needs a topic")
 
 
 def check_move(
@@ -104,3 +115,8 @@ def check_intent(intent: ActionIntent, view: WorldView) -> None:
             check_rest(character, intent)
         case ObserveAction():
             check_observe(character, intent)
+        case _:
+            raise DomainError(
+                ErrorCode.UNSUPPORTED_ACTION,
+                f"no feasibility check for {intent.family.value}",
+            )

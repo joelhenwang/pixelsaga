@@ -1,0 +1,749 @@
+{
+ "version": "0.1.0",
+ "vectors": {
+  "parseDice": {
+   "2d6+3": {
+    "count": 2,
+    "sides": 6,
+    "mod": 3
+   },
+   "d20": {
+    "count": 1,
+    "sides": 20,
+    "mod": 0
+   },
+   "1d8-2": {
+    "count": 1,
+    "sides": 8,
+    "mod": -2
+   },
+   "3d10": {
+    "count": 3,
+    "sides": 10,
+    "mod": 0
+   },
+   "d6": {
+    "count": 1,
+    "sides": 6,
+    "mod": 0
+   },
+   "0d6": null,
+   "2d0": null,
+   "abc": null,
+   "": null,
+   " 4d6 + 1 ": {
+    "count": 4,
+    "sides": 6,
+    "mod": 1
+   },
+   "2D8+5": {
+    "count": 2,
+    "sides": 8,
+    "mod": 5
+   },
+   "10d12-4": {
+    "count": 10,
+    "sides": 12,
+    "mod": -4
+   }
+  },
+  "rollDice": {
+   "2d6+3@[0.0,0.5,0.999]": 8,
+   "1d20@[0.0]": 1,
+   "1d20@[0.9999]": 20,
+   "bogus": 0
+  },
+  "averageDice": {
+   "2d6+3": 10,
+   "1d12": 6.5,
+   "bogus": 0
+  },
+  "abilityMod": {
+   "1": -5,
+   "8": -1,
+   "9": -1,
+   "10": 0,
+   "11": 0,
+   "12": 1,
+   "14": 2,
+   "15": 2,
+   "20": 5,
+   "30": 10
+  },
+  "profBonus": {
+   "0": 2,
+   "1": 2,
+   "4": 2,
+   "5": 3,
+   "8": 3,
+   "9": 4,
+   "12": 4,
+   "13": 5,
+   "16": 5,
+   "17": 6,
+   "20": 6
+  },
+  "fmtMod": {
+   "0": "0",
+   "3": "+3",
+   "-2": "-2"
+  },
+  "slugify": {
+   "Chain Mail": "chain-mail",
+   "Acid Arrow!": "acid-arrow",
+   "": ""
+  },
+  "findEntry": {
+   "monsters:Goblin": {
+    "index": "goblin",
+    "name": "Goblin"
+   },
+   "monsters:Goblins": {
+    "index": "goblin",
+    "name": "Goblin"
+   },
+   "monsters:zzz-nope": null,
+   "weapons:longsword": {
+    "index": "longsword",
+    "name": "Longsword"
+   },
+   "weapons:Long Sword": {
+    "index": "longsword",
+    "name": "Longsword"
+   },
+   "armor:Chain Mail": {
+    "index": "chain-mail",
+    "name": "Chain Mail"
+   },
+   "spells:fireball": {
+    "index": "fireball",
+    "name": "Fireball"
+   },
+   "spells:Fire Ball": {
+    "index": "fireball",
+    "name": "Fireball"
+   },
+   "conditions:POISONED": {
+    "index": "poisoned",
+    "name": "Poisoned"
+   },
+   "races:dragonborn": {
+    "index": "dragonborn",
+    "name": "Dragonborn"
+   },
+   "classes:Fighter": {
+    "index": "fighter",
+    "name": "Fighter"
+   }
+  },
+  "xpForLevel": {
+   "0": 0,
+   "1": 0,
+   "5": 6500,
+   "20": 355000,
+   "21": 355000
+  },
+  "levelFromXp": {
+   "0": 1,
+   "299": 1,
+   "300": 2,
+   "6499": 4,
+   "6500": 5,
+   "355000": 20,
+   "999999": 20
+  },
+  "xpForNextLevel": {
+   "L1": 300,
+   "L1partial": 200,
+   "L20": null
+  },
+  "encounterXp": {
+   "totalXp": 350,
+   "adjustedXp": 700,
+   "multiplier": 2,
+   "monsterCount": 4
+  },
+  "encounterDifficulty": {
+   "partyLevel": 3,
+   "totalXp": 150,
+   "adjustedXp": 300,
+   "multiplier": 2,
+   "monsterCount": 3,
+   "thresholds": {
+    "easy": 150,
+    "medium": 300,
+    "hard": 450,
+    "deadly": 800
+   },
+   "difficulty": "medium"
+  },
+  "sheetDefaults": {
+   "name": "Adventurer",
+   "race": null,
+   "class": "fighter",
+   "subclass": null,
+   "background": null,
+   "level": 1,
+   "stats": {
+    "str": 10,
+    "dex": 10,
+    "con": 10,
+    "int": 10,
+    "wis": 10,
+    "cha": 10
+   },
+   "hp": null,
+   "armor": null,
+   "shield": false,
+   "baseAc": null,
+   "weapons": [],
+   "spells": [],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  },
+  "sheetMod": {
+   "str16": 3,
+   "int8": -1
+  },
+  "sheetProf": {
+   "L3": 2,
+   "L5": 3
+  },
+  "spellcasting": {
+   "fighter": null,
+   "wizard": "int",
+   "dc": 14,
+   "atk": 6,
+   "fighterDc": null
+  },
+  "weaponAttack": {
+   "longsword": 5,
+   "shortbowRanged": 3,
+   "rapierFinesse": 5
+  },
+  "armorAC": {
+   "chainShield": 18,
+   "unarmored": 12,
+   "bogusArmor": 10,
+   "missingArmorHighDex": 10
+  },
+  "maxHp": {
+   "fighter3": 28,
+   "wizard5": 27,
+   "preset": 44
+  },
+  "ensureHp": {
+   "current": 18,
+   "max": 18
+  },
+  "classSpells": [
+   "acid-splash",
+   "chill-touch",
+   "dancing-lights",
+   "fire-bolt",
+   "light"
+  ],
+  "knownSpells": [
+   "fire-bolt",
+   "fireball"
+  ],
+  "raceBonuses": {
+   "dwarf": {
+    "con": 2
+   },
+   "bogus": {}
+  },
+  "sheetSummary": {
+   "fighter": "[D&D SHEET] Borin - Level 3 dwarf fighter\nHP 28/28, AC 18, Prof +2\nSTR +3 DEX +1 CON +2 INT -1 WIS 0 CHA 0\nWeapons: Longsword +5 (1d8 slashing)",
+   "wizard": "[D&D SHEET] Elara - Level 5 elf wizard\nHP 27/27, AC 12, Prof +3\nSTR -1 DEX +2 CON +1 INT +3 WIS +1 CHA 0\nSpell DC 14, spell attack +6\nSpells: Fire Bolt (cantrip) (1d10 fire), Fireball (3rd) (8d6 fire)\nWeapons: Dagger +5 (1d4 piercing)"
+  },
+  "resolveSpell": {
+   "fireball3": {
+    "name": "Fireball",
+    "index": "fireball",
+    "level": 3,
+    "school": "Evocation",
+    "castingTime": "1 action",
+    "range": "150 feet",
+    "components": [
+     "V",
+     "S",
+     "M"
+    ],
+    "material": "A tiny ball of bat guano and sulfur.",
+    "duration": "Instantaneous",
+    "concentration": false,
+    "ritual": false,
+    "attackType": null,
+    "dc": {
+     "type": "dex",
+     "success": "half",
+     "dcValue": 14
+    },
+    "aoe": {
+     "type": "sphere",
+     "size": 20
+    },
+    "heal": null,
+    "damage": {
+     "dice": "8d6",
+     "type": "fire",
+     "slotLevel": 3
+    },
+    "classes": [
+     "Sorcerer",
+     "Wizard"
+    ]
+   },
+   "fireball5": {
+    "name": "Fireball",
+    "index": "fireball",
+    "level": 3,
+    "school": "Evocation",
+    "castingTime": "1 action",
+    "range": "150 feet",
+    "components": [
+     "V",
+     "S",
+     "M"
+    ],
+    "material": "A tiny ball of bat guano and sulfur.",
+    "duration": "Instantaneous",
+    "concentration": false,
+    "ritual": false,
+    "attackType": null,
+    "dc": {
+     "type": "dex",
+     "success": "half",
+     "dcValue": 14
+    },
+    "aoe": {
+     "type": "sphere",
+     "size": 20
+    },
+    "heal": null,
+    "damage": {
+     "dice": "10d6",
+     "type": "fire",
+     "slotLevel": 5
+    },
+    "classes": [
+     "Sorcerer",
+     "Wizard"
+    ]
+   },
+   "fireBolt1": {
+    "name": "Fire Bolt",
+    "index": "fire-bolt",
+    "level": 0,
+    "school": "Evocation",
+    "castingTime": "1 action",
+    "range": "120 feet",
+    "components": [
+     "V",
+     "S"
+    ],
+    "material": null,
+    "duration": "Instantaneous",
+    "concentration": false,
+    "ritual": false,
+    "attackType": "ranged",
+    "dc": null,
+    "aoe": null,
+    "heal": null,
+    "damage": {
+     "dice": "1d10",
+     "type": "fire",
+     "slotLevel": null
+    },
+    "classes": [
+     "Sorcerer",
+     "Wizard"
+    ]
+   },
+   "fireBolt11": {
+    "name": "Fire Bolt",
+    "index": "fire-bolt",
+    "level": 0,
+    "school": "Evocation",
+    "castingTime": "1 action",
+    "range": "120 feet",
+    "components": [
+     "V",
+     "S"
+    ],
+    "material": null,
+    "duration": "Instantaneous",
+    "concentration": false,
+    "ritual": false,
+    "attackType": "ranged",
+    "dc": null,
+    "aoe": null,
+    "heal": null,
+    "damage": {
+     "dice": "3d10",
+     "type": "fire",
+     "slotLevel": null
+    },
+    "classes": [
+     "Sorcerer",
+     "Wizard"
+    ]
+   },
+   "bogus": null,
+   "cureWounds": {
+    "name": "Cure Wounds",
+    "index": "cure-wounds",
+    "level": 1,
+    "school": "Evocation",
+    "castingTime": "1 action",
+    "range": "Touch",
+    "components": [
+     "V",
+     "S"
+    ],
+    "material": null,
+    "duration": "Instantaneous",
+    "concentration": false,
+    "ritual": false,
+    "attackType": null,
+    "dc": null,
+    "aoe": null,
+    "heal": {
+     "1": "1d8 + MOD",
+     "2": "2d8 + MOD",
+     "3": "3d8 + MOD",
+     "4": "4d8 + MOD",
+     "5": "5d8 + MOD",
+     "6": "6d8 + MOD",
+     "7": "7d8 + MOD",
+     "8": "8d8 + MOD",
+     "9": "9d8 + MOD"
+    },
+    "damage": null,
+    "classes": [
+     "Bard",
+     "Cleric",
+     "Druid",
+     "Paladin",
+     "Ranger"
+    ]
+   }
+  },
+  "describeSpell": {
+   "fireball3": "Fireball, 8d6 fire damage, DC 14 dex save (half), 150 feet",
+   "fireBolt1": "Fire Bolt, 1d10 fire damage, spell attack vs AC, 120 feet",
+   "cureWounds": "Cure Wounds, heals undefined, Touch",
+   "none": null
+  },
+  "monsterSheet": {
+   "name": "Goblin",
+   "size": "Small",
+   "type": "humanoid",
+   "subtype": "goblinoid",
+   "alignment": "neutral evil",
+   "cr": 0.25,
+   "xp": 50,
+   "hp": {
+    "current": 7,
+    "max": 7
+   },
+   "hit_dice": "2d6",
+   "ac": 15,
+   "ac_type": "armor",
+   "stats": {
+    "str": 8,
+    "dex": 14,
+    "con": 10,
+    "int": 10,
+    "wis": 8,
+    "cha": 8
+   },
+   "pb": 2,
+   "saves": {},
+   "skills": {
+    "stealth": 6
+   },
+   "speed": {
+    "walk": "30 ft."
+   },
+   "senses": {
+    "darkvision": "60 ft.",
+    "passive_perception": 9
+   },
+   "languages": "Common, Goblin",
+   "resistances": [],
+   "immunities": [],
+   "vulnerabilities": [],
+   "condition_immunities": [],
+   "special_abilities": [
+    {
+     "name": "Nimble Escape",
+     "desc": "The goblin can take the Disengage or Hide action as a bonus action on each of its turns."
+    }
+   ],
+   "actions": [
+    {
+     "name": "Scimitar",
+     "desc": "Melee Weapon Attack: +4 to hit, reach 5 ft., one target. Hit: 5 (1d6 + 2) slashing damage.",
+     "attack_bonus": 4,
+     "dc": null,
+     "damage": [
+      {
+       "dice": "1d6+2",
+       "type": "slashing"
+      }
+     ]
+    },
+    {
+     "name": "Shortbow",
+     "desc": "Ranged Weapon Attack: +4 to hit, range 80/320 ft., one target. Hit: 5 (1d6 + 2) piercing damage.",
+     "attack_bonus": 4,
+     "dc": null,
+     "damage": [
+      {
+       "dice": "1d6+2",
+       "type": "piercing"
+      }
+     ]
+    }
+   ],
+   "reactions": [],
+   "legendary_actions": [],
+   "kind": "monster",
+   "index": "goblin"
+  },
+  "monsterSheetBogus": null,
+  "monsterSummary": {
+   "goblin": "[MONSTER] Goblin (Small humanoid, CR 0.25, 50 XP): AC 15, HP 7 (2d6). Speed: 30 ft. STR -1 DEX +2 CON 0 INT 0 WIS -1 CHA -1. Skills: stealth +6. Actions: Scimitar +4 (1d6+2 slashing), Shortbow +4 (1d6+2 piercing)",
+   "aboleth": "[MONSTER] Aboleth (Large aberration, CR 10, 5900 XP): AC 17, HP 135 (18d10+36). Speed: 10 ft, swim 40 ft. STR +5 DEX -1 CON +2 INT +4 WIS +2 CHA +4. Saves: con +6, int +8, wis +6. Skills: history +12, perception +10. Actions: Multiattack, Tentacle +9 (DC 14 con) (2d6+5 bludgeoning + 1d12 acid), Tail +9 (3d6+5 bludgeoning), Enslave (DC 14 wis)",
+   "bogus": null
+  },
+  "rollAttack": {
+   "miss": {
+    "nat": 5,
+    "total": 10,
+    "nat20": false,
+    "nat1": false,
+    "hit": false,
+    "crit": false
+   },
+   "hit": {
+    "nat": 11,
+    "total": 16,
+    "nat20": false,
+    "nat1": false,
+    "hit": true,
+    "crit": false
+   },
+   "nat20": {
+    "nat": 20,
+    "total": 20,
+    "nat20": true,
+    "nat1": false,
+    "hit": true,
+    "crit": true
+   },
+   "nat1": {
+    "nat": 1,
+    "total": 11,
+    "nat20": false,
+    "nat1": true,
+    "hit": false,
+    "crit": false
+   }
+  },
+  "rollSave": {
+   "fail": {
+    "nat": 5,
+    "total": 7,
+    "nat20": false,
+    "nat1": false,
+    "success": false
+   },
+   "pass": {
+    "nat": 11,
+    "total": 16,
+    "nat20": false,
+    "nat1": false,
+    "success": true
+   },
+   "nat20": {
+    "nat": 20,
+    "total": 20,
+    "nat20": true,
+    "nat1": false,
+    "success": true
+   }
+  },
+  "applyDamage": {
+   "dealt": 8,
+   "overkill": 12,
+   "current": 0,
+   "noTarget": 0
+  },
+  "heal": {
+   "got": 8,
+   "capped": 7,
+   "current": 20,
+   "noTarget": 0
+  },
+  "levelUp": {
+   "fighter2": {
+    "newLevel": 2,
+    "hpGain": 6,
+    "profBonus": 2,
+    "profChanged": false,
+    "abilityScoreBonus": 0,
+    "features": [
+     "Action Surge (1 use)"
+    ],
+    "cantripsKnown": null,
+    "spellsKnown": null,
+    "slots": [
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "classSpecific": {
+     "action_surges": 1,
+     "extra_attacks": 0,
+     "indomitable_uses": 0
+    }
+   },
+   "wizard4": {
+    "newLevel": 4,
+    "hpGain": 4,
+    "profBonus": 2,
+    "profChanged": false,
+    "abilityScoreBonus": 1,
+    "features": [
+     "Ability Score Improvement"
+    ],
+    "cantripsKnown": 4,
+    "spellsKnown": null,
+    "slots": [
+     4,
+     3,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    "classSpecific": {
+     "arcane_recovery_levels": 2
+    }
+   },
+   "maxed": null
+  },
+  "parseEncounter": {
+   "mixed": [
+    {
+     "index": "goblin",
+     "name": "Goblin",
+     "count": 2
+    },
+    {
+     "index": "bugbear",
+     "name": "Bugbear",
+     "count": 1
+    }
+   ],
+   "suffix": [
+    {
+     "index": "goblin",
+     "name": "Goblin",
+     "count": 3
+    },
+    {
+     "index": "orc",
+     "name": "Orc",
+     "count": 1
+    }
+   ],
+   "words": [
+    {
+     "index": "goblin",
+     "name": "Goblin",
+     "count": 3
+    },
+    {
+     "index": "ogre",
+     "name": "Ogre",
+     "count": 1
+    }
+   ],
+   "bogus": [],
+   "empty": []
+  },
+  "parseCast": {
+   "slotTarget": {
+    "index": "fireball",
+    "name": "Fireball",
+    "slotLevel": 3,
+    "target": "goblins"
+   },
+   "plain": {
+    "index": "cure-wounds",
+    "name": "Cure Wounds",
+    "slotLevel": null,
+    "target": null
+   },
+   "bogus": {
+    "index": null,
+    "name": "zzz-nope",
+    "slotLevel": null,
+    "target": null
+   },
+   "empty": null
+  },
+  "parseAttack": {
+   "target": {
+    "index": "longsword",
+    "name": "Longsword",
+    "target": "goblin"
+   },
+   "plain": {
+    "index": "dagger",
+    "name": "Dagger",
+    "target": null
+   },
+   "bogus": {
+    "index": null,
+    "name": "zzz-nope",
+    "target": null
+   }
+  },
+  "parseCondition": {
+   "full": {
+    "index": "poisoned",
+    "name": "Poisoned",
+    "target": "goblin",
+    "duration": "3 round"
+   },
+   "plain": {
+    "index": "prone",
+    "name": "Prone",
+    "target": null,
+    "duration": null
+   },
+   "bogus": {
+    "index": null,
+    "name": "zzz-nope",
+    "target": null,
+    "duration": null
+   }
+  }
+ }
+}

@@ -69,7 +69,7 @@ def test_ready_reports_versions_without_secrets(
     body = response.json()
     assert body["status"] == "degraded"
     assert body["version"] == "0.1.0"
-    assert body["migration_head"] == "0003_trace_correlation"
+    assert body["migration_head"] == "0009_event_seed_bigint"
     assert body["schema_version"] == 1
     by_name = {check["name"]: check for check in body["checks"]}
     assert by_name["database"]["status"] == "ok"

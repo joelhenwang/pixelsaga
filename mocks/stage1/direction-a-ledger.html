@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga Stage 1: Direction A: Ledger</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; margin: 0; }
+header { display: flex; gap: 12px; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid var(--line); }
+header h1 { font-size: 14px; margin: 0; }
+header .meta { color: var(--dim); font-size: 12px; }
+header button { margin-left: auto; background: none; border: 1px solid var(--line); color: var(--fg); padding: 4px 10px; cursor: pointer; }
+main { display: grid; grid-template-columns: 300px 1fr; min-height: calc(100vh - 45px); }
+#timeline { border-right: 1px solid var(--line); padding: 10px 0; overflow-y: auto; }
+.phase { padding: 8px 14px; cursor: pointer; border-left: 3px solid transparent; }
+.phase[aria-current="true"] { border-left-color: var(--acc); }
+.phase .idx { color: var(--dim); font-size: 12px; }
+.phase .st { font-size: 12px; }
+.st.done { color: var(--acc); } .st.run { color: var(--warn); }
+.scene { padding: 4px 14px 4px 26px; font-size: 13px; cursor: pointer; }
+.scene[aria-current="true"] { color: var(--acc); }
+#detail { padding: 14px 18px; max-width: 760px; }
+#detail h2 { font-size: 13px; margin: 18px 0 6px; color: var(--dim); font-weight: 600; }
+#detail h2:first-child { margin-top: 0; }
+.beat { margin: 6px 0; }
+.beat .who { color: var(--acc); }
+.fact { color: var(--dim); font-size: 12px; }
+form.action { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+form.action select, form.action input { background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 6px 8px; font: inherit; }
+form.action button { background: var(--fg); color: var(--bg); border: 0; padding: 6px 14px; cursor: pointer; }
+#queued { color: var(--warn); font-size: 13px; margin-top: 6px; }
+.parts { display: flex; gap: 16px; font-size: 13px; }
+.avatar { width: 40px; height: 40px; border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 8px; vertical-align: middle; }
+@media (max-width: 700px) { main { grid-template-columns: 1fr; } #timeline { border-right: 0; border-bottom: 1px solid var(--line); max-height: 220px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+<h1>PixelSaga / Vale</h1>
+<span class="meta" id="clock">day 1, morning · phase 1 · completed</span>
+<button id="theme" type="button">light</button>
+</header>
+<main>
+<nav id="timeline" aria-label="Phase timeline"></nav>
+<section id="detail" aria-live="polite"></section>
+</main>
+<script>
+"use strict";
+const WORLDSIM = {
+  phases: [
+    { index: 1, label: "morning", state: "completed", scenes: [
+      { id: "sc-wait", title: "Wren waits at the Hearth", outcome: "success",
+        participants: [{ id: "wren", name: "Wren", mark: "W", role: "initiator" }],
+        beats: [
+          { who: null, text: "Embers settle in the Hearth.", facts: ["attempt:wait"] },
+          { who: null, text: "Wren watches the road.", facts: ["attempt:wait"] }
+        ],
+        suggested: { family: "wait" } },
+      { id: "sc-talk", title: "Ash hails Wren at the Market", outcome: "success",
+        participants: [
+          { id: "ash", name: "Ash", mark: "A", role: "initiator" },
+          { id: "wren", name: "Wren", mark: "W", role: "reactor" }
+        ],
+        beats: [
+          { who: "Ash", text: "Dawn patrol. Walk with me?", facts: ["attempt:communicate"] },
+          { who: "Wren", text: "Wren nods once.", facts: ["attempt:communicate"] }
+        ],
+        suggested: { family: "communicate", topic: "dawn patrol" } }
+    ]},
+    { index: 2, label: "midday", state: "running", scenes: [] },
+    { index: 3, label: "evening", state: "pending", scenes: [] }
+  ]
+};
+let cur = { phase: 0, scene: 1 };
+const $ = (s) => document.querySelector(s);
+function renderTimeline() {
+  const nav = $("#timeline"); nav.innerHTML = "";
+  WORLDSIM.phases.forEach((p, pi) => {
+    const d = document.createElement("div");
+    d.className = "phase"; d.tabIndex = 0;
+    d.setAttribute("aria-current", pi === cur.phase ? "true" : "false");
+    const st = p.state === "completed" ? "done" : p.state === "running" ? "run" : "";
+    d.innerHTML = `<span class="idx">phase ${p.index} · ${p.label}</span> <span class="st ${st}">${p.state}</span>`;
+    d.onclick = () => { cur = { phase: pi, scene: 0 }; render(); };
+    nav.appendChild(d);
+    p.scenes.forEach((s, si) => {
+      const sd = document.createElement("div");
+      sd.className = "scene"; sd.tabIndex = 0;
+      sd.setAttribute("aria-current", (pi === cur.phase && si === cur.scene) ? "true" : "false");
+      sd.textContent = `${s.outcome === "success" ? "✓" : "!"} ${s.title}`;
+      sd.onclick = (e) => { e.stopPropagation(); cur = { phase: pi, scene: si }; render(); };
+      nav.appendChild(sd);
+    });
+  });
+}
+function renderDetail() {
+  const el = $("#detail");
+  const phase = WORLDSIM.phases[cur.phase];
+  const scene = phase.scenes[cur.scene];
+  if (!scene) { el.innerHTML = `<h2>phase ${phase.index} · ${phase.label}</h2><p class="fact">No committed scenes yet. Decisions run after the snapshot seal.</p>`; return; }
+  el.innerHTML = `
+    <h2>scene · ${scene.title}</h2>
+    <div class="parts">${scene.participants.map(p => `<span><span class="avatar" aria-hidden="true">${p.mark}</span>${p.name} · ${p.role}</span>`).join("")}</div>
+    <h2>beats</h2>
+    ${scene.beats.map(b => `<p class="beat">${b.who ? `<span class="who">${b.who}:</span> ` : ""}${b.text} <span class="fact">[${b.facts.join(", ")}]</span></p>`).join("")}
+    <h2>your action (Wren)</h2>
+    <form class="action" id="actform">
+      <select name="family" aria-label="Action">
+        <option value="wait"${scene.suggested.family === "wait" ? " selected" : ""}>wait</option>
+        <option value="observe">observe</option>
+        <option value="rest">rest</option>
+        <option value="move">move</option>
+        <option value="communicate"${scene.suggested.family === "communicate" ? " selected" : ""}>communicate</option>
+      </select>
+      <input name="topic" placeholder="topic or focus" value="${scene.suggested.topic || ""}" aria-label="Topic">
+      <button type="submit">Queue for next phase</button>
+    </form>
+    <p id="queued" hidden></p>`;
+  $("#actform").onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const q = $("#queued"); q.hidden = false;
+    q.textContent = `Queued ${fd.get("family")}${fd.get("topic") ? ": " + fd.get("topic") : ""} for phase ${phase.index + 1}. You control the attempt, not its outcome.`;
+  };
+}
+function render() { renderTimeline(); renderDetail(); }
+$("#theme").onclick = (e) => {
+  const light = document.documentElement.classList.toggle("light");
+  e.target.textContent = light ? "dark" : "light";
+};
+if (matchMedia("(prefers-color-scheme: light)").matches) { document.documentElement.classList.add("light"); $("#theme").textContent = "dark"; }
+render();
+</script>
+</body>
+</html>

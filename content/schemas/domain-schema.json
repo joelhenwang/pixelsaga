@@ -1,55 +1,5 @@
 {
   "models": {
-    "AdvanceClockEffect": {
-      "additionalProperties": false,
-      "properties": {
-        "affected_ids": {
-          "items": {
-            "format": "uuid",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Affected Ids",
-          "type": "array"
-        },
-        "effect_type": {
-          "const": "advance_clock",
-          "default": "advance_clock",
-          "title": "Effect Type",
-          "type": "string"
-        },
-        "expected_versions": {
-          "additionalProperties": {
-            "type": "integer"
-          },
-          "title": "Expected Versions",
-          "type": "object"
-        },
-        "from_index": {
-          "minimum": 0,
-          "title": "From Index",
-          "type": "integer"
-        },
-        "schema_version": {
-          "const": 1,
-          "default": 1,
-          "title": "Schema Version",
-          "type": "integer"
-        },
-        "to_index": {
-          "minimum": 0,
-          "title": "To Index",
-          "type": "integer"
-        }
-      },
-      "required": [
-        "affected_ids",
-        "from_index",
-        "to_index"
-      ],
-      "title": "AdvanceClockEffect",
-      "type": "object"
-    },
     "AdvancePhaseCommand": {
       "$defs": {
         "AuditMeta": {
@@ -139,6 +89,491 @@
       "title": "AdvancePhaseCommand",
       "type": "object"
     },
+    "AmbiguityPacket": {
+      "$defs": {
+        "AdvanceClockEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "advance_clock",
+              "default": "advance_clock",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_index": {
+              "minimum": 0,
+              "title": "From Index",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_index": {
+              "minimum": 0,
+              "title": "To Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_index",
+            "to_index"
+          ],
+          "title": "AdvanceClockEffect",
+          "type": "object"
+        },
+        "MemoryRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_memory",
+              "default": "record_memory",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "owner_character_id": {
+              "format": "uuid",
+              "title": "Owner Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "text": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "owner_character_id",
+            "text"
+          ],
+          "title": "MemoryRecordedEffect",
+          "type": "object"
+        },
+        "MoveEntityEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "move_entity",
+              "default": "move_entity",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_location_id": {
+              "format": "uuid",
+              "title": "From Location Id",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_location_id": {
+              "format": "uuid",
+              "title": "To Location Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_location_id",
+            "to_location_id"
+          ],
+          "title": "MoveEntityEffect",
+          "type": "object"
+        },
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        },
+        "ObservationRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_observation",
+              "default": "record_observation",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/ObservationFact"
+              },
+              "minItems": 1,
+              "title": "Facts",
+              "type": "array"
+            },
+            "observer_character_id": {
+              "format": "uuid",
+              "title": "Observer Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "observer_character_id",
+            "facts"
+          ],
+          "title": "ObservationRecordedEffect",
+          "type": "object"
+        },
+        "ResolutionOutcome": {
+          "enum": [
+            "success",
+            "partial",
+            "failure",
+            "impossible"
+          ],
+          "title": "ResolutionOutcome",
+          "type": "string"
+        },
+        "ResourceAdjustedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "delta": {
+              "title": "Delta",
+              "type": "integer"
+            },
+            "effect_type": {
+              "const": "resource_adjusted",
+              "default": "resource_adjusted",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceKind"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "resource",
+            "delta"
+          ],
+          "title": "ResourceAdjustedEffect",
+          "type": "object"
+        },
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Bounded question for the resolver model (never canon, never stored).",
+      "properties": {
+        "allowed_aggregate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Aggregate Ids",
+          "type": "array"
+        },
+        "allowed_outcomes": {
+          "items": {
+            "$ref": "#/$defs/ResolutionOutcome"
+          },
+          "minItems": 1,
+          "title": "Allowed Outcomes",
+          "type": "array"
+        },
+        "determined_effects": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "advance_clock": "#/$defs/AdvanceClockEffect",
+                "move_entity": "#/$defs/MoveEntityEffect",
+                "record_memory": "#/$defs/MemoryRecordedEffect",
+                "record_observation": "#/$defs/ObservationRecordedEffect",
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+              },
+              "propertyName": "effect_type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AdvanceClockEffect"
+              },
+              {
+                "$ref": "#/$defs/MoveEntityEffect"
+              },
+              {
+                "$ref": "#/$defs/ResourceAdjustedEffect"
+              },
+              {
+                "$ref": "#/$defs/ObservationRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/MemoryRecordedEffect"
+              }
+            ]
+          },
+          "title": "Determined Effects",
+          "type": "array"
+        },
+        "intent_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Intent Ids",
+          "type": "array"
+        },
+        "reason": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "scene_id": {
+          "format": "uuid",
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "summaries": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 16,
+          "minItems": 1,
+          "title": "Summaries",
+          "type": "array"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scene_id",
+        "world_id",
+        "snapshot_id",
+        "intent_ids",
+        "summaries",
+        "allowed_outcomes",
+        "reason"
+      ],
+      "title": "AmbiguityPacket",
+      "type": "object"
+    },
+    "Attempt": {
+      "$defs": {
+        "AttemptStatus": {
+          "enum": [
+            "pending",
+            "committed",
+            "superseded"
+          ],
+          "title": "AttemptStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Validated observable execution of an intent, before any outcome.",
+      "properties": {
+        "actor_character_id": {
+          "format": "uuid",
+          "title": "Actor Character Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "intent_id": {
+          "format": "uuid",
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "observable_summary": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Observable Summary",
+          "type": "string"
+        },
+        "scene_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scene Id"
+        },
+        "status": {
+          "$ref": "#/$defs/AttemptStatus",
+          "default": "pending"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "intent_id",
+        "actor_character_id",
+        "observable_summary"
+      ],
+      "title": "Attempt",
+      "type": "object"
+    },
     "AuditMeta": {
       "additionalProperties": false,
       "properties": {
@@ -158,6 +593,73 @@
         "requested_by"
       ],
       "title": "AuditMeta",
+      "type": "object"
+    },
+    "BeatProposal": {
+      "$defs": {
+        "NarrationKind": {
+          "enum": [
+            "narration",
+            "dialogue",
+            "action",
+            "system",
+            "transition"
+          ],
+          "title": "NarrationKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Model-authored beat shape: the graph stamps ids and event linkage.",
+      "properties": {
+        "cited_fact_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Cited Fact Keys",
+          "type": "array"
+        },
+        "emotion_hint": {
+          "default": "",
+          "maxLength": 128,
+          "title": "Emotion Hint",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/NarrationKind",
+          "default": "narration"
+        },
+        "source_effect_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Effect Ids",
+          "type": "array"
+        },
+        "speaker_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speaker Id"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "BeatProposal",
       "type": "object"
     },
     "Character": {
@@ -643,6 +1145,47 @@
       "title": "CommittedEffect",
       "type": "object"
     },
+    "CommunicateAction": {
+      "additionalProperties": false,
+      "description": "Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;\nuntil then only schema validation and liveness/topic checks apply.",
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "family": {
+          "const": "communicate",
+          "default": "communicate",
+          "title": "Family",
+          "type": "string"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "target_character_id": {
+          "format": "uuid",
+          "title": "Target Character Id",
+          "type": "string"
+        },
+        "topic": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Topic",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "snapshot_id",
+        "target_character_id",
+        "topic"
+      ],
+      "title": "CommunicateAction",
+      "type": "object"
+    },
     "ContextManifest": {
       "$defs": {
         "ManifestSource": {
@@ -814,6 +1357,219 @@
       "title": "ContextManifest",
       "type": "object"
     },
+    "ContextRequest": {
+      "additionalProperties": false,
+      "description": "Typed context request: who may know what, as of which snapshot.",
+      "properties": {
+        "actor_id": {
+          "format": "uuid",
+          "title": "Actor Id",
+          "type": "string"
+        },
+        "allowed_classes": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Classes",
+          "type": "array"
+        },
+        "as_of_sequence": {
+          "default": 0,
+          "minimum": 0,
+          "title": "As Of Sequence",
+          "type": "integer"
+        },
+        "call_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Call Id"
+        },
+        "phase_run_id": {
+          "format": "uuid",
+          "title": "Phase Run Id",
+          "type": "string"
+        },
+        "purpose": {
+          "default": "",
+          "maxLength": 256,
+          "title": "Purpose",
+          "type": "string"
+        },
+        "role": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "scene_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scene Id"
+        },
+        "section_budgets": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Section Budgets",
+          "type": "object"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "task_run_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Task Run Id"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "actor_id",
+        "world_id",
+        "phase_run_id",
+        "snapshot_id"
+      ],
+      "title": "ContextRequest",
+      "type": "object"
+    },
+    "ContextSection": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Entries",
+          "type": "array"
+        },
+        "estimated_tokens": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Estimated Tokens",
+          "type": "integer"
+        },
+        "instruction": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Instruction",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "truncated_sources": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Truncated Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "instruction"
+      ],
+      "title": "ContextSection",
+      "type": "object"
+    },
+    "DesiredEffect": {
+      "additionalProperties": false,
+      "description": "What the actor hopes to achieve. Non-authoritative by definition.",
+      "properties": {
+        "depends_on_intent_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Depends On Intent Id"
+        },
+        "description": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "effect_family": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Effect Family",
+          "type": "string"
+        }
+      },
+      "required": [
+        "effect_family",
+        "description"
+      ],
+      "title": "DesiredEffect",
+      "type": "object"
+    },
+    "Disclosure": {
+      "additionalProperties": false,
+      "description": "Explicit disclosure of one fact key to named recipients.",
+      "properties": {
+        "fact_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Fact Key",
+          "type": "string"
+        },
+        "recipient_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Recipient Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "fact_key",
+        "recipient_ids"
+      ],
+      "title": "Disclosure",
+      "type": "object"
+    },
     "FictionalTime": {
       "$defs": {
         "PhaseName": {
@@ -850,6 +1606,337 @@
         "phase"
       ],
       "title": "FictionalTime",
+      "type": "object"
+    },
+    "Intent": {
+      "$defs": {
+        "CommunicateAction": {
+          "additionalProperties": false,
+          "description": "Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;\nuntil then only schema validation and liveness/topic checks apply.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "communicate",
+              "default": "communicate",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            },
+            "topic": {
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Topic",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "target_character_id",
+            "topic"
+          ],
+          "title": "CommunicateAction",
+          "type": "object"
+        },
+        "DesiredEffect": {
+          "additionalProperties": false,
+          "description": "What the actor hopes to achieve. Non-authoritative by definition.",
+          "properties": {
+            "depends_on_intent_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Depends On Intent Id"
+            },
+            "description": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Description",
+              "type": "string"
+            },
+            "effect_family": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Effect Family",
+              "type": "string"
+            }
+          },
+          "required": [
+            "effect_family",
+            "description"
+          ],
+          "title": "DesiredEffect",
+          "type": "object"
+        },
+        "IntentStatus": {
+          "enum": [
+            "proposed",
+            "validated",
+            "invalid",
+            "superseded"
+          ],
+          "title": "IntentStatus",
+          "type": "string"
+        },
+        "MoveAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "destination_location_id": {
+              "format": "uuid",
+              "title": "Destination Location Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "move",
+              "default": "move",
+              "title": "Family",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "destination_location_id"
+          ],
+          "title": "MoveAction",
+          "type": "object"
+        },
+        "ObserveAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "observe",
+              "default": "observe",
+              "title": "Family",
+              "type": "string"
+            },
+            "focus": {
+              "default": "surroundings",
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Focus",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "ObserveAction",
+          "type": "object"
+        },
+        "RestAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "duration_phases": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Duration Phases",
+              "type": "integer"
+            },
+            "family": {
+              "const": "rest",
+              "default": "rest",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "RestAction",
+          "type": "object"
+        },
+        "WaitAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "wait",
+              "default": "wait",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "WaitAction",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One actor's proposed meaningful action from a sealed snapshot.",
+      "properties": {
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "communicate": "#/$defs/CommunicateAction",
+              "move": "#/$defs/MoveAction",
+              "observe": "#/$defs/ObserveAction",
+              "rest": "#/$defs/RestAction",
+              "wait": "#/$defs/WaitAction"
+            },
+            "propertyName": "family"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/WaitAction"
+            },
+            {
+              "$ref": "#/$defs/RestAction"
+            },
+            {
+              "$ref": "#/$defs/ObserveAction"
+            },
+            {
+              "$ref": "#/$defs/MoveAction"
+            },
+            {
+              "$ref": "#/$defs/CommunicateAction"
+            }
+          ],
+          "title": "Action"
+        },
+        "author_character_id": {
+          "format": "uuid",
+          "title": "Author Character Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "desired_effects": {
+          "items": {
+            "$ref": "#/$defs/DesiredEffect"
+          },
+          "title": "Desired Effects",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "phase_run_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase Run Id"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/IntentStatus",
+          "default": "proposed"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "snapshot_id",
+        "author_character_id",
+        "action",
+        "idempotency_key"
+      ],
+      "title": "Intent",
       "type": "object"
     },
     "Lease": {
@@ -1373,6 +2460,245 @@
       "title": "MoveEntityEffect",
       "type": "object"
     },
+    "NarrationBeat": {
+      "$defs": {
+        "NarrationKind": {
+          "enum": [
+            "narration",
+            "dialogue",
+            "action",
+            "system",
+            "transition"
+          ],
+          "title": "NarrationKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "cited_fact_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Cited Fact Keys",
+          "type": "array"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "emotion_hint": {
+          "default": "",
+          "maxLength": 128,
+          "title": "Emotion Hint",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/NarrationKind",
+          "default": "narration"
+        },
+        "scene_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scene Id"
+        },
+        "source_effect_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Effect Ids",
+          "type": "array"
+        },
+        "source_event_id": {
+          "format": "uuid",
+          "title": "Source Event Id",
+          "type": "string"
+        },
+        "speaker_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "None renders as the narrator voice",
+          "title": "Speaker Id"
+        },
+        "text": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "source_event_id",
+        "text"
+      ],
+      "title": "NarrationBeat",
+      "type": "object"
+    },
+    "ObservableEvent": {
+      "$defs": {
+        "Disclosure": {
+          "additionalProperties": false,
+          "description": "Explicit disclosure of one fact key to named recipients.",
+          "properties": {
+            "fact_key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Fact Key",
+              "type": "string"
+            },
+            "recipient_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Recipient Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "fact_key",
+            "recipient_ids"
+          ],
+          "title": "Disclosure",
+          "type": "object"
+        },
+        "FactChannel": {
+          "description": "How a fact travels; decides who can perceive it.",
+          "enum": [
+            "sight",
+            "sound",
+            "direct"
+          ],
+          "title": "FactChannel",
+          "type": "string"
+        },
+        "FactVisibility": {
+          "description": "Who a non-concealed fact is for.",
+          "enum": [
+            "public",
+            "scene",
+            "private"
+          ],
+          "title": "FactVisibility",
+          "type": "string"
+        },
+        "PerceivedFact": {
+          "additionalProperties": false,
+          "description": "One event fact with its perception metadata.",
+          "properties": {
+            "channel": {
+              "$ref": "#/$defs/FactChannel",
+              "default": "sight"
+            },
+            "concealed": {
+              "default": false,
+              "title": "Concealed",
+              "type": "boolean"
+            },
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            },
+            "visibility": {
+              "$ref": "#/$defs/FactVisibility",
+              "default": "scene"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "PerceivedFact",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "An event plus everything perception needs to split its facts.",
+      "properties": {
+        "disclosures": {
+          "items": {
+            "$ref": "#/$defs/Disclosure"
+          },
+          "title": "Disclosures",
+          "type": "array"
+        },
+        "event_id": {
+          "format": "uuid",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/PerceivedFact"
+          },
+          "title": "Facts",
+          "type": "array"
+        },
+        "location_id": {
+          "format": "uuid",
+          "title": "Location Id",
+          "type": "string"
+        },
+        "participant_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "world_id",
+        "location_id"
+      ],
+      "title": "ObservableEvent",
+      "type": "object"
+    },
     "Observation": {
       "$defs": {
         "ObservationFact": {
@@ -1654,6 +2980,231 @@
       "title": "OutboxMessage",
       "type": "object"
     },
+    "PartyMember": {
+      "$defs": {
+        "HitPoints": {
+          "additionalProperties": false,
+          "properties": {
+            "current": {
+              "title": "Current",
+              "type": "integer"
+            },
+            "max": {
+              "title": "Max",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "current",
+            "max"
+          ],
+          "title": "HitPoints",
+          "type": "object"
+        },
+        "Sheet": {
+          "additionalProperties": false,
+          "description": "One adventurer. Mirrors the monolith's sheet object field for field.",
+          "properties": {
+            "armor": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Armor"
+            },
+            "background": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Background"
+            },
+            "base_ac": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Base Ac"
+            },
+            "character_class": {
+              "default": "fighter",
+              "title": "Character Class",
+              "type": "string"
+            },
+            "conditions": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Conditions",
+              "type": "array"
+            },
+            "equipment": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Equipment",
+              "type": "array"
+            },
+            "hp": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/HitPoints"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "level": {
+              "default": 1,
+              "title": "Level",
+              "type": "integer"
+            },
+            "name": {
+              "default": "Adventurer",
+              "title": "Name",
+              "type": "string"
+            },
+            "prepared": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Prepared",
+              "type": "array"
+            },
+            "race": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Race"
+            },
+            "shield": {
+              "default": false,
+              "title": "Shield",
+              "type": "boolean"
+            },
+            "spells": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Spells",
+              "type": "array"
+            },
+            "stats": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Stats",
+              "type": "object"
+            },
+            "subclass": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Subclass"
+            },
+            "weapons": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Weapons",
+              "type": "array"
+            },
+            "xp": {
+              "default": 0,
+              "title": "Xp",
+              "type": "integer"
+            }
+          },
+          "title": "Sheet",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Character Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "name_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name Key",
+          "type": "string"
+        },
+        "sheet": {
+          "$ref": "#/$defs/Sheet"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "name",
+        "name_key",
+        "sheet"
+      ],
+      "title": "PartyMember",
+      "type": "object"
+    },
     "PauseSimulationCommand": {
       "$defs": {
         "AuditMeta": {
@@ -1741,6 +3292,65 @@
         "audit"
       ],
       "title": "PauseSimulationCommand",
+      "type": "object"
+    },
+    "PerceivedFact": {
+      "$defs": {
+        "FactChannel": {
+          "description": "How a fact travels; decides who can perceive it.",
+          "enum": [
+            "sight",
+            "sound",
+            "direct"
+          ],
+          "title": "FactChannel",
+          "type": "string"
+        },
+        "FactVisibility": {
+          "description": "Who a non-concealed fact is for.",
+          "enum": [
+            "public",
+            "scene",
+            "private"
+          ],
+          "title": "FactVisibility",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One event fact with its perception metadata.",
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/FactChannel",
+          "default": "sight"
+        },
+        "concealed": {
+          "default": false,
+          "title": "Concealed",
+          "type": "boolean"
+        },
+        "key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "visibility": {
+          "$ref": "#/$defs/FactVisibility",
+          "default": "scene"
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ],
+      "title": "PerceivedFact",
       "type": "object"
     },
     "PhaseRun": {
@@ -1894,6 +3504,284 @@
       "title": "PhaseSnapshot",
       "type": "object"
     },
+    "Reaction": {
+      "$defs": {
+        "CommunicateAction": {
+          "additionalProperties": false,
+          "description": "Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;\nuntil then only schema validation and liveness/topic checks apply.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "communicate",
+              "default": "communicate",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            },
+            "topic": {
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Topic",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "target_character_id",
+            "topic"
+          ],
+          "title": "CommunicateAction",
+          "type": "object"
+        },
+        "MoveAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "destination_location_id": {
+              "format": "uuid",
+              "title": "Destination Location Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "move",
+              "default": "move",
+              "title": "Family",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "destination_location_id"
+          ],
+          "title": "MoveAction",
+          "type": "object"
+        },
+        "ObserveAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "observe",
+              "default": "observe",
+              "title": "Family",
+              "type": "string"
+            },
+            "focus": {
+              "default": "surroundings",
+              "maxLength": 256,
+              "minLength": 1,
+              "title": "Focus",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "ObserveAction",
+          "type": "object"
+        },
+        "ReactionStatus": {
+          "enum": [
+            "pending",
+            "committed"
+          ],
+          "title": "ReactionStatus",
+          "type": "string"
+        },
+        "RestAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "duration_phases": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Duration Phases",
+              "type": "integer"
+            },
+            "family": {
+              "const": "rest",
+              "default": "rest",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "RestAction",
+          "type": "object"
+        },
+        "WaitAction": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "wait",
+              "default": "wait",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id"
+          ],
+          "title": "WaitAction",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Bounded response by one eligible participant to one attempt.",
+      "properties": {
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "communicate": "#/$defs/CommunicateAction",
+              "move": "#/$defs/MoveAction",
+              "observe": "#/$defs/ObserveAction",
+              "rest": "#/$defs/RestAction",
+              "wait": "#/$defs/WaitAction"
+            },
+            "propertyName": "family"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/WaitAction"
+            },
+            {
+              "$ref": "#/$defs/RestAction"
+            },
+            {
+              "$ref": "#/$defs/ObserveAction"
+            },
+            {
+              "$ref": "#/$defs/MoveAction"
+            },
+            {
+              "$ref": "#/$defs/CommunicateAction"
+            }
+          ],
+          "title": "Action"
+        },
+        "attempt_id": {
+          "format": "uuid",
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "reactor_character_id": {
+          "format": "uuid",
+          "title": "Reactor Character Id",
+          "type": "string"
+        },
+        "scene_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Scene Id"
+        },
+        "status": {
+          "$ref": "#/$defs/ReactionStatus",
+          "default": "pending"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "attempt_id",
+        "reactor_character_id",
+        "action"
+      ],
+      "title": "Reaction",
+      "type": "object"
+    },
     "RecentMemory": {
       "$defs": {
         "Visibility": {
@@ -1972,6 +3860,774 @@
         "created_phase_index"
       ],
       "title": "RecentMemory",
+      "type": "object"
+    },
+    "Resolution": {
+      "$defs": {
+        "AdvanceClockEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "advance_clock",
+              "default": "advance_clock",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_index": {
+              "minimum": 0,
+              "title": "From Index",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_index": {
+              "minimum": 0,
+              "title": "To Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_index",
+            "to_index"
+          ],
+          "title": "AdvanceClockEffect",
+          "type": "object"
+        },
+        "MemoryRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_memory",
+              "default": "record_memory",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "owner_character_id": {
+              "format": "uuid",
+              "title": "Owner Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "text": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "owner_character_id",
+            "text"
+          ],
+          "title": "MemoryRecordedEffect",
+          "type": "object"
+        },
+        "MoveEntityEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "move_entity",
+              "default": "move_entity",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_location_id": {
+              "format": "uuid",
+              "title": "From Location Id",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_location_id": {
+              "format": "uuid",
+              "title": "To Location Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_location_id",
+            "to_location_id"
+          ],
+          "title": "MoveEntityEffect",
+          "type": "object"
+        },
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        },
+        "ObservationRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_observation",
+              "default": "record_observation",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/ObservationFact"
+              },
+              "minItems": 1,
+              "title": "Facts",
+              "type": "array"
+            },
+            "observer_character_id": {
+              "format": "uuid",
+              "title": "Observer Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "observer_character_id",
+            "facts"
+          ],
+          "title": "ObservationRecordedEffect",
+          "type": "object"
+        },
+        "ResolutionOutcome": {
+          "enum": [
+            "success",
+            "partial",
+            "failure",
+            "impossible"
+          ],
+          "title": "ResolutionOutcome",
+          "type": "string"
+        },
+        "ResolverKind": {
+          "enum": [
+            "deterministic",
+            "model"
+          ],
+          "title": "ResolverKind",
+          "type": "string"
+        },
+        "ResourceAdjustedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "delta": {
+              "title": "Delta",
+              "type": "integer"
+            },
+            "effect_type": {
+              "const": "resource_adjusted",
+              "default": "resource_adjusted",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceKind"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "resource",
+            "delta"
+          ],
+          "title": "ResourceAdjustedEffect",
+          "type": "object"
+        },
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One accepted outcome for a scene: typed effects plus evidence.",
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "effects": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "advance_clock": "#/$defs/AdvanceClockEffect",
+                "move_entity": "#/$defs/MoveEntityEffect",
+                "record_memory": "#/$defs/MemoryRecordedEffect",
+                "record_observation": "#/$defs/ObservationRecordedEffect",
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+              },
+              "propertyName": "effect_type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AdvanceClockEffect"
+              },
+              {
+                "$ref": "#/$defs/MoveEntityEffect"
+              },
+              {
+                "$ref": "#/$defs/ResourceAdjustedEffect"
+              },
+              {
+                "$ref": "#/$defs/ObservationRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/MemoryRecordedEffect"
+              }
+            ]
+          },
+          "title": "Effects",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "outcome": {
+          "$ref": "#/$defs/ResolutionOutcome"
+        },
+        "profile_version": {
+          "default": "",
+          "maxLength": 64,
+          "title": "Profile Version",
+          "type": "string"
+        },
+        "random_seed": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Random Seed",
+          "type": "integer"
+        },
+        "rationale": {
+          "default": "",
+          "maxLength": 2000,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "resolver": {
+          "$ref": "#/$defs/ResolverKind"
+        },
+        "scene_id": {
+          "format": "uuid",
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "scene_id",
+        "outcome",
+        "resolver"
+      ],
+      "title": "Resolution",
+      "type": "object"
+    },
+    "ResolverProposal": {
+      "$defs": {
+        "AdvanceClockEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "advance_clock",
+              "default": "advance_clock",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_index": {
+              "minimum": 0,
+              "title": "From Index",
+              "type": "integer"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_index": {
+              "minimum": 0,
+              "title": "To Index",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_index",
+            "to_index"
+          ],
+          "title": "AdvanceClockEffect",
+          "type": "object"
+        },
+        "MemoryRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_memory",
+              "default": "record_memory",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "owner_character_id": {
+              "format": "uuid",
+              "title": "Owner Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "text": {
+              "maxLength": 2000,
+              "minLength": 1,
+              "title": "Text",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "owner_character_id",
+            "text"
+          ],
+          "title": "MemoryRecordedEffect",
+          "type": "object"
+        },
+        "MoveEntityEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "move_entity",
+              "default": "move_entity",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "from_location_id": {
+              "format": "uuid",
+              "title": "From Location Id",
+              "type": "string"
+            },
+            "route_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Route Id"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            },
+            "to_location_id": {
+              "format": "uuid",
+              "title": "To Location Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "from_location_id",
+            "to_location_id"
+          ],
+          "title": "MoveEntityEffect",
+          "type": "object"
+        },
+        "ObservationFact": {
+          "additionalProperties": false,
+          "properties": {
+            "key": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "value": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Value",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "value"
+          ],
+          "title": "ObservationFact",
+          "type": "object"
+        },
+        "ObservationRecordedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "effect_type": {
+              "const": "record_observation",
+              "default": "record_observation",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "facts": {
+              "items": {
+                "$ref": "#/$defs/ObservationFact"
+              },
+              "minItems": 1,
+              "title": "Facts",
+              "type": "array"
+            },
+            "observer_character_id": {
+              "format": "uuid",
+              "title": "Observer Character Id",
+              "type": "string"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "observer_character_id",
+            "facts"
+          ],
+          "title": "ObservationRecordedEffect",
+          "type": "object"
+        },
+        "ResolutionOutcome": {
+          "enum": [
+            "success",
+            "partial",
+            "failure",
+            "impossible"
+          ],
+          "title": "ResolutionOutcome",
+          "type": "string"
+        },
+        "ResourceAdjustedEffect": {
+          "additionalProperties": false,
+          "properties": {
+            "affected_ids": {
+              "items": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "minItems": 1,
+              "title": "Affected Ids",
+              "type": "array"
+            },
+            "delta": {
+              "title": "Delta",
+              "type": "integer"
+            },
+            "effect_type": {
+              "const": "resource_adjusted",
+              "default": "resource_adjusted",
+              "title": "Effect Type",
+              "type": "string"
+            },
+            "expected_versions": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "title": "Expected Versions",
+              "type": "object"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceKind"
+            },
+            "schema_version": {
+              "const": 1,
+              "default": 1,
+              "title": "Schema Version",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "affected_ids",
+            "resource",
+            "delta"
+          ],
+          "title": "ResourceAdjustedEffect",
+          "type": "object"
+        },
+        "ResourceKind": {
+          "enum": [
+            "stamina",
+            "mana"
+          ],
+          "title": "ResourceKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Structured resolver output: outcome, feasible effects, rationale.",
+      "properties": {
+        "effects": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "advance_clock": "#/$defs/AdvanceClockEffect",
+                "move_entity": "#/$defs/MoveEntityEffect",
+                "record_memory": "#/$defs/MemoryRecordedEffect",
+                "record_observation": "#/$defs/ObservationRecordedEffect",
+                "resource_adjusted": "#/$defs/ResourceAdjustedEffect"
+              },
+              "propertyName": "effect_type"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AdvanceClockEffect"
+              },
+              {
+                "$ref": "#/$defs/MoveEntityEffect"
+              },
+              {
+                "$ref": "#/$defs/ResourceAdjustedEffect"
+              },
+              {
+                "$ref": "#/$defs/ObservationRecordedEffect"
+              },
+              {
+                "$ref": "#/$defs/MemoryRecordedEffect"
+              }
+            ]
+          },
+          "title": "Effects",
+          "type": "array"
+        },
+        "outcome": {
+          "$ref": "#/$defs/ResolutionOutcome"
+        },
+        "rationale": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome",
+        "rationale"
+      ],
+      "title": "ResolverProposal",
       "type": "object"
     },
     "ResourceAdjustedEffect": {
@@ -2186,6 +4842,188 @@
       "title": "Route",
       "type": "object"
     },
+    "Scene": {
+      "$defs": {
+        "ParticipantRole": {
+          "enum": [
+            "initiator",
+            "reactor",
+            "observer"
+          ],
+          "title": "ParticipantRole",
+          "type": "string"
+        },
+        "SceneParticipant": {
+          "additionalProperties": false,
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "role": {
+              "$ref": "#/$defs/ParticipantRole"
+            }
+          },
+          "required": [
+            "character_id",
+            "role"
+          ],
+          "title": "SceneParticipant",
+          "type": "object"
+        },
+        "SceneStatus": {
+          "enum": [
+            "proposed",
+            "validating",
+            "ready",
+            "resolving",
+            "resolved",
+            "committed",
+            "invalid",
+            "retryable_failed",
+            "terminal_failed"
+          ],
+          "title": "SceneStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Causally interacting intents with one atomic outcome boundary.",
+      "properties": {
+        "beat_budget": {
+          "default": 8,
+          "maximum": 64,
+          "minimum": 1,
+          "title": "Beat Budget",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "intent_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Intent Ids",
+          "type": "array"
+        },
+        "mutable_aggregate_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Mutable Aggregate Ids",
+          "type": "array"
+        },
+        "participants": {
+          "items": {
+            "$ref": "#/$defs/SceneParticipant"
+          },
+          "minItems": 1,
+          "title": "Participants",
+          "type": "array"
+        },
+        "phase_run_id": {
+          "format": "uuid",
+          "title": "Phase Run Id",
+          "type": "string"
+        },
+        "resolution_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resolution Id"
+        },
+        "snapshot_id": {
+          "format": "uuid",
+          "title": "Snapshot Id",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/SceneStatus",
+          "default": "proposed"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "phase_run_id",
+        "snapshot_id",
+        "participants",
+        "intent_ids"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "SceneParticipant": {
+      "$defs": {
+        "ParticipantRole": {
+          "enum": [
+            "initiator",
+            "reactor",
+            "observer"
+          ],
+          "title": "ParticipantRole",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/ParticipantRole"
+        }
+      },
+      "required": [
+        "character_id",
+        "role"
+      ],
+      "title": "SceneParticipant",
+      "type": "object"
+    },
     "SeedWorldCommand": {
       "$defs": {
         "AuditMeta": {
@@ -2286,6 +5124,173 @@
         "content_hash"
       ],
       "title": "SeedWorldCommand",
+      "type": "object"
+    },
+    "Sheet": {
+      "$defs": {
+        "HitPoints": {
+          "additionalProperties": false,
+          "properties": {
+            "current": {
+              "title": "Current",
+              "type": "integer"
+            },
+            "max": {
+              "title": "Max",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "current",
+            "max"
+          ],
+          "title": "HitPoints",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One adventurer. Mirrors the monolith's sheet object field for field.",
+      "properties": {
+        "armor": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Armor"
+        },
+        "background": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Background"
+        },
+        "base_ac": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Ac"
+        },
+        "character_class": {
+          "default": "fighter",
+          "title": "Character Class",
+          "type": "string"
+        },
+        "conditions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Conditions",
+          "type": "array"
+        },
+        "equipment": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Equipment",
+          "type": "array"
+        },
+        "hp": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HitPoints"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "level": {
+          "default": 1,
+          "title": "Level",
+          "type": "integer"
+        },
+        "name": {
+          "default": "Adventurer",
+          "title": "Name",
+          "type": "string"
+        },
+        "prepared": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Prepared",
+          "type": "array"
+        },
+        "race": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Race"
+        },
+        "shield": {
+          "default": false,
+          "title": "Shield",
+          "type": "boolean"
+        },
+        "spells": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Spells",
+          "type": "array"
+        },
+        "stats": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Stats",
+          "type": "object"
+        },
+        "subclass": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Subclass"
+        },
+        "weapons": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Weapons",
+          "type": "array"
+        },
+        "xp": {
+          "default": 0,
+          "title": "Xp",
+          "type": "integer"
+        }
+      },
+      "title": "Sheet",
       "type": "object"
     },
     "SnapshotCharacter": {
@@ -2426,6 +5431,37 @@
         "kind"
       ],
       "title": "TaskRun",
+      "type": "object"
+    },
+    "ValidationIssue": {
+      "additionalProperties": false,
+      "description": "One structural or semantic rejection with a stable location path.",
+      "properties": {
+        "code": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Code",
+          "type": "string"
+        },
+        "location": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Location",
+          "type": "string"
+        },
+        "message": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        }
+      },
+      "required": [
+        "location",
+        "code",
+        "message"
+      ],
+      "title": "ValidationIssue",
       "type": "object"
     },
     "WaitAction": {

@@ -166,3 +166,188 @@ class ErrorEnvelope(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     error: ErrorDetail
+
+
+class CharacterSummary(BaseModel):
+    """Stage 1 character listing (owned by S1-API-001)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    name: str
+    life_status: str
+    location_id: UUID
+
+
+class CharacterDetail(BaseModel):
+    """Stage 1 character view; card excerpt only for self or watcher."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    name: str
+    life_status: str
+    location_id: UUID
+    card: dict[str, object] | None = None
+    state: dict[str, object] | None = None
+
+
+class ParticipantView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    character_id: UUID
+    role: str
+
+
+class IntentView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    author_character_id: UUID
+    family: str
+    detail: dict[str, object] | None = None
+
+
+class AttemptView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    actor_character_id: UUID
+    observable_summary: str
+    status: str
+
+
+class ReactionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    reactor_character_id: UUID
+    family: str
+    detail: dict[str, object] | None = None
+
+
+class ResolutionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    outcome: str
+    resolver: str
+    rationale: str
+
+
+class SceneDetail(BaseModel):
+    """Stage 1 scene view scoped to the caller perspective (S1-API-001)."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    phase_run_id: UUID
+    status: str
+    beat_budget: int
+    event_id: UUID | None = None
+    participants: list[ParticipantView] = Field(default_factory=list)
+    intents: list[IntentView] = Field(default_factory=list)
+    attempts: list[AttemptView] = Field(default_factory=list)
+    reactions: list[ReactionView] = Field(default_factory=list)
+    resolution: ResolutionView | None = None
+
+
+class SceneSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    status: str
+    event_id: UUID | None = None
+    participant_ids: list[UUID] = Field(default_factory=list)
+
+
+class BeatView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    speaker_id: UUID | None = None
+    kind: str
+    text: str
+    source_event_id: UUID
+
+
+class ModelRunView(BaseModel):
+    """Watcher-only model audit view: metadata, never raw hidden content."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    call_id: UUID
+    role: str
+    profile: str
+    status: str
+    actor_id: UUID | None = None
+    manifest_id: UUID | None = None
+    rendered_hash: str | None = None
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+
+
+class Stage1AdvanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    absolute_index: int = Field(ge=1)
+    player_intents: dict[str, dict[str, object]] = Field(default_factory=dict)
+
+
+class Stage1SceneOutcome(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    scene_id: UUID
+    event_id: UUID
+    resolution_outcome: str
+    narration: str
+
+
+class Stage1AdvanceResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    run_id: UUID
+    world_id: UUID
+    absolute_index: int
+    snapshot_id: UUID
+    scenes: list[Stage1SceneOutcome] = Field(default_factory=list)
+    duplicate: bool = False
+
+
+class RunIdRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    run_id: UUID
+
+
+class PartyBeginRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    name: str = Field(min_length=1, max_length=128)
+    race: str = Field(default="human", max_length=64)
+    character_class: str = Field(default="fighter", max_length=64)
+    level: int = Field(default=1, ge=1, le=20)
+    stats: dict[str, int] | None = None
+
+
+class PartyMemberView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    name: str
+    level: int
+    character_class: str
+    hp_current: int | None = None
+    hp_max: int | None = None
+    conditions: list[str] = Field(default_factory=list)
+    version: int
+
+
+class PartyRosterResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    members: list[PartyMemberView] = Field(default_factory=list)

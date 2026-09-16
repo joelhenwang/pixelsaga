@@ -60,10 +60,8 @@ class CommandType(StrEnum):
     ADVANCE_PHASE = "advance_phase"
     PAUSE_SIMULATION = "pause_simulation"
     RESUME_SIMULATION = "resume_simulation"
+    COMMIT_SCENE = "commit_scene"
     SUBMIT_PLAYER_INTENT = "submit_player_intent"
-    SUBMIT_DIRECTOR_PROPOSAL = "submit_director_proposal"
-    APPLY_DEITY_OVERRIDE = "apply_deity_override"
-    RETRY_TASK = "retry_task"
     SKIP_TASK = "skip_task"
     CREATE_EXPORT = "create_export"
     IMPORT_WORLD = "import_world"
@@ -150,3 +148,59 @@ class CallStatus(StrEnum):
     STARTED = "started"
     SUCCEEDED = "succeeded"
     FAILED = "failed"
+
+
+class IntentStatus(StrEnum):
+    PROPOSED = "proposed"
+    VALIDATED = "validated"
+    INVALID = "invalid"
+    SUPERSEDED = "superseded"
+
+
+class AttemptStatus(StrEnum):
+    PENDING = "pending"
+    COMMITTED = "committed"
+    SUPERSEDED = "superseded"
+
+
+class SceneStatus(StrEnum):
+    PROPOSED = "proposed"
+    VALIDATING = "validating"
+    READY = "ready"
+    RESOLVING = "resolving"
+    RESOLVED = "resolved"
+    COMMITTED = "committed"
+    INVALID = "invalid"
+    RETRYABLE_FAILED = "retryable_failed"
+    TERMINAL_FAILED = "terminal_failed"
+
+
+class ReactionStatus(StrEnum):
+    PENDING = "pending"
+    COMMITTED = "committed"
+
+
+class ResolutionOutcome(StrEnum):
+    SUCCESS = "success"
+    PARTIAL = "partial"
+    FAILURE = "failure"
+    IMPOSSIBLE = "impossible"
+
+
+class ResolverKind(StrEnum):
+    DETERMINISTIC = "deterministic"
+    MODEL = "model"
+
+
+class NarrationKind(StrEnum):
+    NARRATION = "narration"
+    DIALOGUE = "dialogue"
+    ACTION = "action"
+    SYSTEM = "system"
+    TRANSITION = "transition"
+
+
+class ParticipantRole(StrEnum):
+    INITIATOR = "initiator"
+    REACTOR = "reactor"
+    OBSERVER = "observer"

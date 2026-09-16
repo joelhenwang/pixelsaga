@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga D&amp;D: Direction D: Begin</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; margin: 0; }
+#wrap { max-width: 420px; margin: 0 auto; padding: 16px 14px 30px; }
+h1 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 0 0 12px; }
+label { display: block; font-size: 12px; color: var(--dim); margin: 12px 0 4px; }
+input, select { width: 100%; background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 9px; font: inherit; }
+.row { display: flex; gap: 8px; }
+.row > div { flex: 1; min-width: 0; }
+#stats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 4px; }
+#stats div { border: 1px solid var(--line); text-align: center; padding: 6px 0; }
+#stats b { display: block; font-size: 17px; }
+#stats span { font-size: 11px; color: var(--dim); }
+#preview { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-top: 16px; padding: 10px 2px; font-size: 14px; }
+#preview .dim { color: var(--dim); font-size: 13px; }
+#bar { display: flex; gap: 8px; margin-top: 16px; }
+#begin { flex: 1; background: var(--fg); color: var(--bg); border: 0; padding: 10px; cursor: pointer; }
+#theme { background: none; border: 1px solid var(--line); color: var(--fg); padding: 10px 14px; cursor: pointer; }
+#done { display: none; margin-top: 16px; font-size: 14px; }
+#done .acc { color: var(--acc); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+<h1>begin adventure</h1>
+<form id="form">
+<label for="name">name</label>
+<input id="name" value="Borin" maxlength="64" autocomplete="off">
+<div class="row">
+<div><label for="race">race</label>
+<select id="race"><option>dwarf</option><option>elf</option><option>human</option><option>halfling</option></select></div>
+<div><label for="cls">class</label>
+<select id="cls"><option>fighter</option><option>ranger</option><option>wizard</option><option>cleric</option></select></div>
+<div><label for="level">level</label>
+<select id="level"><option>1</option><option>2</option><option>3</option></select></div>
+</div>
+<label>stats · <span id="mode">auto</span> (<button id="reroll" type="button" style="background:none;border:0;color:inherit;font:inherit;padding:0;cursor:pointer;text-decoration:underline">reroll</button>)</label>
+<div id="stats" aria-label="Ability scores"></div>
+<div id="preview" aria-live="polite"></div>
+<div id="bar">
+<button id="begin" type="submit">begin</button>
+<button id="theme" type="button">light</button>
+</div>
+</form>
+<div id="done"></div>
+</div>
+<script>
+"use strict";
+// Static stand-in for POST /api/v1/stage1/party/begin. Rolls are fixture
+// shuffles only; the engine owns every canonical roll.
+const SETS = [
+  { str: 15, dex: 12, con: 14, int: 10, wis: 13, cha: 8 },
+  { str: 14, dex: 13, con: 15, int: 8, wis: 12, cha: 10 }
+];
+const HP = { fighter: 10, ranger: 10, wizard: 6, cleric: 8 };
+const ABIL = ["str", "dex", "con", "int", "wis", "cha"];
+let set = 0;
+const $ = (s) => document.querySelector(s);
+function mod(v) { return Math.floor((v - 10) / 2); }
+function sheet() {
+  const cls = $("#cls").value, stats = SETS[set];
+  const hp = HP[cls] + mod(stats.con);
+  return { hp, ac: cls === "fighter" ? 18 : 14 };
+}
+function render() {
+  const stats = SETS[set];
+  $("#stats").innerHTML = ABIL.map((a) =>
+    `<div><b>${stats[a]}</b><span>${a} ${mod(stats[a]) >= 0 ? "+" : ""}${mod(stats[a])}</span></div>`).join("");
+  const s = sheet();
+  $("#preview").innerHTML =
+    `<b>${$("#name").value || "Adventurer"}</b> · lv ${$("#level").value} ${$("#race").value} ${$("#cls").value}` +
+    `<br><span class="dim">HP ${s.hp}/${s.hp} · AC ${s.ac} · 0 companions seated</span>`;
+}
+$("#reroll").onclick = () => { set = (set + 1) % SETS.length; render(); };
+["#name", "#race", "#cls", "#level"].forEach((s) =>
+  $(s).addEventListener("input", render));
+$("#theme").onclick = () => {
+  const root = document.documentElement;
+  root.classList.toggle("light");
+  $("#theme").textContent = root.classList.contains("light") ? "dark" : "light";
+};
+$("#form").onsubmit = (e) => {
+  e.preventDefault();
+  const s = sheet(), name = $("#name").value || "Adventurer";
+  $("#form").style.display = "none";
+  const done = $("#done"); done.style.display = "block";
+  done.innerHTML = `<span class="acc">${name} seated.</span> HP ${s.hp}/${s.hp} · AC ${s.ac}<br>` +
+    `<span class="acc">Scene 1 opens at the world clock.</span>`;
+};
+render();
+</script>
+</body>
+</html>

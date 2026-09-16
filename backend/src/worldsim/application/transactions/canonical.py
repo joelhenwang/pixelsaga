@@ -16,20 +16,31 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from worldsim.application.unit_of_work import UnitOfWork
+from worldsim.domain.characters import Character
 from worldsim.domain.effects import (
     AdvanceClockEffect,
     DomainEffect,
     MoveEntityEffect,
     ResourceAdjustedEffect,
 )
-from worldsim.domain.enums import EffectType, EventType, Visibility
+from worldsim.domain.enums import (
+    AttemptStatus,
+    EffectType,
+    EventType,
+    IntentStatus,
+    ReactionStatus,
+    SceneStatus,
+    Visibility,
+)
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.perception import Observation, ObservationFact, RecentMemory
 from worldsim.domain.rules.projection import apply_character_effect, apply_world_effect
 from worldsim.domain.rules.randomness import RandomEvidence
+from worldsim.domain.scenes import Attempt, Intent, Reaction, Resolution, Scene
 from worldsim.domain.tasks import OutboxMessage
 from worldsim.domain.time import utcnow
+from worldsim.domain.world import World
 
 
 class UnitOfWorkFactory(Protocol):
@@ -65,6 +76,17 @@ class OutboxSpec:
 
 
 @dataclass(frozen=True)
+class SceneRecords:
+    """Stage 1 scene layer persisted atomically with its event (S1-COMMIT-001)."""
+
+    scene: Scene
+    intents: list[Intent] = field(default_factory=list)
+    attempts: list[Attempt] = field(default_factory=list)
+    reactions: list[Reaction] = field(default_factory=list)
+    resolution: Resolution | None = None
+
+
+@dataclass(frozen=True)
 class CommitRequest:
     command_id: UUID
     world_id: UUID
@@ -82,6 +104,7 @@ class CommitRequest:
     memories: list[MemorySpec] = field(default_factory=list)
     outbox: list[OutboxSpec] = field(default_factory=list)
     random: RandomEvidence | None = None
+    scene_records: SceneRecords | None = None
 
 
 @dataclass(frozen=True)
@@ -152,6 +175,9 @@ class CanonicalTransaction:
                     CommittedEffect(event_id=event_id, ordinal=ordinal, effect=effect)
                 )
             self._fire("after_effects")
+            if request.scene_records is not None:
+                await self._persist_scene(uow, request, event_id)
+                self._fire("after_scene")
             await self._project(uow, request)
             self._fire("after_projections")
             observation_ids = await self._perceive(uow, request, event_id)
@@ -205,22 +231,57 @@ class CanonicalTransaction:
                 raise exc
             return await self._duplicate(uow, existing, request)
 
+    async def _persist_scene(self, uow: UnitOfWork, request: CommitRequest, event_id: UUID) -> None:
+        """Persist the scene layer with commit-time statuses (S1-COMMIT-001)."""
+        records = request.scene_records
+        if records is None:
+            return
+        for intent in records.intents:
+            await uow.scenes.save_intent(
+                intent.model_copy(update={"status": IntentStatus.VALIDATED})
+            )
+        await uow.scenes.save_scene(
+            records.scene.model_copy(
+                update={"status": SceneStatus.COMMITTED, "event_id": event_id}
+            ),
+            event_id,
+        )
+        for attempt in records.attempts:
+            await uow.scenes.save_attempt(
+                attempt.model_copy(
+                    update={"status": AttemptStatus.COMMITTED, "scene_id": records.scene.id}
+                )
+            )
+        for reaction in records.reactions:
+            await uow.scenes.save_reaction(
+                reaction.model_copy(
+                    update={"status": ReactionStatus.COMMITTED, "scene_id": records.scene.id}
+                )
+            )
+        if records.resolution is not None:
+            await uow.scenes.save_resolution(records.resolution)
+
     async def _project(self, uow: UnitOfWork, request: CommitRequest) -> None:
+        # Fold every effect per aggregate, then save once: the version
+        # table bumps once per commit, so rows must too. Saving per
+        # effect goes stale on the second touch of one aggregate.
+        worlds: dict[UUID, World] = {}
+        characters: dict[UUID, Character] = {}
+        clock: dict[UUID, AdvanceClockEffect] = {}
         for effect in request.effects:
             if isinstance(effect, AdvanceClockEffect):
-                world = await uow.worlds.get(_primary_target(effect, request.world_id))
-                projected = apply_world_effect(world, effect)
-                await uow.worlds.save(projected, request.expected_versions[str(world.id)])
-                await uow.worlds.set_clock(
-                    world.id, projected.day, projected.phase.value, effect.to_index
-                )
+                target = _primary_target(effect, request.world_id)
+                current = worlds.get(target)
+                if current is None:
+                    current = await uow.worlds.get(target)
+                worlds[target] = apply_world_effect(current, effect)
+                clock[target] = effect
             elif isinstance(effect, (MoveEntityEffect, ResourceAdjustedEffect)):
                 target = _primary_target(effect, request.world_id)
-                character = await uow.characters.get(target)
-                projected_char = apply_character_effect(character, effect)
-                await uow.characters.save_state(
-                    projected_char, request.expected_versions[str(target)]
-                )
+                current = characters.get(target)
+                if current is None:
+                    current = await uow.characters.get(target)
+                characters[target] = apply_character_effect(current, effect)
             else:
                 # Observation and memory effects project no state. New effect
                 # types must add a projector branch instead of landing here.
@@ -232,6 +293,13 @@ class CanonicalTransaction:
                         ErrorCode.UNSUPPORTED_ACTION,
                         f"no projector for {effect.effect_type.value}",
                     )
+        for target, world in worlds.items():
+            await uow.worlds.save(world, request.expected_versions[str(target)])
+            last = clock[target]
+            assert isinstance(last, AdvanceClockEffect)
+            await uow.worlds.set_clock(target, world.day, world.phase.value, last.to_index)
+        for target, character in characters.items():
+            await uow.characters.save_state(character, request.expected_versions[str(target)])
 
     async def _perceive(
         self, uow: UnitOfWork, request: CommitRequest, event_id: UUID

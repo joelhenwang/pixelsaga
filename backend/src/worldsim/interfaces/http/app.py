@@ -24,7 +24,7 @@ from worldsim.interfaces.http.errors import (
     domain_error_handler,
     unhandled_error_handler,
 )
-from worldsim.interfaces.http.routes import health, operations, world
+from worldsim.interfaces.http.routes import health, operations, stage1, world
 from worldsim.interfaces.http.state import (
     MIGRATIONS_DIR,
     SEED_DIR,
@@ -74,4 +74,5 @@ def create_app(
     app.include_router(health.router, prefix="/api/v1")
     app.include_router(world.router, prefix="/api/v1")
     app.include_router(operations.router, prefix="/api/v1")
+    app.include_router(stage1.router, prefix="/api/v1")
     return app

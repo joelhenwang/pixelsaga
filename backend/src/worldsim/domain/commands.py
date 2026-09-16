@@ -84,7 +84,16 @@ class MoveAction(ActionBase):
     route_id: RouteId | None = None
 
 
+class CommunicateAction(ActionBase):
+    """Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;
+    until then only schema validation and liveness/topic checks apply."""
+
+    family: Literal[ActionFamily.COMMUNICATE] = ActionFamily.COMMUNICATE
+    target_character_id: CharacterId
+    topic: str = Field(min_length=1, max_length=256)
+
+
 ActionIntent = Annotated[
-    WaitAction | RestAction | ObserveAction | MoveAction,
+    WaitAction | RestAction | ObserveAction | MoveAction | CommunicateAction,
     Field(discriminator="family"),
 ]

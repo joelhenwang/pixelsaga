@@ -64,6 +64,29 @@ class SqlAlchemyPerceptionRepository:
             for row in rows
         ]
 
+    async def observations_for_observer(
+        self, observer_id: UUID, limit: int = 20
+    ) -> list[Observation]:
+        rows = (
+            await self._session.execute(
+                select(ObservationRow)
+                .where(ObservationRow.observer_character_id == observer_id)
+                .order_by(ObservationRow.created_phase_index.desc())
+                .limit(limit)
+            )
+        ).scalars()
+        return [
+            Observation(
+                id=row.id,
+                world_id=row.world_id,
+                event_id=row.event_id,
+                observer_character_id=row.observer_character_id,
+                facts=_facts_to_domain(row.facts),
+                created_phase_index=row.created_phase_index,
+            )
+            for row in rows
+        ]
+
     async def add_memory(self, memory: RecentMemory) -> None:
         self._session.add(
             RecentMemoryRow(

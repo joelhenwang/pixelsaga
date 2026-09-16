@@ -5,7 +5,15 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    BigInteger,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -44,7 +52,7 @@ class WorldEventRow(Base):
     participant_ids: Mapped[list[str]] = mapped_column(JSONB, default=list)
     summary: Mapped[dict[str, str]] = mapped_column(JSONB, default=dict)
     visibility: Mapped[str] = mapped_column(String(16), default="public")
-    random_seed: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    random_seed: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     random_algorithm: Mapped[str | None] = mapped_column(String(64), nullable=True)
     random_result: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

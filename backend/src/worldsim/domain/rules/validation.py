@@ -22,6 +22,7 @@ from worldsim.domain.effects import (
     ResourceAdjustedEffect,
 )
 from worldsim.domain.enums import ResourceKind
+from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.perception import ObservationFact
 from worldsim.domain.rules.actions import check_intent
 from worldsim.domain.rules.resources import rest_recovery, restore
@@ -89,6 +90,11 @@ def plan_effects(intent: ActionIntent, view: WorldView) -> list[DomainEffect]:
                     facts=[ObservationFact(key="focus", value=intent.focus)],
                 )
             ]
+        case _:
+            raise DomainError(
+                ErrorCode.UNSUPPORTED_ACTION,
+                f"no effect plan for {intent.family.value}",
+            )
 
 
 def plan_memory(owner: Character, text: str) -> MemoryRecordedEffect:

@@ -67,9 +67,13 @@ class OpenRouterGateway:
             await client.aclose()
 
     def _body(self, request: CompletionRequest) -> dict[str, Any]:
+        messages: list[dict[str, str]] = []
+        if request.system is not None:
+            messages.append({"role": "system", "content": request.system})
+        messages.append({"role": "user", "content": request.prompt})
         body: dict[str, Any] = {
             "model": self.profile.model_id,
-            "messages": [{"role": "user", "content": request.prompt}],
+            "messages": messages,
             "max_tokens": request.max_tokens,
         }
         if request.json_mode:

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga Stage 1: Direction B: Stage</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+#strip { display: flex; gap: 0; border-bottom: 1px solid var(--line); font-size: 12px; overflow-x: auto; }
+#strip button { background: none; border: 0; border-right: 1px solid var(--line); color: var(--dim); padding: 8px 12px; cursor: pointer; white-space: nowrap; font: inherit; }
+#strip button[aria-current="true"] { color: var(--fg); box-shadow: inset 0 -2px 0 var(--acc); }
+#status { margin-left: auto; padding: 8px 12px; color: var(--dim); white-space: nowrap; }
+#stage { flex: 1; max-width: 680px; width: 100%; margin: 0 auto; padding: 26px 18px 12px; }
+#stage h1 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 0 0 14px; }
+.beat { font-size: 19px; margin: 12px 0; }
+.beat.dialogue { margin-left: 0; }
+.beat .who { color: var(--acc); }
+#cast { display: flex; gap: 10px; margin: 18px 0 0; }
+.person { border: 1px solid var(--line); padding: 8px 10px; display: flex; gap: 10px; align-items: center; min-width: 0; }
+.person .avatar { width: 44px; height: 44px; border: 1px solid var(--line); display: inline-flex; align-items: center; justify-content: center; font-size: 20px; flex: none; }
+.person .nm { font-size: 13px; } .person .rl { font-size: 12px; color: var(--dim); }
+#bar { border-top: 1px solid var(--line); padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); }
+#bar .row { max-width: 680px; margin: 0 auto; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+#bar select, #bar input { background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 8px; font: inherit; }
+#bar input { flex: 1; min-width: 140px; }
+#bar button { padding: 8px 14px; cursor: pointer; }
+#go { background: var(--fg); color: var(--bg); border: 0; }
+#theme { background: none; border: 1px solid var(--line); color: var(--fg); }
+#queued { max-width: 680px; margin: 6px auto 0; color: var(--warn); font-size: 13px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<nav id="strip" aria-label="Scenes"></nav>
+<main id="stage" aria-live="polite"></main>
+<footer id="bar">
+<div class="row">
+<select id="family" aria-label="Action">
+<option value="wait">wait</option><option value="observe">observe</option>
+<option value="rest">rest</option><option value="move">move</option>
+<option value="communicate">communicate</option>
+</select>
+<input id="topic" placeholder="topic or focus: blank waits" aria-label="Topic">
+<button id="go" type="button">Act as Wren</button>
+<button id="theme" type="button">light</button>
+</div>
+<p id="queued" hidden></p>
+</footer>
+<script>
+"use strict";
+const WORLDSIM = {
+  clock: "day 1, morning · phase 1 · completed",
+  scenes: [
+    { id: "sc-wait", title: "Hearth: Wren holds",
+      cast: [{ name: "Wren", mark: "W", role: "initiator" }],
+      beats: [
+        { who: null, text: "Embers settle in the Hearth." },
+        { who: null, text: "Wren watches the road." }
+      ] },
+    { id: "sc-talk", title: "Market: Ash hails Wren",
+      cast: [
+        { name: "Ash", mark: "A", role: "initiator" },
+        { name: "Wren", mark: "W", role: "reactor" }
+      ],
+      beats: [
+        { who: "Ash", text: "Dawn patrol. Walk with me?" },
+        { who: "Wren", text: "Wren nods once." }
+      ] }
+  ]
+};
+let cur = 1;
+const $ = (s) => document.querySelector(s);
+function render() {
+  const strip = $("#strip"); strip.innerHTML = "";
+  WORLDSIM.scenes.forEach((s, i) => {
+    const b = document.createElement("button");
+    b.textContent = `${i + 1} · ${s.title}`;
+    b.setAttribute("aria-current", i === cur ? "true" : "false");
+    b.onclick = () => { cur = i; render(); };
+    strip.appendChild(b);
+  });
+  const st = document.createElement("span");
+  st.id = "status"; st.textContent = WORLDSIM.clock;
+  strip.appendChild(st);
+  const s = WORLDSIM.scenes[cur];
+  $("#stage").innerHTML = `<h1>${s.title}</h1>` +
+    s.beats.map(b => `<p class="beat${b.who ? " dialogue" : ""}">${b.who ? `<span class="who">${b.who}:</span> ` : ""}${b.text}</p>`).join("") +
+    `<div id="cast">${s.cast.map(p => `<div class="person"><span class="avatar" aria-hidden="true">${p.mark}</span><span><span class="nm">${p.name}</span><br><span class="rl">${p.role}</span></span></div>`).join("")}</div>`;
+  $("#family").value = cur === 1 ? "communicate" : "wait";
+  $("#topic").value = cur === 1 ? "dawn patrol" : "";
+}
+$("#go").onclick = () => {
+  const q = $("#queued"); q.hidden = false;
+  const t = $("#topic").value;
+  q.textContent = `Queued ${$("#family").value}${t ? ": " + t : ""} for the next phase. You control the attempt, not its outcome.`;
+};
+$("#theme").onclick = (e) => {
+  const light = document.documentElement.classList.toggle("light");
+  e.target.textContent = light ? "dark" : "light";
+};
+if (matchMedia("(prefers-color-scheme: light)").matches) { document.documentElement.classList.add("light"); $("#theme").textContent = "dark"; }
+render();
+</script>
+</body>
+</html>

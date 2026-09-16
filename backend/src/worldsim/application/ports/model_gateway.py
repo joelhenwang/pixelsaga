@@ -64,6 +64,7 @@ class CompletionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     prompt: str = Field(min_length=1, max_length=32000)
+    system: str | None = Field(default=None, min_length=1, max_length=16000)
     max_tokens: int = Field(default=512, ge=1, le=4096)
     json_mode: bool = False
 

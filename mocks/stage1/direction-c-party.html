@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PixelSaga D&amp;D: Direction C: Party</title>
+<style>
+:root { color-scheme: dark; --bg: #000; --fg: #e8e8e8; --dim: #9a9a9a; --line: #2c2c2c; --acc: #7dd87d; --warn: #e0a63c; --bad: #e06c6c; }
+html.light { --bg: #fff; --fg: #111; --dim: #555; --line: #ddd; --acc: #1a7a1a; --warn: #925e00; --bad: #a31515; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, sans-serif; margin: 0; }
+#wrap { max-width: 760px; margin: 0 auto; padding: 18px 16px 30px; }
+h1 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 0 0 4px; }
+h2 { font-size: 13px; color: var(--dim); font-weight: 600; margin: 22px 0 6px; }
+#clock { font-size: 12px; color: var(--dim); margin-bottom: 14px; }
+.member { border-top: 1px solid var(--line); padding: 10px 2px; }
+.member:last-of-type { border-bottom: 1px solid var(--line); }
+.mrow { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.mname { font-weight: 700; }
+.mmeta { color: var(--dim); font-size: 13px; }
+.hp { font-family: ui-monospace, monospace; font-size: 13px; margin-left: auto; white-space: nowrap; }
+.hp .bar { color: var(--acc); }
+.hp.low .bar { color: var(--warn); }
+.hp.crit .bar { color: var(--bad); }
+.conds { font-size: 13px; color: var(--warn); margin-top: 2px; }
+.detail { font-size: 13px; color: var(--dim); margin-top: 4px; display: none; }
+.member[aria-expanded="true"] .detail { display: block; }
+button.link { background: none; border: 0; color: inherit; font: inherit; padding: 0; cursor: pointer; text-align: left; }
+#log { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+#log li { padding: 7px 2px; border-bottom: 1px solid var(--line); font-size: 14px; }
+#log .enc { color: var(--warn); }
+#log .hit { color: var(--fg); }
+#log .cond { color: var(--warn); }
+#log .seed { color: var(--dim); font-size: 12px; }
+#bar { display: flex; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+#bar button { padding: 8px 14px; cursor: pointer; }
+#advance { background: var(--fg); color: var(--bg); border: 0; }
+#theme { background: none; border: 1px solid var(--line); color: var(--fg); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="wrap">
+<h1>party · dawn patrol</h1>
+<p id="clock">day 1, morning · phase 1 · scene 2 committed</p>
+<section id="roster" aria-label="Party roster"></section>
+<h2>combat log · scene 2</h2>
+<ol id="log"></ol>
+<div id="bar">
+<button id="advance" type="button">advance to 3</button>
+<button id="theme" type="button">light</button>
+</div>
+</div>
+<script>
+"use strict";
+// Fixture mirrors GET /api/v1/stage1/party plus Wire-2 outcome beats.
+const PARTY = {
+  members: [
+    { name: "Borin", character_class: "fighter", level: 1, hp_current: 8, hp_max: 12,
+      ac: 18, weapons: ["longsword +5 (1d8+3)", "handaxe +5 (1d6+3)"], conditions: ["Poisoned"] },
+    { name: "Lyra", character_class: "ranger", level: 3, hp_current: 25, hp_max: 25,
+      ac: 14, weapons: ["longsword +5 (1d8+3)", "longbow +5 (1d8+3)"], conditions: [] }
+  ],
+  log: [
+    { kind: "enc", text: "Encounter: 2x Goblin (overwhelming, 150 adjusted XP)." },
+    { kind: "hit", text: "Borin hits Goblin for 3 slashing. (7->4 HP)" },
+    { kind: "hit", text: "Borin hits Goblin for 6 slashing. (4->0 HP)" },
+    { kind: "cond", text: "Poisoned on Borin (2 rounds)." },
+    { kind: "seed", text: "seed 48207113 · seeded-d20-v1 · 4 tags, 0 unresolved" }
+  ]
+};
+function hpbar(cur, max) {
+  const cells = 10, filled = Math.round((cur / max) * cells);
+  return "■".repeat(filled) + "□".repeat(cells - filled);
+}
+const $ = (s) => document.querySelector(s);
+function render() {
+  const roster = $("#roster"); roster.innerHTML = "";
+  PARTY.members.forEach((m, i) => {
+    const frac = m.hp_current / m.hp_max;
+    const cls = frac <= 0.25 ? "crit" : frac <= 0.6 ? "low" : "";
+    const el = document.createElement("div");
+    el.className = "member"; el.setAttribute("aria-expanded", i === 0 ? "true" : "false");
+    el.innerHTML =
+      `<button class="link" type="button" aria-label="Toggle ${m.name} details"><span class="mrow">` +
+      `<span class="mname">${m.name}</span>` +
+      `<span class="mmeta">lv ${m.level} ${m.character_class} · AC ${m.ac}</span>` +
+      `<span class="hp ${cls}"><span class="bar">${hpbar(m.hp_current, m.hp_max)}</span> ${m.hp_current}/${m.hp_max}</span>` +
+      `</span></button>` +
+      (m.conditions.length ? `<div class="conds">${m.conditions.join(" · ")}</div>` : "") +
+      `<div class="detail">${m.weapons.join(" &nbsp; ")}</div>`;
+    el.querySelector("button").onclick = () =>
+      el.setAttribute("aria-expanded", el.getAttribute("aria-expanded") !== "true" ? "true" : "false");
+    roster.appendChild(el);
+  });
+  const log = $("#log"); log.innerHTML = "";
+  PARTY.log.forEach((e) => {
+    const li = document.createElement("li"); li.className = e.kind; li.textContent = e.text;
+    log.appendChild(li);
+  });
+}
+$("#theme").onclick = () => {
+  const root = document.documentElement;
+  root.classList.toggle("light");
+  $("#theme").textContent = root.classList.contains("light") ? "dark" : "light";
+};
+$("#advance").onclick = () => { $("#advance").disabled = true; $("#advance").textContent = "advancing…"; };
+render();
+</script>
+</body>
+</html>

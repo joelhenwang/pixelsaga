@@ -88,6 +88,168 @@
         "title": "AdvanceResult",
         "type": "object"
       },
+      "AttemptView": {
+        "additionalProperties": false,
+        "properties": {
+          "actor_character_id": {
+            "format": "uuid",
+            "title": "Actor Character Id",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "observable_summary": {
+            "title": "Observable Summary",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "actor_character_id",
+          "observable_summary",
+          "status"
+        ],
+        "title": "AttemptView",
+        "type": "object"
+      },
+      "BeatView": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "source_event_id": {
+            "format": "uuid",
+            "title": "Source Event Id",
+            "type": "string"
+          },
+          "speaker_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker Id"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "text",
+          "source_event_id"
+        ],
+        "title": "BeatView",
+        "type": "object"
+      },
+      "CharacterDetail": {
+        "additionalProperties": false,
+        "description": "Stage 1 character view; card excerpt only for self or watcher.",
+        "properties": {
+          "card": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "life_status": {
+            "title": "Life Status",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "life_status",
+          "location_id"
+        ],
+        "title": "CharacterDetail",
+        "type": "object"
+      },
+      "CharacterSummary": {
+        "additionalProperties": false,
+        "description": "Stage 1 character listing (owned by S1-API-001).",
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "life_status": {
+            "title": "Life Status",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "life_status",
+          "location_id"
+        ],
+        "title": "CharacterSummary",
+        "type": "object"
+      },
       "ClockResponse": {
         "additionalProperties": false,
         "properties": {
@@ -277,6 +439,287 @@
         "title": "HealthLiveResponse",
         "type": "object"
       },
+      "IntentView": {
+        "additionalProperties": false,
+        "properties": {
+          "author_character_id": {
+            "format": "uuid",
+            "title": "Author Character Id",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "author_character_id",
+          "family"
+        ],
+        "title": "IntentView",
+        "type": "object"
+      },
+      "ModelRunView": {
+        "additionalProperties": false,
+        "description": "Watcher-only model audit view: metadata, never raw hidden content.",
+        "properties": {
+          "actor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Id"
+          },
+          "call_id": {
+            "format": "uuid",
+            "title": "Call Id",
+            "type": "string"
+          },
+          "completion_tokens": {
+            "default": 0,
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "manifest_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manifest Id"
+          },
+          "profile": {
+            "title": "Profile",
+            "type": "string"
+          },
+          "prompt_tokens": {
+            "default": 0,
+            "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "rendered_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rendered Hash"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "call_id",
+          "role",
+          "profile",
+          "status"
+        ],
+        "title": "ModelRunView",
+        "type": "object"
+      },
+      "ParticipantView": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "character_id",
+          "role"
+        ],
+        "title": "ParticipantView",
+        "type": "object"
+      },
+      "PartyBeginRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "character_class": {
+            "default": "fighter",
+            "maxLength": 64,
+            "title": "Character Class",
+            "type": "string"
+          },
+          "level": {
+            "default": 1,
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Level",
+            "type": "integer"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "race": {
+            "default": "human",
+            "maxLength": 64,
+            "title": "Race",
+            "type": "string"
+          },
+          "stats": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stats"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "name"
+        ],
+        "title": "PartyBeginRequest",
+        "type": "object"
+      },
+      "PartyMemberView": {
+        "additionalProperties": false,
+        "properties": {
+          "character_class": {
+            "title": "Character Class",
+            "type": "string"
+          },
+          "conditions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "hp_current": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hp Current"
+          },
+          "hp_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hp Max"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "level": {
+            "title": "Level",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "name",
+          "level",
+          "character_class",
+          "version"
+        ],
+        "title": "PartyMemberView",
+        "type": "object"
+      },
+      "PartyRosterResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/PartyMemberView"
+            },
+            "title": "Members",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "PartyRosterResponse",
+        "type": "object"
+      },
       "PhaseName": {
         "enum": [
           "dawn",
@@ -292,6 +735,44 @@
         ],
         "title": "PhaseName",
         "type": "string"
+      },
+      "ReactionView": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reactor_character_id": {
+            "format": "uuid",
+            "title": "Reactor Character Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reactor_character_id",
+          "family"
+        ],
+        "title": "ReactionView",
+        "type": "object"
       },
       "ReadyResponse": {
         "additionalProperties": false,
@@ -405,6 +886,173 @@
         "title": "ReconcileResponse",
         "type": "object"
       },
+      "ResolutionView": {
+        "additionalProperties": false,
+        "properties": {
+          "outcome": {
+            "title": "Outcome",
+            "type": "string"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "resolver": {
+            "title": "Resolver",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome",
+          "resolver",
+          "rationale"
+        ],
+        "title": "ResolutionView",
+        "type": "object"
+      },
+      "RunIdRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "title": "RunIdRequest",
+        "type": "object"
+      },
+      "SceneDetail": {
+        "additionalProperties": false,
+        "description": "Stage 1 scene view scoped to the caller perspective (S1-API-001).",
+        "properties": {
+          "attempts": {
+            "items": {
+              "$ref": "#/components/schemas/AttemptView"
+            },
+            "title": "Attempts",
+            "type": "array"
+          },
+          "beat_budget": {
+            "title": "Beat Budget",
+            "type": "integer"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "intents": {
+            "items": {
+              "$ref": "#/components/schemas/IntentView"
+            },
+            "title": "Intents",
+            "type": "array"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantView"
+            },
+            "title": "Participants",
+            "type": "array"
+          },
+          "phase_run_id": {
+            "format": "uuid",
+            "title": "Phase Run Id",
+            "type": "string"
+          },
+          "reactions": {
+            "items": {
+              "$ref": "#/components/schemas/ReactionView"
+            },
+            "title": "Reactions",
+            "type": "array"
+          },
+          "resolution": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResolutionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "phase_run_id",
+          "status",
+          "beat_budget"
+        ],
+        "title": "SceneDetail",
+        "type": "object"
+      },
+      "SceneSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "participant_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Participant Ids",
+            "type": "array"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "SceneSummary",
+        "type": "object"
+      },
       "SeedResponse": {
         "additionalProperties": false,
         "properties": {
@@ -433,6 +1081,110 @@
           "duplicate"
         ],
         "title": "SeedResponse",
+        "type": "object"
+      },
+      "Stage1AdvanceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "minimum": 1.0,
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "player_intents": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Player Intents",
+            "type": "object"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "absolute_index"
+        ],
+        "title": "Stage1AdvanceRequest",
+        "type": "object"
+      },
+      "Stage1AdvanceResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "duplicate": {
+            "default": false,
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "scenes": {
+            "items": {
+              "$ref": "#/components/schemas/Stage1SceneOutcome"
+            },
+            "title": "Scenes",
+            "type": "array"
+          },
+          "snapshot_id": {
+            "format": "uuid",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "world_id",
+          "absolute_index",
+          "snapshot_id"
+        ],
+        "title": "Stage1AdvanceResponse",
+        "type": "object"
+      },
+      "Stage1SceneOutcome": {
+        "additionalProperties": false,
+        "properties": {
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "narration": {
+            "title": "Narration",
+            "type": "string"
+          },
+          "resolution_outcome": {
+            "title": "Resolution Outcome",
+            "type": "string"
+          },
+          "scene_id": {
+            "format": "uuid",
+            "title": "Scene Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scene_id",
+          "event_id",
+          "resolution_outcome",
+          "narration"
+        ],
+        "title": "Stage1SceneOutcome",
         "type": "object"
       },
       "TaskResponse": {
@@ -735,6 +1487,507 @@
         "summary": "Get Task",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/stage1/advance": {
+      "post": {
+        "operationId": "advance_api_v1_stage1_advance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Stage1AdvanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stage1AdvanceResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Advance",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/characters": {
+      "get": {
+        "operationId": "list_characters_api_v1_stage1_characters_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CharacterSummary"
+                  },
+                  "title": "Response List Characters Api V1 Stage1 Characters Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Characters",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/characters/{character_id}": {
+      "get": {
+        "operationId": "get_character_api_v1_stage1_characters__character_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Character",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/model-runs": {
+      "get": {
+        "operationId": "list_model_runs_api_v1_stage1_model_runs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "phase_run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Phase Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ModelRunView"
+                  },
+                  "title": "Response List Model Runs Api V1 Stage1 Model Runs Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Model Runs",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/party": {
+      "get": {
+        "description": "Party sheets are shared party knowledge: full roster for both roles.",
+        "operationId": "party_roster_api_v1_stage1_party_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyRosterResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Party Roster",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/party/begin": {
+      "post": {
+        "description": "Seat the player's adventurer (explicit stats or the auto build).",
+        "operationId": "begin_party_member_api_v1_stage1_party_begin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartyBeginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyMemberView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Begin Party Member",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/pause": {
+      "post": {
+        "operationId": "pause_api_v1_stage1_pause_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunIdRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Pause Api V1 Stage1 Pause Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Pause",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/resume": {
+      "post": {
+        "operationId": "resume_api_v1_stage1_resume_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunIdRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Resume Api V1 Stage1 Resume Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Resume",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/scenes": {
+      "get": {
+        "operationId": "list_scenes_api_v1_stage1_scenes_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "phase_run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Phase Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SceneSummary"
+                  },
+                  "title": "Response List Scenes Api V1 Stage1 Scenes Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Scenes",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/scenes/{scene_id}": {
+      "get": {
+        "operationId": "get_scene_api_v1_stage1_scenes__scene_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scene_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scene Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SceneDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Scene",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/scenes/{scene_id}/narration": {
+      "get": {
+        "operationId": "get_narration_api_v1_stage1_scenes__scene_id__narration_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scene_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scene Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BeatView"
+                  },
+                  "title": "Response Get Narration Api V1 Stage1 Scenes  Scene Id  Narration Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Narration",
+        "tags": [
+          "stage1"
         ]
       }
     },

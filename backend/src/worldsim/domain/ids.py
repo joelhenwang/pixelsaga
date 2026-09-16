@@ -6,7 +6,7 @@ See the identifier rules in 03_DOMAIN_AND_PERSISTENCE.md.
 
 from __future__ import annotations
 
-from uuid import UUID, uuid4
+from uuid import NAMESPACE_OID, UUID, uuid4, uuid5
 
 WorldId = UUID
 CharacterId = UUID
@@ -23,6 +23,13 @@ MemoryId = UUID
 OutboxId = UUID
 CallId = UUID
 ManifestId = UUID
+IntentId = UUID
+AttemptId = UUID
+SceneId = UUID
+ReactionId = UUID
+ResolutionId = UUID
+NarrationId = UUID
+PartyMemberId = UUID
 
 
 def new_world_id() -> WorldId:
@@ -30,6 +37,10 @@ def new_world_id() -> WorldId:
 
 
 def new_character_id() -> CharacterId:
+    return uuid4()
+
+
+def new_party_member_id() -> PartyMemberId:
     return uuid4()
 
 
@@ -82,4 +93,62 @@ def new_call_id() -> CallId:
 
 
 def new_manifest_id() -> ManifestId:
+    return uuid4()
+
+
+def new_intent_id() -> IntentId:
+    return uuid4()
+
+
+def _derive(*parts: object) -> UUID:
+    return uuid5(NAMESPACE_OID, ":".join(["worldsim", *(str(p) for p in parts)]))
+
+
+def derive_intent_id(world_id: WorldId, snapshot_id: SnapshotId, author: CharacterId) -> IntentId:
+    """Stable intent ID: one intent per author per snapshot (matches the DB constraint)."""
+    return _derive("intent", world_id.hex, snapshot_id.hex, author.hex)
+
+
+def derive_attempt_id(intent_id: IntentId) -> AttemptId:
+    """Stable attempt ID: one attempt per intent."""
+    return _derive("attempt", intent_id.hex)
+
+
+def derive_reaction_id(attempt_id: AttemptId, reactor: CharacterId) -> ReactionId:
+    """Stable reaction ID: one reaction per reactor per attempt."""
+    return _derive("reaction", attempt_id.hex, reactor.hex)
+
+
+def derive_resolution_id(scene_id: SceneId) -> ResolutionId:
+    """Stable resolution ID: one resolution per scene."""
+    return _derive("resolution", scene_id.hex)
+
+
+def derive_combat_event_id(source_event_id: UUID) -> EventId:
+    """Stable combat event ID: one combat record per narrated event."""
+    return _derive("combat", source_event_id.hex)
+
+
+def derive_task_id(run_id: PhaseRunId, role: str, actor: CharacterId) -> TaskId:
+    """Stable task-run ID: restarts resume the same graph thread."""
+    return _derive("task", run_id.hex, role, actor.hex)
+
+
+def new_attempt_id() -> AttemptId:
+    return uuid4()
+
+
+def new_scene_id() -> SceneId:
+    return uuid4()
+
+
+def new_reaction_id() -> ReactionId:
+    return uuid4()
+
+
+def new_resolution_id() -> ResolutionId:
+    return uuid4()
+
+
+def new_narration_id() -> NarrationId:
     return uuid4()

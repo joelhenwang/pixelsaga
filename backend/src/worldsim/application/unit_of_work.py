@@ -11,8 +11,10 @@ from worldsim.application.ports.repositories import (
     EventRepository,
     LocationRepository,
     OutboxRepository,
+    PartyRepository,
     PerceptionRepository,
     PhaseRepository,
+    SceneRepository,
     TaskRepository,
     VersionStore,
     WorldRepository,
@@ -27,6 +29,8 @@ class UnitOfWork(Protocol):
     def locations(self) -> LocationRepository: ...
     @property
     def characters(self) -> CharacterRepository: ...
+    @property
+    def party(self) -> PartyRepository: ...
     @property
     def phases(self) -> PhaseRepository: ...
     @property
@@ -43,6 +47,8 @@ class UnitOfWork(Protocol):
     def perception(self) -> PerceptionRepository: ...
     @property
     def traces(self) -> TraceRepository: ...
+    @property
+    def scenes(self) -> SceneRepository: ...
     async def __aenter__(self) -> Self: ...
     async def __aexit__(
         self,

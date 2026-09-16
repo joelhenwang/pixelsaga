@@ -89,6 +89,12 @@ class TracingSettings(BaseModel):
     endpoint: str = "https://api.smith.langchain.com"
 
 
+class GraphSettings(BaseModel):
+    """LangGraph checkpoint contract (owned by S1-GRAPH-001)."""
+
+    checkpoint_schema: str = Field(default="graph_state", min_length=1, max_length=63)
+
+
 class SecuritySettings(BaseModel):
     """Explicit override for non-loopback listeners."""
 
@@ -107,6 +113,7 @@ class Settings(BaseSettings):
     database: DatabaseSettings = DatabaseSettings()
     provider: ProviderSettings = ProviderSettings()
     tracing: TracingSettings = TracingSettings()
+    graphs: GraphSettings = GraphSettings()
     security: SecuritySettings = SecuritySettings()
 
     @model_validator(mode="after")

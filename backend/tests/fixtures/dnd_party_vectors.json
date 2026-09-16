@@ -1,0 +1,653 @@
+{
+ "tables": {
+  "statArray": [
+   15,
+   14,
+   13,
+   12,
+   10,
+   8
+  ],
+  "priorities": {
+   "barbarian": [
+    "str",
+    "con",
+    "dex",
+    "wis",
+    "cha",
+    "int"
+   ],
+   "bard": [
+    "cha",
+    "dex",
+    "con",
+    "int",
+    "wis",
+    "str"
+   ],
+   "cleric": [
+    "wis",
+    "str",
+    "con",
+    "cha",
+    "dex",
+    "int"
+   ],
+   "druid": [
+    "wis",
+    "con",
+    "dex",
+    "int",
+    "cha",
+    "str"
+   ],
+   "fighter": [
+    "str",
+    "con",
+    "dex",
+    "wis",
+    "cha",
+    "int"
+   ],
+   "monk": [
+    "dex",
+    "wis",
+    "con",
+    "str",
+    "int",
+    "cha"
+   ],
+   "paladin": [
+    "str",
+    "cha",
+    "con",
+    "wis",
+    "dex",
+    "int"
+   ],
+   "ranger": [
+    "dex",
+    "wis",
+    "con",
+    "str",
+    "int",
+    "cha"
+   ],
+   "rogue": [
+    "dex",
+    "int",
+    "con",
+    "wis",
+    "cha",
+    "str"
+   ],
+   "sorcerer": [
+    "cha",
+    "con",
+    "dex",
+    "int",
+    "wis",
+    "str"
+   ],
+   "warlock": [
+    "cha",
+    "con",
+    "dex",
+    "wis",
+    "int",
+    "str"
+   ],
+   "wizard": [
+    "int",
+    "dex",
+    "con",
+    "wis",
+    "cha",
+    "str"
+   ]
+  },
+  "autoWeapons": {
+   "barbarian": [
+    "greataxe",
+    "handaxe"
+   ],
+   "bard": [
+    "rapier",
+    "dagger"
+   ],
+   "cleric": [
+    "mace",
+    "spear"
+   ],
+   "druid": [
+    "quarterstaff",
+    "sling"
+   ],
+   "fighter": [
+    "longsword",
+    "handaxe"
+   ],
+   "monk": [
+    "shortsword",
+    "quarterstaff"
+   ],
+   "paladin": [
+    "longsword",
+    "spear"
+   ],
+   "ranger": [
+    "longsword",
+    "longbow"
+   ],
+   "rogue": [
+    "rapier",
+    "shortbow"
+   ],
+   "sorcerer": [
+    "quarterstaff",
+    "dagger"
+   ],
+   "warlock": [
+    "quarterstaff",
+    "dagger"
+   ],
+   "wizard": [
+    "quarterstaff",
+    "dagger"
+   ]
+  },
+  "autoArmor": {
+   "cleric": "chain-mail",
+   "fighter": "chain-mail",
+   "paladin": "chain-mail",
+   "ranger": "leather-armor",
+   "rogue": "leather-armor",
+   "bard": "leather-armor",
+   "druid": "leather-armor",
+   "barbarian": null,
+   "monk": null,
+   "sorcerer": null,
+   "warlock": null,
+   "wizard": null
+  },
+  "maxParty": 4
+ },
+ "limits": {
+  "wizard1": {
+   "list": [
+    "acid-splash",
+    "chill-touch",
+    "dancing-lights",
+    "fire-bolt",
+    "light",
+    "mage-hand",
+    "mending",
+    "message",
+    "minor-illusion",
+    "poison-spray",
+    "prestidigitation",
+    "ray-of-frost",
+    "shocking-grasp",
+    "true-strike",
+    "alarm",
+    "burning-hands",
+    "charm-person",
+    "color-spray",
+    "comprehend-languages",
+    "detect-magic",
+    "disguise-self",
+    "expeditious-retreat",
+    "false-life",
+    "feather-fall",
+    "find-familiar",
+    "floating-disk",
+    "fog-cloud",
+    "grease",
+    "hideous-laughter",
+    "identify",
+    "illusory-script",
+    "jump",
+    "longstrider",
+    "mage-armor",
+    "magic-missile",
+    "protection-from-evil-and-good",
+    "shield",
+    "silent-image",
+    "sleep",
+    "thunderwave",
+    "unseen-servant"
+   ],
+   "maxCantrips": 3,
+   "maxKnown": 1,
+   "maxSlot": 1
+  },
+  "wizard5": {
+   "list": [
+    "acid-splash",
+    "chill-touch",
+    "dancing-lights",
+    "fire-bolt",
+    "light",
+    "mage-hand",
+    "mending",
+    "message",
+    "minor-illusion",
+    "poison-spray",
+    "prestidigitation",
+    "ray-of-frost",
+    "shocking-grasp",
+    "true-strike",
+    "alarm",
+    "burning-hands",
+    "charm-person",
+    "color-spray",
+    "comprehend-languages",
+    "detect-magic",
+    "disguise-self",
+    "expeditious-retreat",
+    "false-life",
+    "feather-fall",
+    "find-familiar",
+    "floating-disk",
+    "fog-cloud",
+    "grease",
+    "hideous-laughter",
+    "identify",
+    "illusory-script",
+    "jump",
+    "longstrider",
+    "mage-armor",
+    "magic-missile",
+    "protection-from-evil-and-good",
+    "shield",
+    "silent-image",
+    "sleep",
+    "thunderwave",
+    "unseen-servant",
+    "acid-arrow",
+    "alter-self",
+    "arcane-lock",
+    "arcanists-magic-aura",
+    "blindness-deafness",
+    "blur",
+    "continual-flame",
+    "darkness",
+    "darkvision",
+    "detect-thoughts",
+    "enlarge-reduce",
+    "flaming-sphere",
+    "gentle-repose",
+    "gust-of-wind",
+    "hold-person",
+    "invisibility",
+    "knock",
+    "levitate",
+    "locate-object",
+    "magic-mouth",
+    "magic-weapon",
+    "mirror-image",
+    "misty-step",
+    "ray-of-enfeeblement",
+    "rope-trick",
+    "scorching-ray",
+    "see-invisibility",
+    "shatter",
+    "spider-climb",
+    "suggestion",
+    "web",
+    "animate-dead",
+    "bestow-curse",
+    "blink",
+    "clairvoyance",
+    "counterspell",
+    "dispel-magic",
+    "fear",
+    "fireball",
+    "fly",
+    "gaseous-form",
+    "glyph-of-warding",
+    "haste",
+    "hypnotic-pattern",
+    "lightning-bolt",
+    "magic-circle",
+    "major-image",
+    "nondetection",
+    "phantom-steed",
+    "protection-from-energy",
+    "remove-curse",
+    "sending",
+    "sleet-storm",
+    "slow",
+    "stinking-cloud",
+    "tiny-hut",
+    "tongues",
+    "vampiric-touch",
+    "water-breathing"
+   ],
+   "maxCantrips": 4,
+   "maxKnown": 5,
+   "maxSlot": 3
+  },
+  "cleric3": {
+   "list": [
+    "guidance",
+    "light",
+    "mending",
+    "resistance",
+    "sacred-flame",
+    "spare-the-dying",
+    "thaumaturgy",
+    "bane",
+    "bless",
+    "command",
+    "create-or-destroy-water",
+    "cure-wounds",
+    "detect-evil-and-good",
+    "detect-magic",
+    "detect-poison-and-disease",
+    "guiding-bolt",
+    "healing-word",
+    "inflict-wounds",
+    "protection-from-evil-and-good",
+    "purify-food-and-drink",
+    "sanctuary",
+    "shield-of-faith",
+    "aid",
+    "augury",
+    "blindness-deafness",
+    "calm-emotions",
+    "continual-flame",
+    "enhance-ability",
+    "find-traps",
+    "gentle-repose",
+    "hold-person",
+    "lesser-restoration",
+    "locate-object",
+    "prayer-of-healing",
+    "protection-from-poison",
+    "silence",
+    "spiritual-weapon",
+    "warding-bond",
+    "zone-of-truth"
+   ],
+   "maxCantrips": 3,
+   "maxKnown": 3,
+   "maxSlot": 2
+  },
+  "fighter3": {
+   "list": [],
+   "maxCantrips": 0,
+   "maxKnown": 0,
+   "maxSlot": 0
+  },
+  "bard2": {
+   "list": [
+    "dancing-lights",
+    "light",
+    "mage-hand",
+    "mending",
+    "message",
+    "minor-illusion",
+    "prestidigitation",
+    "true-strike",
+    "vicious-mockery",
+    "animal-friendship",
+    "bane",
+    "charm-person",
+    "comprehend-languages",
+    "cure-wounds",
+    "detect-magic",
+    "disguise-self",
+    "feather-fall",
+    "healing-word",
+    "heroism",
+    "hideous-laughter",
+    "identify",
+    "illusory-script",
+    "longstrider",
+    "silent-image",
+    "sleep",
+    "speak-with-animals",
+    "thunderwave",
+    "unseen-servant"
+   ],
+   "maxCantrips": 2,
+   "maxKnown": 5,
+   "maxSlot": 1
+  }
+ },
+ "autoSpells": {
+  "wizard5": [
+   "poison-spray",
+   "fire-bolt",
+   "chill-touch",
+   "ray-of-frost",
+   "fireball",
+   "shatter",
+   "sleep",
+   "lightning-bolt",
+   "vampiric-touch"
+  ],
+  "cleric3": [
+   "sacred-flame",
+   "guidance",
+   "light",
+   "spiritual-weapon",
+   "inflict-wounds",
+   "guiding-bolt"
+  ],
+  "bard2": [
+   "vicious-mockery",
+   "dancing-lights",
+   "sleep",
+   "thunderwave",
+   "cure-wounds",
+   "healing-word",
+   "animal-friendship"
+  ],
+  "sorcerer4": [
+   "poison-spray",
+   "fire-bolt",
+   "chill-touch",
+   "ray-of-frost",
+   "shocking-grasp",
+   "shatter",
+   "sleep",
+   "scorching-ray",
+   "burning-hands",
+   "magic-missile"
+  ]
+ },
+ "autoSheet": {
+  "Lyra-ranger3": {
+   "name": "Lyra",
+   "race": "elf",
+   "class": "ranger",
+   "subclass": "hunter",
+   "background": null,
+   "level": 3,
+   "stats": {
+    "str": 12,
+    "dex": 17,
+    "con": 13,
+    "int": 10,
+    "wis": 14,
+    "cha": 8
+   },
+   "hp": {
+    "current": 25,
+    "max": 25
+   },
+   "armor": "leather-armor",
+   "shield": false,
+   "baseAc": null,
+   "weapons": [
+    "longsword",
+    "longbow"
+   ],
+   "spells": [
+    "cure-wounds",
+    "alarm",
+    "animal-friendship"
+   ],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  },
+  "Borin-fighter1": {
+   "name": "Borin",
+   "race": "dwarf",
+   "class": "fighter",
+   "subclass": "champion",
+   "background": null,
+   "level": 1,
+   "stats": {
+    "str": 15,
+    "dex": 13,
+    "con": 16,
+    "int": 8,
+    "wis": 12,
+    "cha": 10
+   },
+   "hp": {
+    "current": 13,
+    "max": 13
+   },
+   "armor": "chain-mail",
+   "shield": true,
+   "baseAc": null,
+   "weapons": [
+    "longsword",
+    "handaxe"
+   ],
+   "spells": [],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  },
+  "Elara-wizard5": {
+   "name": "Elara",
+   "race": "human",
+   "class": "wizard",
+   "subclass": "evocation",
+   "background": null,
+   "level": 5,
+   "stats": {
+    "str": 9,
+    "dex": 15,
+    "con": 14,
+    "int": 16,
+    "wis": 13,
+    "cha": 11
+   },
+   "hp": {
+    "current": 32,
+    "max": 32
+   },
+   "armor": null,
+   "shield": false,
+   "baseAc": null,
+   "weapons": [
+    "quarterstaff",
+    "dagger"
+   ],
+   "spells": [
+    "poison-spray",
+    "fire-bolt",
+    "chill-touch",
+    "ray-of-frost",
+    "fireball",
+    "shatter",
+    "sleep",
+    "lightning-bolt",
+    "vampiric-touch",
+    "acid-arrow",
+    "flaming-sphere",
+    "scorching-ray"
+   ],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  },
+  "Thrak-barbarian2": {
+   "name": "Thrak",
+   "race": "half-orc",
+   "class": "barbarian",
+   "subclass": "berserker",
+   "background": null,
+   "level": 2,
+   "stats": {
+    "str": 17,
+    "dex": 13,
+    "con": 15,
+    "int": 8,
+    "wis": 12,
+    "cha": 10
+   },
+   "hp": {
+    "current": 23,
+    "max": 23
+   },
+   "armor": null,
+   "shield": true,
+   "baseAc": 12,
+   "weapons": [
+    "greataxe",
+    "handaxe"
+   ],
+   "spells": [],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  },
+  "Mira-cleric4": {
+   "name": "Mira",
+   "race": "halfling",
+   "class": "cleric",
+   "subclass": "life",
+   "background": null,
+   "level": 4,
+   "stats": {
+    "str": 14,
+    "dex": 12,
+    "con": 13,
+    "int": 8,
+    "wis": 15,
+    "cha": 12
+   },
+   "hp": {
+    "current": 27,
+    "max": 27
+   },
+   "armor": "chain-mail",
+   "shield": true,
+   "baseAc": null,
+   "weapons": [
+    "mace",
+    "spear"
+   ],
+   "spells": [
+    "sacred-flame",
+    "guidance",
+    "light",
+    "mending",
+    "spiritual-weapon",
+    "inflict-wounds",
+    "guiding-bolt",
+    "aid",
+    "prayer-of-healing",
+    "cure-wounds"
+   ],
+   "prepared": [],
+   "equipment": [],
+   "xp": 0,
+   "rng": null
+  }
+ },
+ "partyPrompt": "\n- D&D PARTY (real 5e sheets — the ENGINE resolves all rolls, damage, HP, and spells; you describe actions, never numbers). The party is EXACTLY the 2 member(s) listed below — do not invent extra party members; companions only join when the story has them join the party:\n  [D&D SHEET] Lyra - Level 3 elf ranger (hunter)\n  HP 25/25, AC 14, Prof +2\n  STR +1 DEX +3 CON +1 INT 0 WIS +2 CHA -1\n  Spell DC 12, spell attack +4\n  Spells: Cure Wounds (1st), Alarm (1st), Animal Friendship (1st)\n  Weapons: Longsword +3 (1d8 slashing), Longbow +5 (1d8 piercing)\n  [D&D SHEET] Borin - Level 1 dwarf fighter (champion)\n  HP 13/13, AC 18, Prof +2\n  STR +2 DEX +1 CON +3 INT -1 WIS +1 CHA 0\n  Weapons: Longsword +4 (1d8 slashing), Handaxe +4 (1d6 slashing)",
+ "rulesText": "\n- D&D MODE: You are the dungeon master AND narrator of a 5e tabletop adventure. The player controls real D&D character sheets (see D&D PARTY). The ENGINE resolves ALL rules, dice rolls, damage, monster stats, and spell effects — you MUST NEVER state numbers yourself (no hit points, no AC, no DCs, no damage amounts, no slot counts). Describe only what characters do, say, and see.\n- PLAYER CONTROL: You narrate the world, its characters, and the consequences of the party's actions — but only the PLAYER decides what their character (and their companions, when directed) says or does. Never script the player's actions, and no NPC can force the player's character into anything against the player's will; a refused demand stays refused, and the NPC reacts instead.\n- ROLLS: When the player attempts something uncertain (attacking, sneaking, persuading, searching, casting), pick a sensible ability/skill and signal the roll with a tag line so the engine can resolve it. Tags go on their OWN LINE, in plain English:\n  ENCOUNTER[2x Goblin, 1x Bugbear]: Two goblins and a bugbear block the bridge ahead.\n  ATTACK[longsword]: The fighter lunges at the nearest goblin.\n  CAST[fireball]: The wizard hurls a sphere of flame at the horde.\n  CONDITION[poisoned]: The rogue sways, pale and unsteady.\n  Use lowercase spell/weapon names exactly as listed on the character sheets.\n- After a tagged roll, the engine reports the outcome; narrate the RESULT dramatically (a near-miss, a brutal hit, a goblin dropping) without restating any numbers.\n- The party begins at full health with all spell slots available. The monsters and NPCs of this world are real 5e creatures with real stat blocks — the engine knows them, so you never need to invent statistics.\n- Encounters should be fair but dangerous: deadly fights, clever tactics, and consequences for bad decisions are all welcome, and heroics are always rewarded.\n- RECRUITMENT: When an NPC agrees to travel with the party as a companion, emit on its own line: RECRUIT[Name]: race class, level N (e.g. RECRUIT[Lyra]: elf ranger, level 3), based on their established identity — the engine builds them a real 5e sheet and resolves their rolls from then on. The party caps at 4 adventurers total, so do NOT recruit past that, and do not treat every friendly NPC as a party member — only those who actually join. The player and their companions are the ONLY combat-capable party; other NPCs are non-combatants unless the engine gives them stat blocks."
+}

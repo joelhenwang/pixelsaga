@@ -17,3 +17,6 @@ backend/.venv/
 .pi/skills/
 perchance-ver/
 evidence/
+frontend/node_modules/
+frontend/dist/
+backend/src/worldsim.egg-info/
