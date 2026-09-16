@@ -16,6 +16,7 @@ async function load(): Promise<void> {
       { kind: "observation", items: diary.observations ?? [] },
       { kind: "memory", items: diary.memories ?? [] },
       { kind: "summary", items: diary.summaries ?? [] },
+      { kind: "digest", items: diary.digests ?? [] },
     ];
   } catch (error) {
     fail("diary load failed", error);

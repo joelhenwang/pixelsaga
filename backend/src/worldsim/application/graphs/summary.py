@@ -33,6 +33,9 @@ from worldsim.application.ports.model_gateway import (
 #: Versioned summary prompt file.
 SUMMARY_PROMPT_VERSION = "summary.v1"
 
+#: Versioned digest prompt file; same graph, different task.
+DIGEST_PROMPT_VERSION = "digest.v1"
+
 #: Model output budget for one day's retelling.
 SUMMARY_MAX_CHARS = 4000
 
@@ -82,6 +85,12 @@ def prompt_path() -> Path:
 def load_summary_prompt() -> str:
     """Read the versioned summary prompt (fails loudly when missing)."""
     return prompt_path().read_text(encoding="utf-8")
+
+
+def load_digest_prompt() -> str:
+    """Read the versioned digest prompt (fails loudly when missing)."""
+    path = Path(__file__).resolve().parents[4] / "prompts" / f"{DIGEST_PROMPT_VERSION}.md"
+    return path.read_text(encoding="utf-8")
 
 
 def render_user_prompt(owner_name: str, day: int, sources_text: str) -> str:

@@ -3862,6 +3862,12 @@
       },
       "additionalProperties": false,
       "properties": {
+        "content_hash": {
+          "default": "",
+          "maxLength": 64,
+          "title": "Content Hash",
+          "type": "string"
+        },
         "created_phase_index": {
           "minimum": 0,
           "title": "Created Phase Index",
@@ -3889,6 +3895,13 @@
           "format": "uuid",
           "title": "Observer Character Id",
           "type": "string"
+        },
+        "salience": {
+          "default": 1.0,
+          "maximum": 5.0,
+          "minimum": 0.0,
+          "title": "Salience",
+          "type": "number"
         },
         "world_id": {
           "format": "uuid",
@@ -4943,6 +4956,12 @@
       },
       "additionalProperties": false,
       "properties": {
+        "content_hash": {
+          "default": "",
+          "maxLength": 64,
+          "title": "Content Hash",
+          "type": "string"
+        },
         "created_phase_index": {
           "minimum": 0,
           "title": "Created Phase Index",
@@ -4983,6 +5002,13 @@
           "format": "uuid",
           "title": "Owner Character Id",
           "type": "string"
+        },
+        "salience": {
+          "default": 1.0,
+          "maximum": 5.0,
+          "minimum": 0.0,
+          "title": "Salience",
+          "type": "number"
         },
         "text": {
           "maxLength": 2000,

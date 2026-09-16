@@ -37,6 +37,7 @@ from worldsim.domain.enums import (
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.ids import new_skill_id
+from worldsim.domain.memory import memory_hash, observation_hash
 from worldsim.domain.perception import Observation, ObservationFact, RecentMemory
 from worldsim.domain.progress import (
     CharacterSkill,
@@ -399,6 +400,9 @@ class CanonicalTransaction:
                 observer_character_id=spec.observer_id,
                 facts=list(spec.facts),
                 created_phase_index=request.absolute_index,
+                content_hash=observation_hash(
+                    [{"key": fact.key, "value": fact.value} for fact in spec.facts]
+                ),
             )
             await uow.perception.add_observation(observation)
             ids.append(observation.id)
@@ -425,6 +429,7 @@ class CanonicalTransaction:
                 text=spec.text,
                 visibility=spec.visibility,
                 created_phase_index=request.absolute_index,
+                content_hash=memory_hash(spec.text),
             )
             await uow.perception.add_memory(memory)
             ids.append(memory.id)

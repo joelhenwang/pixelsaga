@@ -40,6 +40,8 @@ class SqlAlchemyPerceptionRepository:
                 observer_character_id=observation.observer_character_id,
                 facts=[{"key": fact.key, "value": fact.value} for fact in observation.facts],
                 created_phase_index=observation.created_phase_index,
+                salience=observation.salience,
+                content_hash=observation.content_hash or None,
             )
         )
         await self._session.flush()
@@ -60,17 +62,27 @@ class SqlAlchemyPerceptionRepository:
                 observer_character_id=row.observer_character_id,
                 facts=_facts_to_domain(row.facts),
                 created_phase_index=row.created_phase_index,
+                salience=row.salience,
+                content_hash=row.content_hash or "",
             )
             for row in rows
         ]
 
     async def observations_for_observer(
-        self, observer_id: UUID, limit: int = 20
+        self,
+        observer_id: UUID,
+        limit: int = 20,
+        since_phase_index: int = 0,
+        min_salience: float = 0.0,
     ) -> list[Observation]:
         rows = (
             await self._session.execute(
                 select(ObservationRow)
-                .where(ObservationRow.observer_character_id == observer_id)
+                .where(
+                    ObservationRow.observer_character_id == observer_id,
+                    (ObservationRow.created_phase_index >= since_phase_index)
+                    | (ObservationRow.salience >= min_salience),
+                )
                 .order_by(ObservationRow.created_phase_index.desc())
                 .limit(limit)
             )
@@ -83,6 +95,8 @@ class SqlAlchemyPerceptionRepository:
                 observer_character_id=row.observer_character_id,
                 facts=_facts_to_domain(row.facts),
                 created_phase_index=row.created_phase_index,
+                salience=row.salience,
+                content_hash=row.content_hash or "",
             )
             for row in rows
         ]
@@ -98,15 +112,23 @@ class SqlAlchemyPerceptionRepository:
                 text=memory.text,
                 visibility=memory.visibility.value,
                 created_phase_index=memory.created_phase_index,
+                salience=memory.salience,
+                content_hash=memory.content_hash or None,
             )
         )
         await self._session.flush()
 
-    async def memories_for_owner(self, owner_id: UUID) -> list[RecentMemory]:
+    async def memories_for_owner(
+        self, owner_id: UUID, since_phase_index: int = 0, min_salience: float = 0.0
+    ) -> list[RecentMemory]:
         rows = (
             await self._session.execute(
                 select(RecentMemoryRow)
-                .where(RecentMemoryRow.owner_character_id == owner_id)
+                .where(
+                    RecentMemoryRow.owner_character_id == owner_id,
+                    (RecentMemoryRow.created_phase_index >= since_phase_index)
+                    | (RecentMemoryRow.salience >= min_salience),
+                )
                 .order_by(RecentMemoryRow.created_phase_index)
             )
         ).scalars()
@@ -120,6 +142,34 @@ class SqlAlchemyPerceptionRepository:
                 text=row.text,
                 visibility=Visibility(row.visibility),
                 created_phase_index=row.created_phase_index,
+                salience=row.salience,
+                content_hash=row.content_hash or "",
             )
             for row in rows
         ]
+
+    async def bump_salience(
+        self,
+        observation_ids: list[UUID],
+        memory_ids: list[UUID],
+        amount: float,
+        cap: float,
+    ) -> None:
+        """Raise persisted salience for cited rows; citations are code-scored."""
+        if observation_ids:
+            rows = (
+                await self._session.execute(
+                    select(ObservationRow).where(ObservationRow.id.in_(observation_ids))
+                )
+            ).scalars()
+            for row in rows:
+                row.salience = min(cap, row.salience + amount)
+        if memory_ids:
+            rows = (
+                await self._session.execute(
+                    select(RecentMemoryRow).where(RecentMemoryRow.id.in_(memory_ids))
+                )
+            ).scalars()
+            for row in rows:
+                row.salience = min(cap, row.salience + amount)
+        await self._session.flush()

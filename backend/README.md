@@ -484,3 +484,29 @@ client (`content/clients/worldsim.ts`) covers the party views and
 routes. Static direction mocks live in `mocks/stage1/`: A/B for the
 visual-novel timeline, C for the party roster plus combat log, D for
 the narrow begin-adventure flow.
+
+## Memory lifecycle (S3-MEM-001)
+
+Perception rows carry persisted `salience` (migration 0019, default
+1.0, cap 5.0) and a `content_hash` over canonical facts/text with a
+backfill. Only model-cited summary sources bump salience (+1 per
+citation); fallback-expanded citations never bump, or every row
+would saturate within days. Assembly scores candidates as persisted
+salience decayed by age (`score_salience`, half-life 40 phases from
+world config) and loads only the recent window (30 phases) plus
+rows at or above the salience floor (2.0) — recent-or-salient, never
+the full history.
+
+At each midnight commit the orchestrator promotes qualifying old
+rows (salience >= 2.0, age >= 10 phases, not already digested, at
+most one digest per owner per day) into `long_term_memory`
+(migration 0020) through the summary graph with the `digest.v1`
+prompt and existing citation validation. Digests re-enter assembly
+as memory candidates with a fixed 2.5 score and render in the diary
+beside summaries. `memory.promotion.enabled=false` disables
+promotion; reads fall back to the window. Digest model calls count
+into the per-phase budget like summaries.
+
+Raw rows are append-only (the perception repo exposes no
+update/delete) and every digest source must hash-match its current
+row; the S3 gate audits this mechanically.

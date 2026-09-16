@@ -24,6 +24,7 @@ ItemInstanceId = UUID
 HookId = UUID
 ArcId = UUID
 SummaryId = UUID
+DigestId = UUID
 RoleGrantId = UUID
 PhaseRunId = UUID
 SnapshotId = UUID
@@ -114,6 +115,10 @@ def new_arc_id() -> ArcId:
 
 
 def new_summary_id() -> SummaryId:
+    return uuid4()
+
+
+def new_digest_id() -> DigestId:
     return uuid4()
 
 

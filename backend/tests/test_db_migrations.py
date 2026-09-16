@@ -23,7 +23,11 @@ from worldsim.infrastructure.db.verify import (
 from worldsim.infrastructure.settings import Settings
 
 SCRATCH_DB = "worldsim_migtest"
-HEAD = "0018_s2_roles"
+def _head() -> str:
+    """Current single script head; lanes advance it without re-pinning tests."""
+    heads = script_heads(_config())
+    assert len(heads) == 1
+    return heads[0]
 
 
 def _migrations_dir() -> Path:
@@ -96,7 +100,7 @@ async def _report() -> MigrationReport:
 
 
 def test_single_head_in_history() -> None:
-    assert script_heads(_config()) == [HEAD]
+    assert len(script_heads(_config())) == 1
 
 
 def test_upgrade_downgrade_reupgrade_cycle(scratch_env: str) -> None:
@@ -104,17 +108,17 @@ def test_upgrade_downgrade_reupgrade_cycle(scratch_env: str) -> None:
     alembic_command.downgrade(config, "base")
     assert asyncio.run(_current()) is None
     alembic_command.upgrade(config, "head")
-    assert asyncio.run(_current()) == HEAD
+    assert asyncio.run(_current()) == _head()
     assert asyncio.run(_extension_present()) == 1
     report = asyncio.run(_report())
-    assert report.current == HEAD
-    assert report.heads == [HEAD]
+    assert report.current == _head()
+    assert report.heads == [_head()]
     assert not report.multiple_heads
     assert report.up_to_date
     alembic_command.downgrade(config, "base")
     assert asyncio.run(_current()) is None
     alembic_command.upgrade(config, "head")
-    assert asyncio.run(_current()) == HEAD
+    assert asyncio.run(_current()) == _head()
 
 
 def test_detect_multiple_heads_in_tmp_dir(tmp_path: Path) -> None:

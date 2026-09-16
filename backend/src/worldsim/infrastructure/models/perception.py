@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import CheckConstraint, ForeignKey, Integer, String
+from sqlalchemy import CheckConstraint, Float, ForeignKey, Integer, String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
@@ -31,6 +31,8 @@ class ObservationRow(Base):
     )
     facts: Mapped[list[object]] = mapped_column(JSONB, default=list)
     created_phase_index: Mapped[int] = mapped_column(Integer)
+    salience: Mapped[float] = mapped_column(Float, default=1.0)
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     __table_args__ = (CheckConstraint("created_phase_index >= 0", name="ck_obs_phase"),)
 
@@ -56,6 +58,8 @@ class RecentMemoryRow(Base):
     text: Mapped[str] = mapped_column(String(2000))
     visibility: Mapped[str] = mapped_column(String(16), default="private")
     created_phase_index: Mapped[int] = mapped_column(Integer)
+    salience: Mapped[float] = mapped_column(Float, default=1.0)
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     __table_args__ = (
         CheckConstraint("visibility IN ('public','private')", name="ck_mem_visibility"),

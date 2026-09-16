@@ -14,6 +14,7 @@ from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.characters import Character, CharacterCard
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.knowledge import Belief, Claim
+from worldsim.domain.memory import MemoryDigest
 from worldsim.domain.narration import NarrationBeat
 from worldsim.domain.narrative import NarrativeArc, NarrativeHook
 from worldsim.domain.party import Monster, PartyMember
@@ -176,6 +177,12 @@ class SummaryRepository(Protocol):
     async def list_for_owner(self, world_id: UUID, owner_id: UUID) -> list[DailySummary]: ...
 
 
+class DigestRepository(Protocol):
+    async def add(self, digest: MemoryDigest) -> None: ...
+    async def count_versions(self, world_id: UUID, owner_id: UUID, day: int) -> int: ...
+    async def list_for_owner(self, world_id: UUID, owner_id: UUID) -> list[MemoryDigest]: ...
+
+
 class RoleRepository(Protocol):
     async def get_for_world(self, world_id: UUID) -> RoleGrant | None: ...
     async def set_grant(self, grant: RoleGrant) -> RoleGrant: ...
@@ -262,10 +269,23 @@ class PerceptionRepository(Protocol):
     async def add_observation(self, observation: Observation) -> None: ...
     async def observations_for_event(self, event_id: UUID) -> list[Observation]: ...
     async def observations_for_observer(
-        self, observer_id: UUID, limit: int = 20
+        self,
+        observer_id: UUID,
+        limit: int = 20,
+        since_phase_index: int = 0,
+        min_salience: float = 0.0,
     ) -> list[Observation]: ...
     async def add_memory(self, memory: RecentMemory) -> None: ...
-    async def memories_for_owner(self, owner_id: UUID) -> list[RecentMemory]: ...
+    async def memories_for_owner(
+        self, owner_id: UUID, since_phase_index: int = 0, min_salience: float = 0.0
+    ) -> list[RecentMemory]: ...
+    async def bump_salience(
+        self,
+        observation_ids: list[UUID],
+        memory_ids: list[UUID],
+        amount: float,
+        cap: float,
+    ) -> None: ...
 
 
 class SceneRepository(Protocol):

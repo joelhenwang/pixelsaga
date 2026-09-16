@@ -36,6 +36,8 @@ class Observation(BaseModel):
     observer_character_id: CharacterId
     facts: list[ObservationFact] = Field(min_length=1)
     created_phase_index: int = Field(ge=0)
+    salience: float = Field(default=1.0, ge=0.0, le=5.0)
+    content_hash: str = Field(default="", max_length=64)
 
 
 class RecentMemory(BaseModel):
@@ -49,6 +51,8 @@ class RecentMemory(BaseModel):
     text: str = Field(min_length=1, max_length=2000)
     visibility: Visibility = Visibility.PRIVATE
     created_phase_index: int = Field(ge=0)
+    salience: float = Field(default=1.0, ge=0.0, le=5.0)
+    content_hash: str = Field(default="", max_length=64)
 
 
 class FactChannel(StrEnum):

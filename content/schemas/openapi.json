@@ -878,6 +878,13 @@
             "title": "Character Id",
             "type": "string"
           },
+          "digests": {
+            "items": {
+              "$ref": "#/components/schemas/DiaryEntry"
+            },
+            "title": "Digests",
+            "type": "array"
+          },
           "memories": {
             "items": {
               "$ref": "#/components/schemas/DiaryEntry"
@@ -3629,7 +3636,7 @@
     },
     "/api/v1/stage2/characters/{character_id}/diary": {
       "get": {
-        "description": "One owner's observations, memories, and summaries. Holder or watcher.",
+        "description": "One owner's observations, memories, summaries, and digests. Holder or watcher.",
         "operationId": "diary_api_v1_stage2_characters__character_id__diary_get",
         "parameters": [
           {

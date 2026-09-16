@@ -633,6 +633,7 @@ class DiaryResponse(BaseModel):
     observations: list[DiaryEntry] = Field(default_factory=list)
     memories: list[DiaryEntry] = Field(default_factory=list)
     summaries: list[DiaryEntry] = Field(default_factory=list)
+    digests: list[DiaryEntry] = Field(default_factory=list)
 
 
 class HookView(BaseModel):

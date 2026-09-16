@@ -9,6 +9,8 @@ from typing import Any, cast
 
 import httpx
 import pytest
+from alembic.config import Config
+from alembic.script import ScriptDirectory
 from fastapi.testclient import TestClient
 
 from worldsim.infrastructure.model_gateway.fake import FakeGateway
@@ -69,7 +71,9 @@ def test_ready_reports_versions_without_secrets(
     body = response.json()
     assert body["status"] == "degraded"
     assert body["version"] == "0.1.0"
-    assert body["migration_head"] == "0018_s2_roles"
+    config = Config()
+    config.set_main_option("script_location", str(MIGRATIONS))
+    assert body["migration_head"] in ScriptDirectory.from_config(config).get_heads()
     assert body["schema_version"] == 1
     by_name = {check["name"]: check for check in body["checks"]}
     assert by_name["database"]["status"] == "ok"

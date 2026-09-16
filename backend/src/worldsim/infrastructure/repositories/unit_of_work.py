@@ -16,6 +16,7 @@ from worldsim.infrastructure.repositories.characters import (
     SqlAlchemyCharacterRepository,
 )
 from worldsim.infrastructure.repositories.commands import SqlAlchemyCommandRepository
+from worldsim.infrastructure.repositories.digests import SqlAlchemyDigestRepository
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
@@ -69,6 +70,7 @@ class SqlAlchemyUnitOfWork:
         self._party: SqlAlchemyPartyRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
         self._narrative: SqlAlchemyNarrativeRepository | None = None
+        self._digests: SqlAlchemyDigestRepository | None = None
         self._summaries: SqlAlchemySummaryRepository | None = None
         self._roles: SqlAlchemyRoleRepository | None = None
         self._activities: SqlAlchemyActivityRepository | None = None
@@ -212,6 +214,12 @@ class SqlAlchemyUnitOfWork:
         return self._summaries
 
     @property
+    def digests(self) -> SqlAlchemyDigestRepository:
+        if self._digests is None:
+            self._digests = SqlAlchemyDigestRepository(self._require_session())
+        return self._digests
+
+    @property
     def roles(self) -> SqlAlchemyRoleRepository:
         if self._roles is None:
             self._roles = SqlAlchemyRoleRepository(self._require_session())
@@ -255,6 +263,7 @@ class SqlAlchemyUnitOfWork:
             self._roles = None
             self._activities = None
             self._routes = None
+            self._digests = None
             self._schedules = None
             self._outbox = None
             self._perception = None

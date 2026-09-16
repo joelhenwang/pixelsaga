@@ -70,9 +70,11 @@ from worldsim.application.graphs.resolve import (
 from worldsim.application.graphs.runtime import invoke
 from worldsim.application.graphs.state import GraphInvocation
 from worldsim.application.graphs.summary import (
+    DIGEST_PROMPT_VERSION,
     SUMMARY_PROMPT_VERSION,
     SummaryGraphDeps,
     build_summary_graph,
+    load_digest_prompt,
     load_summary_prompt,
 )
 from worldsim.application.orchestration.service import derive_run_id, derive_snapshot_id
@@ -124,10 +126,32 @@ from worldsim.domain.ids import (
     derive_intent_id,
     derive_task_id,
     new_arc_id,
+    new_digest_id,
     new_hook_id,
     new_monster_id,
     new_narration_id,
     new_summary_id,
+)
+from worldsim.domain.memory import (
+    CITE_BUMP_KEY,
+    DEFAULT_CITE_BUMP,
+    DEFAULT_HALF_LIFE_PHASES,
+    DEFAULT_PROMOTION_MAX_PER_DAY,
+    DEFAULT_PROMOTION_MIN_AGE,
+    DEFAULT_PROMOTION_THRESHOLD,
+    DEFAULT_RECENT_PHASES,
+    DEFAULT_SALIENCE_FLOOR,
+    DIGEST_SCORE,
+    HALF_LIFE_PHASES_KEY,
+    MAX_SALIENCE,
+    PROMOTION_ENABLED_KEY,
+    PROMOTION_MAX_PER_DAY_KEY,
+    PROMOTION_MIN_AGE_KEY,
+    PROMOTION_THRESHOLD_KEY,
+    RECENT_PHASES_KEY,
+    SALIENCE_FLOOR_KEY,
+    MemoryDigest,
+    score_salience,
 )
 from worldsim.domain.narration import NarrationBeat
 from worldsim.domain.party import Monster
@@ -223,6 +247,18 @@ def _snapshot_hash(
         separators=(",", ":"),
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _config_float(config: dict[str, object], key: str, default: float) -> float:
+    """World-config float with a recorded default; wrong types fall back."""
+    raw = config.get(key)
+    return float(raw) if isinstance(raw, (int, float)) else default
+
+
+def _config_int(config: dict[str, object], key: str, default: int) -> int:
+    """World-config int with a recorded default; wrong types fall back."""
+    raw = config.get(key)
+    return int(raw) if isinstance(raw, int) else default
 
 
 def _summarize(action: ActionIntent, names: Mapping[UUID, str]) -> str:
@@ -340,6 +376,7 @@ class Stage1Orchestrator:
         await self._set_state(run_id, PhaseRunState.COMPLETED)
         if index % PHASES_PER_DAY == PHASES_PER_DAY - 1:
             await self._summarize_day(world_id, run_id, index, index // PHASES_PER_DAY + 1)
+            await self._promote_memories(world_id, run_id, index, index // PHASES_PER_DAY + 1)
         return Stage1PhaseReport(
             run_id=run_id,
             world_id=world_id,
@@ -802,6 +839,169 @@ class Stage1Orchestrator:
                     version=taken + 1,
                 )
             )
+            await self._bump_cited(uow, world_id, [str(s) for s in raw_cited])
+            await uow.commit()
+        return True
+
+    async def _bump_cited(self, uow: Any, world_id: UUID, cited: list[str]) -> None:
+        """Raise salience for model-cited sources only.
+
+        Fallback-expanded citations (the whole same-day set) never
+        bump: indiscriminate bumps would push every row to the cap
+        within days and erase all discrimination.
+        """
+        if not cited:
+            return
+        config = await uow.worlds.get_config(world_id)
+        raw_bump = config.get(CITE_BUMP_KEY)
+        bump = float(raw_bump) if isinstance(raw_bump, (int, float)) else DEFAULT_CITE_BUMP
+        obs_ids: list[UUID] = []
+        mem_ids: list[UUID] = []
+        for source_id in cited:
+            kind, _, raw = source_id.partition(":")
+            try:
+                parsed = UUID(raw)
+            except ValueError:
+                continue
+            if kind == "obs":
+                obs_ids.append(parsed)
+            elif kind == "mem":
+                mem_ids.append(parsed)
+        if obs_ids or mem_ids:
+            await uow.perception.bump_salience(obs_ids, mem_ids, bump, MAX_SALIENCE)
+
+    async def _promote_memories(self, world_id: UUID, run_id: UUID, index: int, day: int) -> int:
+        """Compress qualifying old sources into digests; never fails the phase."""
+        async with self._factory() as uow:
+            config = await uow.worlds.get_config(world_id)
+        if config.get(PROMOTION_ENABLED_KEY, True) is False:
+            return 0
+        async with self._factory() as uow:
+            characters = [
+                c
+                for c in await uow.characters.list_for_world(world_id)
+                if c.life_status == LifeStatus.ALIVE
+            ]
+        written = 0
+        for character in sorted(characters, key=lambda c: c.id.hex):
+            try:
+                if await self._promote_owner(world_id, run_id, index, day, character, config):
+                    written += 1
+            except Exception:
+                continue
+        return written
+
+    async def _promote_owner(
+        self,
+        world_id: UUID,
+        run_id: UUID,
+        index: int,
+        day: int,
+        character: Character,
+        config: dict[str, object],
+    ) -> bool:
+        """Digest one owner's qualifying old sources; False when none qualify."""
+        threshold = _config_float(config, PROMOTION_THRESHOLD_KEY, DEFAULT_PROMOTION_THRESHOLD)
+        min_age = _config_int(config, PROMOTION_MIN_AGE_KEY, DEFAULT_PROMOTION_MIN_AGE)
+        max_per_day = _config_int(config, PROMOTION_MAX_PER_DAY_KEY, DEFAULT_PROMOTION_MAX_PER_DAY)
+        async with self._factory() as uow:
+            taken = await uow.digests.count_versions(world_id, character.id, day)
+            if taken >= max_per_day:
+                return False
+            digested = {
+                str(source)
+                for digest in await uow.digests.list_for_owner(world_id, character.id)
+                for source in digest.source_ids
+            }
+            observations = await uow.perception.observations_for_observer(character.id, 100000)
+            memories = await uow.perception.memories_for_owner(character.id)
+        lines: list[str] = []
+        source_ids: list[str] = []
+        for obs in observations:
+            if obs.salience < threshold or index - obs.created_phase_index < min_age:
+                continue
+            if f"obs:{obs.id}" in digested:
+                continue
+            for fact in obs.facts:
+                lines.append(f"obs:{obs.id} {fact.key}: {fact.value}")
+                source_ids.append(f"obs:{obs.id}")
+        for mem in memories:
+            if mem.salience < threshold or index - mem.created_phase_index < min_age:
+                continue
+            if f"mem:{mem.id}" in digested:
+                continue
+            lines.append(f"mem:{mem.id} {mem.text}")
+            source_ids.append(f"mem:{mem.id}")
+        if not lines:
+            return False
+        task_run_id = derive_task_id(run_id, "digest", character.id)
+        owner = f"s1digest:{run_id.hex[:8]}"
+        await self._track_task(world_id, task_run_id, owner)
+        spec = ManifestSpec(
+            role="memory_digest",
+            profile=self._profiles["summary"],  # type: ignore[arg-type]
+            prompt_version=DIGEST_PROMPT_VERSION,
+            world_id=world_id,
+            phase_run_id=run_id,
+            task_run_id=task_run_id,
+            actor_id=character.id,
+            sources=[],
+            budgets={},
+            tokens={},
+            dropped=[],
+        )
+        traced = TracedGateway(self._gateways("summary"), self._traces, spec)
+        invocation = GraphInvocation(
+            graph_name="memory-digest",
+            graph_version="v1",
+            task_run_id=task_run_id,
+            world_id=world_id,
+            phase_run_id=run_id,
+            snapshot_id=run_id,
+            actor_id=character.id,
+            role="memory_digest",
+            profile_version=traced.profile.version,
+            prompt_version=DIGEST_PROMPT_VERSION,
+            input={
+                "owner_name": character.name,
+                "day": day,
+                "sources_text": "\n".join(lines),
+                "source_ids": sorted(set(source_ids)),
+            },
+        )
+        graph = build_summary_graph(
+            SummaryGraphDeps(
+                gateway=traced,
+                profile=self._profiles["summary"],  # type: ignore[arg-type]
+                system_template=load_digest_prompt(),
+            )
+        )
+        try:
+            result = await invoke(graph, invocation)
+        except Exception:
+            await self._finish_task(task_run_id, owner, False)
+            return False
+        await self._finish_task(task_run_id, owner, True)
+        proposal: dict[str, Any] = result.get("proposal") or {}
+        text = str(proposal.get("text", "")) or f"Enduring traces: {len(source_ids)} older sources."
+        raw_cited: list[Any] = proposal.get("source_ids", [])
+        cited = [str(s) for s in raw_cited] or sorted(set(source_ids))
+        async with self._factory() as uow:
+            taken = await uow.digests.count_versions(world_id, character.id, day)
+            await uow.digests.add(
+                MemoryDigest(
+                    id=new_digest_id(),
+                    world_id=world_id,
+                    owner_character_id=character.id,
+                    text=text,
+                    source_ids=cited,
+                    day=day,
+                    created_phase_index=index,
+                    profile_version=traced.profile.version,
+                    prompt_version=DIGEST_PROMPT_VERSION,
+                    version=taken + 1,
+                )
+            )
             await uow.commit()
         return True
 
@@ -1093,9 +1293,21 @@ class Stage1Orchestrator:
         async with self._factory() as uow:
             card = await uow.characters.get_card(character.id, character.card_version)
             place = await uow.locations.get(character.location_id)
-            observations = await uow.perception.observations_for_observer(character.id, 5)
-            memories = await uow.perception.memories_for_owner(character.id)
+            config = await uow.worlds.get_config(world_id)
+            _day, _phase, now_index = await uow.worlds.get_clock(world_id)
+            half_life = _config_int(config, HALF_LIFE_PHASES_KEY, DEFAULT_HALF_LIFE_PHASES)
+            recent_phases = _config_int(config, RECENT_PHASES_KEY, DEFAULT_RECENT_PHASES)
+            floor = _config_float(config, SALIENCE_FLOOR_KEY, DEFAULT_SALIENCE_FLOOR)
+            since = max(0, now_index - recent_phases)
+            observations = await uow.perception.observations_for_observer(
+                character.id, 100000, since_phase_index=since, min_salience=floor
+            )
+            memories = await uow.perception.memories_for_owner(
+                character.id, since_phase_index=since, min_salience=floor
+            )
+
             relationships = await uow.relationships.list_for_character(world_id, character.id)
+            digests = await uow.digests.list_for_owner(world_id, character.id)
             names = {c.id: c.name for c in await uow.characters.list_for_world(world_id)}
         candidates = [
             SourceCandidate(
@@ -1140,7 +1352,9 @@ class Stage1Orchestrator:
                         visibility=Visibility.PRIVATE,
                         owner_id=character.id,
                         text=f"{fact.key}: {fact.value}",
-                        score=1.0,
+                        score=score_salience(
+                            obs.salience, now_index - obs.created_phase_index, half_life
+                        ),
                         created_phase_index=obs.created_phase_index,
                     )
                 )
@@ -1165,8 +1379,22 @@ class Stage1Orchestrator:
                     visibility=memory.visibility,
                     owner_id=character.id,
                     text=memory.text,
-                    score=1.0,
+                    score=score_salience(
+                        memory.salience, now_index - memory.created_phase_index, half_life
+                    ),
                     created_phase_index=memory.created_phase_index,
+                )
+            )
+        for digest in digests:
+            candidates.append(
+                SourceCandidate(
+                    source_id=f"digest:{digest.id}",
+                    data_class="memories",
+                    visibility=Visibility.PRIVATE,
+                    owner_id=character.id,
+                    text=digest.text,
+                    score=DIGEST_SCORE,
+                    created_phase_index=digest.created_phase_index,
                 )
             )
         request = ContextRequest(

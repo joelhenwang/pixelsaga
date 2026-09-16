@@ -102,7 +102,7 @@ async def world_map(world_id: UUID, request: Request) -> api.MapResponse:
 
 @router.get("/stage2/characters/{character_id}/diary", response_model=api.DiaryResponse)
 async def diary(character_id: UUID, request: Request) -> api.DiaryResponse:
-    """One owner's observations, memories, and summaries. Holder or watcher."""
+    """One owner's observations, memories, summaries, and digests. Holder or watcher."""
     role, viewer = await _effective_viewer(request, character_id)
     require_role(role, "watcher", "player")
     if role != "watcher" and viewer != character_id:
@@ -113,6 +113,7 @@ async def diary(character_id: UUID, request: Request) -> api.DiaryResponse:
         observations = await uow.perception.observations_for_observer(character_id, 50)
         memories = await uow.perception.memories_for_owner(character_id)
         summaries = await uow.summaries.list_for_owner(character.world_id, character_id)
+        digests = await uow.digests.list_for_owner(character.world_id, character_id)
     return api.DiaryResponse(
         character_id=character_id,
         observations=[
@@ -129,6 +130,9 @@ async def diary(character_id: UUID, request: Request) -> api.DiaryResponse:
         ],
         summaries=[
             api.DiaryEntry(kind="summary", phase=s.day * 10 - 1, text=s.text) for s in summaries
+        ],
+        digests=[
+            api.DiaryEntry(kind="digest", phase=d.created_phase_index, text=d.text) for d in digests
         ],
     )
 

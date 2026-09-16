@@ -364,6 +364,7 @@ export interface DiaryEntry {
 
 export interface DiaryResponse {
   character_id: string;
+  digests?: DiaryEntry[] | null;
   memories?: DiaryEntry[] | null;
   observations?: DiaryEntry[] | null;
   summaries?: DiaryEntry[] | null;

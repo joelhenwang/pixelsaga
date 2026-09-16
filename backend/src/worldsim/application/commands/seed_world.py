@@ -21,6 +21,7 @@ from worldsim.domain.characters import Character, CharacterCard
 from worldsim.domain.enums import EventType, LifeStatus, PhaseName, PhaseRunState
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.events import WorldEvent
+from worldsim.domain.memory import memory_hash
 from worldsim.domain.perception import RecentMemory
 from worldsim.domain.phases import PhaseRun
 from worldsim.domain.world import Location, Route, World
@@ -394,6 +395,7 @@ class SeedService:
                         event_id=event_id,
                         text=secret.text,
                         created_phase_index=0,
+                        content_hash=memory_hash(secret.text),
                     )
                 )
             await uow.commands.set_result(command_id, event_id)
