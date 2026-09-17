@@ -107,7 +107,7 @@ class CommitRequest:
     payload: dict[str, object]
     input_hash: str
     absolute_index: int
-    phase_run_id: UUID
+    phase_run_id: UUID | None
     event_type: EventType
     effects: list[DomainEffect]
     observations: list[ObservationSpec] = field(default_factory=list)

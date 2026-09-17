@@ -95,6 +95,7 @@ class ResourceKind(StrEnum):
 class EventType(StrEnum):
     WORLD_SEEDED = "world_seeded"
     WORLD_TICKED = "world_ticked"
+    MACRO_TICKED = "macro_ticked"
     ACTION_RESOLVED = "action_resolved"
     DEITY_OVERRIDE = "deity_override"
     SCHEDULE_FIRED = "schedule_fired"

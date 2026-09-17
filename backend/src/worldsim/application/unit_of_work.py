@@ -15,6 +15,7 @@ from worldsim.application.ports.repositories import (
     InventoryRepository,
     KnowledgeRepository,
     LocationRepository,
+    MacroRepository,
     MonsterRepository,
     NarrativeRepository,
     OutboxRepository,
@@ -52,6 +53,8 @@ class UnitOfWork(Protocol):
     def routes(self) -> RouteRepository: ...
     @property
     def schedules(self) -> ScheduleRepository: ...
+    @property
+    def macro(self) -> MacroRepository: ...
     @property
     def relationships(self) -> RelationshipRepository: ...
     @property

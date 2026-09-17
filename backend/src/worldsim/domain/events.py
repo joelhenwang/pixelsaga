@@ -26,7 +26,7 @@ class WorldEvent(BaseModel):
     event_type: EventType
     schema_version: int = Field(default=1, ge=1)
     absolute_index: int = Field(ge=0)
-    phase_run_id: PhaseRunId
+    phase_run_id: PhaseRunId | None = None
     source_command_id: CommandId | None = None
     source_task_id: TaskId | None = None
     participant_ids: list[UUID] = Field(default_factory=list)

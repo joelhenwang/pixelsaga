@@ -66,7 +66,7 @@ class SqlAlchemyEventRepository:
         await self._session.flush()
 
     def _to_domain(self, row: WorldEventRow) -> WorldEvent:
-        assert row.phase_run_id is not None, "world events always name a phase run"
+        # Macro-period events belong to no phase run; the domain default is None.
         return WorldEvent(
             id=row.id,
             world_id=row.world_id,

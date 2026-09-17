@@ -21,6 +21,7 @@ from worldsim.infrastructure.repositories.digests import SqlAlchemyDigestReposit
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
+from worldsim.infrastructure.repositories.macro import SqlAlchemyMacroRepository
 from worldsim.infrastructure.repositories.monsters import SqlAlchemyMonsterRepository
 from worldsim.infrastructure.repositories.narrative import SqlAlchemyNarrativeRepository
 from worldsim.infrastructure.repositories.outbox import SqlAlchemyOutboxRepository
@@ -78,6 +79,7 @@ class SqlAlchemyUnitOfWork:
         self._activities: SqlAlchemyActivityRepository | None = None
         self._routes: SqlAlchemyRouteRepository | None = None
         self._schedules: SqlAlchemyScheduleRepository | None = None
+        self._macro: SqlAlchemyMacroRepository | None = None
 
     def _require_session(self) -> AsyncSession:
         assert self._session is not None, "unit of work is not open"
@@ -195,6 +197,13 @@ class SqlAlchemyUnitOfWork:
     def schedules(self) -> SqlAlchemyScheduleRepository:
         if self._schedules is None:
             self._schedules = SqlAlchemyScheduleRepository(self._require_session())
+        return self._schedules
+
+    @property
+    def macro(self) -> SqlAlchemyMacroRepository:
+        if self._macro is None:
+            self._macro = SqlAlchemyMacroRepository(self._require_session())
+        return self._macro
         return self._schedules
 
     @property

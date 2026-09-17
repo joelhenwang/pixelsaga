@@ -292,6 +292,7 @@ class PhaseOrchestrator:
             event_id = await uow.commands.get_result(command_id)
             assert event_id is not None, "committed command must link its event"
             event = await uow.events.get_event(event_id)
+            assert event.phase_run_id is not None, "detailed ticks always name a phase run"
             run = await uow.phases.get_run(event.phase_run_id)
             try:
                 snapshot = await uow.phases.get_snapshot(_derive("snapshot", run.id.hex))

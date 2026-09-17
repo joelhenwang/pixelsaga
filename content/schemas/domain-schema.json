@@ -8370,6 +8370,7 @@
           "enum": [
             "world_seeded",
             "world_ticked",
+            "macro_ticked",
             "action_resolved",
             "deity_override",
             "schedule_fired"
@@ -8415,9 +8416,17 @@
           "type": "array"
         },
         "phase_run_id": {
-          "format": "uuid",
-          "title": "Phase Run Id",
-          "type": "string"
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase Run Id"
         },
         "random_algorithm": {
           "anyOf": [
@@ -8516,8 +8525,7 @@
         "world_id",
         "sequence",
         "event_type",
-        "absolute_index",
-        "phase_run_id"
+        "absolute_index"
       ],
       "title": "WorldEvent",
       "type": "object"
@@ -8742,6 +8750,7 @@
           "enum": [
             "world_seeded",
             "world_ticked",
+            "macro_ticked",
             "action_resolved",
             "deity_override",
             "schedule_fired"
@@ -9098,9 +9107,17 @@
               "type": "array"
             },
             "phase_run_id": {
-              "format": "uuid",
-              "title": "Phase Run Id",
-              "type": "string"
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Phase Run Id"
             },
             "random_algorithm": {
               "anyOf": [
@@ -9199,8 +9216,7 @@
             "world_id",
             "sequence",
             "event_type",
-            "absolute_index",
-            "phase_run_id"
+            "absolute_index"
           ],
           "title": "WorldEvent",
           "type": "object"
