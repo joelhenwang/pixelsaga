@@ -22,6 +22,7 @@ from worldsim.domain.macro import (
     MacroPolicy,
     resolution_range,
 )
+from worldsim.domain.time import absolute_index
 
 POLICY_PENDING_KEY = "macro.max_pending_schedules"
 POLICY_WINDOW_KEY = "macro.max_window_phases"
@@ -92,11 +93,20 @@ async def check_window(
 async def select_resolution(
     factory: UnitOfWorkFactory, world_id: UUID, day: int, policy: MacroPolicy | None = None
 ) -> MacroResolution | None:
-    """Largest eligible resolution covering ``day``; None means stay detailed."""
+    """Largest eligible resolution runnable now; None means stay detailed.
+
+    The window must start exactly at the live clock: a larger eligible
+    window that began in the past is not runnable, so selection falls
+    through to the resolution that starts here.
+    """
     async with factory() as uow:
         resolved = policy if policy is not None else await load_policy(uow, world_id)
+        world = await uow.worlds.get(world_id)
+        clock = absolute_index(world.day, world.phase)
         for resolution in _LARGEST_FIRST:
             start, end = resolution_range(day, resolution)
+            if start != clock:
+                continue
             report = await check_window(uow, world_id, start, end, resolved)
             if report.eligible:
                 return resolution
