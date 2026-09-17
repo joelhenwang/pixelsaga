@@ -2435,6 +2435,152 @@
       "title": "Disclosure",
       "type": "object"
     },
+    "EndConditionEvidence": {
+      "$defs": {
+        "EndConditionKind": {
+          "enum": [
+            "sustained_peace",
+            "civilization_eradicated",
+            "maximum_day"
+          ],
+          "title": "EndConditionKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Deterministic evidence for one end-condition evaluation.\n\nOne calm scene never satisfies peace: ``window_start_absolute``\nbounds the sustained window the evaluation inspected, and\n``evidence_event_ids`` carries the supporting canon.",
+      "properties": {
+        "detail": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "evaluated_absolute": {
+          "minimum": 0,
+          "title": "Evaluated Absolute",
+          "type": "integer"
+        },
+        "evidence_event_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": "Evidence Event Ids",
+          "type": "array"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/EndConditionKind"
+        },
+        "satisfied": {
+          "default": false,
+          "title": "Satisfied",
+          "type": "boolean"
+        },
+        "window_start_absolute": {
+          "minimum": 0,
+          "title": "Window Start Absolute",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "kind",
+        "evaluated_absolute",
+        "window_start_absolute",
+        "detail"
+      ],
+      "title": "EndConditionEvidence",
+      "type": "object"
+    },
+    "EraSummary": {
+      "additionalProperties": false,
+      "description": "One version of one owner's account of a macro interval.\n\nSame accumulation rule as daily summaries: regeneration writes a\nnew row, never rewrites; source IDs point at macro events and\nperspective-owned records only.",
+      "properties": {
+        "end_absolute": {
+          "minimum": 0,
+          "title": "End Absolute",
+          "type": "integer"
+        },
+        "fallback": {
+          "default": false,
+          "title": "Fallback",
+          "type": "boolean"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "owner_id": {
+          "format": "uuid",
+          "title": "Owner Id",
+          "type": "string"
+        },
+        "profile_version": {
+          "default": "",
+          "maxLength": 64,
+          "title": "Profile Version",
+          "type": "string"
+        },
+        "prompt_version": {
+          "default": "",
+          "maxLength": 64,
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "start_absolute": {
+          "minimum": 0,
+          "title": "Start Absolute",
+          "type": "integer"
+        },
+        "text": {
+          "maxLength": 8000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "owner_id",
+        "start_absolute",
+        "end_absolute",
+        "text"
+      ],
+      "title": "EraSummary",
+      "type": "object"
+    },
     "FictionalTime": {
       "$defs": {
         "PhaseName": {
@@ -2471,6 +2617,81 @@
         "phase"
       ],
       "title": "FictionalTime",
+      "type": "object"
+    },
+    "FocusAssignment": {
+      "$defs": {
+        "FocusSlot": {
+          "enum": [
+            "main",
+            "sub",
+            "companion"
+          ],
+          "title": "FocusSlot",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Explicit, versioned focus-slot succession between characters.",
+      "properties": {
+        "effective_absolute": {
+          "minimum": 0,
+          "title": "Effective Absolute",
+          "type": "integer"
+        },
+        "from_character_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "From Character Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 500,
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "slot": {
+          "$ref": "#/$defs/FocusSlot"
+        },
+        "to_character_id": {
+          "format": "uuid",
+          "title": "To Character Id",
+          "type": "string"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "slot",
+        "to_character_id",
+        "effective_absolute",
+        "reason"
+      ],
+      "title": "FocusAssignment",
       "type": "object"
     },
     "Intent": {
@@ -3098,6 +3319,105 @@
       "title": "Lease",
       "type": "object"
     },
+    "LineageCharacter": {
+      "$defs": {
+        "LifeStatus": {
+          "enum": [
+            "alive",
+            "dead"
+          ],
+          "title": "LifeStatus",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Genealogy projection of one character: birth, death, succession.\n\nCarries no memories. Public history stays attached to the entity\nID; descendants start with no inherited private records.",
+      "properties": {
+        "birth_absolute": {
+          "minimum": 0,
+          "title": "Birth Absolute",
+          "type": "integer"
+        },
+        "character_id": {
+          "format": "uuid",
+          "title": "Character Id",
+          "type": "string"
+        },
+        "death_absolute": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Death Absolute"
+        },
+        "life_status": {
+          "$ref": "#/$defs/LifeStatus",
+          "default": "alive"
+        },
+        "succession_eligible": {
+          "default": false,
+          "title": "Succession Eligible",
+          "type": "boolean"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "character_id",
+        "world_id",
+        "birth_absolute"
+      ],
+      "title": "LineageCharacter",
+      "type": "object"
+    },
+    "LineageLink": {
+      "additionalProperties": false,
+      "description": "One parent-to-child link with a fictional birth position.",
+      "properties": {
+        "birth_absolute": {
+          "minimum": 0,
+          "title": "Birth Absolute",
+          "type": "integer"
+        },
+        "child_id": {
+          "format": "uuid",
+          "title": "Child Id",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "parent_id": {
+          "format": "uuid",
+          "title": "Parent Id",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "parent_id",
+        "child_id",
+        "birth_absolute"
+      ],
+      "title": "LineageLink",
+      "type": "object"
+    },
     "Location": {
       "$defs": {
         "Route": {
@@ -3196,6 +3516,214 @@
         "name"
       ],
       "title": "Location",
+      "type": "object"
+    },
+    "MacroAggregateEffect": {
+      "$defs": {
+        "MacroEffectKind": {
+          "enum": [
+            "clock_advance",
+            "resource_recovery",
+            "ageing",
+            "schedule_progress",
+            "relationship_drift",
+            "delayed_effect"
+          ],
+          "title": "MacroEffectKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One sourced aggregate change produced by a macro run.\n\nThe engine decomposes each record into concrete row updates and\ncommits exactly one canonical event per record; ``event_id`` is\nthat event once committed.",
+      "properties": {
+        "detail": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "event_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Id"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/MacroEffectKind"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "target_ids": {
+          "items": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "maxItems": 64,
+          "title": "Target Ids",
+          "type": "array"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "run_id",
+        "world_id",
+        "kind",
+        "detail"
+      ],
+      "title": "MacroAggregateEffect",
+      "type": "object"
+    },
+    "MacroInterruption": {
+      "$defs": {
+        "InterruptionReason": {
+          "enum": [
+            "high_salience",
+            "seeded_event",
+            "operator"
+          ],
+          "title": "InterruptionReason",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "A high-salience break that returns a macro run to detailed simulation.",
+      "properties": {
+        "at_absolute": {
+          "minimum": 0,
+          "title": "At Absolute",
+          "type": "integer"
+        },
+        "detail": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Detail",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "reason": {
+          "$ref": "#/$defs/InterruptionReason"
+        },
+        "run_id": {
+          "format": "uuid",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "run_id",
+        "world_id",
+        "at_absolute",
+        "reason",
+        "detail"
+      ],
+      "title": "MacroInterruption",
+      "type": "object"
+    },
+    "MacroPeriodRun": {
+      "$defs": {
+        "MacroResolution": {
+          "enum": [
+            "day",
+            "week",
+            "month",
+            "year"
+          ],
+          "title": "MacroResolution",
+          "type": "string"
+        },
+        "MacroRunState": {
+          "enum": [
+            "planned",
+            "running",
+            "interrupted",
+            "completed",
+            "cancelled"
+          ],
+          "title": "MacroRunState",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "One deterministic advance of a quiet interval at reduced resolution.",
+      "properties": {
+        "end_absolute": {
+          "minimum": 0,
+          "title": "End Absolute",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "resolution": {
+          "$ref": "#/$defs/MacroResolution"
+        },
+        "seed": {
+          "minimum": 0,
+          "title": "Seed",
+          "type": "integer"
+        },
+        "start_absolute": {
+          "minimum": 0,
+          "title": "Start Absolute",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/MacroRunState",
+          "default": "planned"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "world_id",
+        "start_absolute",
+        "end_absolute",
+        "resolution",
+        "seed"
+      ],
+      "title": "MacroPeriodRun",
       "type": "object"
     },
     "ManifestSource": {

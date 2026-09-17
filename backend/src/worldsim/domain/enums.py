@@ -250,3 +250,39 @@ class ParticipantRole(StrEnum):
     INITIATOR = "initiator"
     REACTOR = "reactor"
     OBSERVER = "observer"
+
+
+class MacroResolution(StrEnum):
+    DAY = "day"
+    WEEK = "week"
+    MONTH = "month"
+    YEAR = "year"
+
+
+class MacroRunState(StrEnum):
+    PLANNED = "planned"
+    RUNNING = "running"
+    INTERRUPTED = "interrupted"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class MacroEffectKind(StrEnum):
+    CLOCK_ADVANCE = "clock_advance"
+    RESOURCE_RECOVERY = "resource_recovery"
+    AGEING = "ageing"
+    SCHEDULE_PROGRESS = "schedule_progress"
+    RELATIONSHIP_DRIFT = "relationship_drift"
+    DELAYED_EFFECT = "delayed_effect"
+
+
+class InterruptionReason(StrEnum):
+    HIGH_SALIENCE = "high_salience"
+    SEEDED_EVENT = "seeded_event"
+    OPERATOR = "operator"
+
+
+class EndConditionKind(StrEnum):
+    SUSTAINED_PEACE = "sustained_peace"
+    CIVILIZATION_ERADICATED = "civilization_eradicated"
+    MAXIMUM_DAY = "maximum_day"

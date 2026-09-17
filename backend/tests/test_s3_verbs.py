@@ -302,14 +302,15 @@ def test_spar_bout_persists_and_replays_clean(
 def test_summarize_falls_back_to_author_on_mismatch() -> None:
     from uuid import uuid4
 
-    from worldsim.application.orchestration.stage1 import _summarize
+    from worldsim.application.orchestration import stage1
     from worldsim.domain.commands import WaitAction
 
+    summarize = stage1._summarize  # pyright: ignore[reportPrivateUsage]
     wren, ash = uuid4(), uuid4()
     names = {wren: "Wren", ash: "Ash"}
-    assert _summarize(WaitAction(character_id=wren, snapshot_id=uuid4()), names) == "Wren waits"
+    assert summarize(WaitAction(character_id=wren, snapshot_id=uuid4()), names) == "Wren waits"
     assert (
-        _summarize(WaitAction(character_id=uuid4(), snapshot_id=uuid4()), names, wren)
+        summarize(WaitAction(character_id=uuid4(), snapshot_id=uuid4()), names, wren)
         == "Wren waits"
     )
 

@@ -44,6 +44,13 @@ ResolutionId = UUID
 NarrationId = UUID
 PartyMemberId = UUID
 MonsterId = UUID
+MacroRunId = UUID
+MacroAggregateEffectId = UUID
+MacroInterruptionId = UUID
+LineageLinkId = UUID
+FocusAssignmentId = UUID
+EraSummaryId = UUID
+EndEvidenceId = UUID
 
 
 def new_world_id() -> WorldId:
@@ -204,6 +211,13 @@ def derive_task_id(run_id: PhaseRunId, role: str, actor: CharacterId) -> TaskId:
     return _derive("task", run_id.hex, role, actor.hex)
 
 
+def derive_macro_run_id(
+    world_id: WorldId, start_absolute: int, end_absolute: int, resolution: str
+) -> MacroRunId:
+    """Stable macro run ID: repeating a period replays the same run, never duplicates."""
+    return _derive("macro-run", world_id.hex, start_absolute, end_absolute, resolution)
+
+
 def new_attempt_id() -> AttemptId:
     return uuid4()
 
@@ -213,6 +227,34 @@ def new_scene_id() -> SceneId:
 
 
 def new_reaction_id() -> ReactionId:
+    return uuid4()
+
+
+def new_macro_run_id() -> MacroRunId:
+    return uuid4()
+
+
+def new_macro_aggregate_effect_id() -> MacroAggregateEffectId:
+    return uuid4()
+
+
+def new_macro_interruption_id() -> MacroInterruptionId:
+    return uuid4()
+
+
+def new_lineage_link_id() -> LineageLinkId:
+    return uuid4()
+
+
+def new_focus_assignment_id() -> FocusAssignmentId:
+    return uuid4()
+
+
+def new_era_summary_id() -> EraSummaryId:
+    return uuid4()
+
+
+def new_end_evidence_id() -> EndEvidenceId:
     return uuid4()
 
 
