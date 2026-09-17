@@ -23,8 +23,11 @@ import uuid
 
 from worldsim.domain.commands import (
     ActionIntent,
+    AppealAction,
     CommunicateAction,
     MoveAction,
+    SparAction,
+    TransferAction,
 )
 from worldsim.domain.enums import ParticipantRole
 from worldsim.domain.ids import IntentId, PhaseRunId, SnapshotId, WorldId
@@ -33,8 +36,12 @@ from worldsim.domain.scenes import DesiredEffect, Intent, Scene, SceneParticipan
 
 
 def target_key(action: ActionIntent) -> str | None:
-    """Shared-target signal: communicate target or move destination."""
+    """Shared-target signal: communicate/spar/transfer target or move destination."""
     if isinstance(action, CommunicateAction):
+        return f"character:{action.target_character_id}"
+    if isinstance(action, SparAction):
+        return f"character:{action.target_character_id}"
+    if isinstance(action, TransferAction):
         return f"character:{action.target_character_id}"
     if isinstance(action, MoveAction):
         return f"location:{action.destination_location_id}"
@@ -64,6 +71,12 @@ def mutable_aggregates(intent: Intent) -> frozenset[str]:
         return frozenset(aggregates)
     if isinstance(action, CommunicateAction):
         return frozenset({author, f"character:{action.target_character_id}"})
+    if isinstance(action, SparAction):
+        return frozenset({author, f"character:{action.target_character_id}"})
+    if isinstance(action, AppealAction):
+        return frozenset({author})
+    if isinstance(action, TransferAction):
+        return frozenset({author, f"character:{action.target_character_id}"})
     if action.family == "rest":
         return frozenset({author})
     return frozenset()
@@ -71,7 +84,7 @@ def mutable_aggregates(intent: Intent) -> frozenset[str]:
 
 def _active(action: ActionIntent) -> bool:
     """Intents that reach into shared space (passive waits/rests do not)."""
-    return action.family in ("communicate", "move", "observe")
+    return action.family in ("communicate", "move", "observe", "spar", "appeal", "transfer")
 
 
 def _linked(first: Intent, second: Intent, locations: dict[str, str]) -> bool:

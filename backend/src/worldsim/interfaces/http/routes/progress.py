@@ -12,6 +12,7 @@ from worldsim.application.commands.inventory import give_item, transfer_item
 from worldsim.domain.items import ItemDefinition, load_item_definitions
 from worldsim.domain.progress import ItemInstance
 from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role, require_role
 
 router = APIRouter(tags=["progress"])
 
@@ -41,7 +42,8 @@ def _item_view(item: ItemInstance) -> api.ItemView:
 @router.post("/stage2/items/give", response_model=api.ItemView)
 async def give(body: api.ItemGiveRequest, request: Request) -> api.ItemView:
     """Create one instance for a holder (or the ground)."""
-    role = request.headers.get("x-worldsim-role", "watcher").lower()
+    role, _viewer = await effective_role(request, body.world_id)
+    require_role(role, "watcher", "player")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         item = await give_item(
@@ -59,8 +61,11 @@ async def give(body: api.ItemGiveRequest, request: Request) -> api.ItemView:
 @router.post("/stage2/items/{item_id}/transfer", response_model=api.ItemView)
 async def transfer(item_id: UUID, body: api.ItemTransferRequest, request: Request) -> api.ItemView:
     """Move one instance to a new holder (or drop it)."""
-    role = request.headers.get("x-worldsim-role", "watcher").lower()
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        world_id = (await uow.inventory.get_item(item_id)).world_id
+    role, _viewer = await effective_role(request, world_id)
+    require_role(role, "watcher", "player")
     async with state.uow_factory()() as uow:
         item = await transfer_item(uow, role, item_id, body.to_owner_id)
     return _item_view(item)

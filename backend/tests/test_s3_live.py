@@ -37,7 +37,9 @@ def test_three_phases_live(migrated_db: None) -> None:
     settings = Settings()
     assert settings.provider.active_profile == "openrouter"
     app = create_app(
-        settings, seed_dir=SEED_DIR, migrations_dir=MIGRATIONS,
+        settings,
+        seed_dir=SEED_DIR,
+        migrations_dir=MIGRATIONS,
     )
     headers = {"X-Worldsim-Role": "watcher"}
     with TestClient(app) as raw:

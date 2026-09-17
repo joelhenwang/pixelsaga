@@ -33,6 +33,8 @@ from uuid import UUID, uuid4
 from sqlalchemy.exc import IntegrityError
 
 from worldsim.application.commands.director import accept_decision
+from worldsim.application.commands.inventory import move_item
+from worldsim.application.commands.knowledge import fold_claim
 from worldsim.application.commands.party import recruit_companion
 from worldsim.application.context.assembler import assemble, to_manifest_dict
 from worldsim.application.graphs.character import (
@@ -93,7 +95,14 @@ from worldsim.application.transactions.scenes import build_scene_commit, observa
 from worldsim.application.unit_of_work import UnitOfWork
 from worldsim.domain.activities import Activity, effective_progress
 from worldsim.domain.characters import Character
-from worldsim.domain.commands import ActionIntent, CommunicateAction, MoveAction
+from worldsim.domain.commands import (
+    ActionIntent,
+    AppealAction,
+    CommunicateAction,
+    MoveAction,
+    SparAction,
+    TransferAction,
+)
 from worldsim.domain.context import ContextEnvelope, ContextRequest, SourceCandidate
 from worldsim.domain.director import (
     DIRECTOR_COOLDOWN_PHASES,
@@ -114,6 +123,7 @@ from worldsim.domain.enums import (
     LifeStatus,
     NarrativeStatus,
     PhaseRunState,
+    ResolutionOutcome,
     ResourceKind,
     ScheduleStatus,
     Visibility,
@@ -132,6 +142,7 @@ from worldsim.domain.ids import (
     new_narration_id,
     new_summary_id,
 )
+from worldsim.domain.knowledge import normalize
 from worldsim.domain.memory import (
     CITE_BUMP_KEY,
     DEFAULT_CITE_BUMP,
@@ -154,7 +165,7 @@ from worldsim.domain.memory import (
     score_salience,
 )
 from worldsim.domain.narration import NarrationBeat
-from worldsim.domain.party import Monster
+from worldsim.domain.party import Monster, party_name_key
 from worldsim.domain.perception import (
     Disclosure,
     FactChannel,
@@ -169,13 +180,18 @@ from worldsim.domain.relationships import describe
 from worldsim.domain.rules.dnd import (
     DataTables,
     MonsterState,
+    armor_ac,
     build_sheet_summary,
     dnd_party_prompt,
     dnd_rules_text,
     load_data,
     parse_recruit_tags,
     resolve_narration_tags,
+    roll_attack,
+    roll_damage,
+    weapon_attack_bonus,
 )
+from worldsim.domain.rules.dnd.data import dict_field, entry, str_field, table
 from worldsim.domain.rules.perception import permitted_facts
 from worldsim.domain.rules.phases import is_quiet_phase
 from worldsim.domain.rules.resources import rest_recovery, restore, spend
@@ -267,6 +283,15 @@ def _summarize(action: ActionIntent, names: Mapping[UUID, str]) -> str:
     if isinstance(action, CommunicateAction):
         target = names.get(action.target_character_id, "?")
         return f"{names.get(action.character_id, '?')} says to {target}: {action.topic}"
+    if isinstance(action, SparAction):
+        target = names.get(action.target_character_id, "?")
+        weapon = f" with {action.weapon}" if action.weapon else ""
+        return f"{names.get(action.character_id, '?')} spars with {target}{weapon}"
+    if isinstance(action, AppealAction):
+        return f"{names.get(action.character_id, '?')} appeals: {action.proposition}"
+    if isinstance(action, TransferAction):
+        target = names.get(action.target_character_id, "?")
+        return f"{names.get(action.character_id, '?')} gives {target} an item"
     family = action.family.value
     return f"{names.get(action.character_id, '?')} {family}s"
 
@@ -1464,12 +1489,162 @@ class Stage1Orchestrator:
         narration = await self._narrate_scene(
             world_id, run_id, scene, result.event_id, quiet, over_budget
         )
+        if resolution.outcome == ResolutionOutcome.SUCCESS:
+            await self._settle_scene_verbs(world_id, run_id, index, scene, members, result.event_id)
         return SceneOutcome(
             scene_id=scene.id,
             event_id=result.event_id,
             resolution_outcome=resolution.outcome.value,
             narration=narration,
         )
+
+    async def _settle_scene_verbs(
+        self,
+        world_id: UUID,
+        run_id: UUID,
+        index: int,
+        scene: Scene,
+        members: list[Intent],
+        event_id: UUID,
+    ) -> None:
+        """Settle v2 verb intents after the scene commit, idempotently.
+
+        Each verb writes a settle-gate command row first: a replayed
+        phase collides on the gate and skips work it already did, so a
+        crash between scenes can never double-apply a bout, claim, or
+        handoff. Gate plus work share one transaction; anything else
+        rolls back and the phase fails loud for a safe retry.
+        """
+        for intent in members:
+            action = intent.action
+            if not isinstance(action, (SparAction, AppealAction, TransferAction)):
+                continue
+            async with self._factory() as uow:
+                try:
+                    await uow.commands.add(
+                        command_id=uuid4(),
+                        world_id=world_id,
+                        key=f"settle:{intent.id.hex}",
+                        actor_role="system",
+                        command_type="settle_verb",
+                        expected_versions={},
+                        payload={
+                            "intent_id": str(intent.id),
+                            "scene_id": str(scene.id),
+                            "family": action.family.value,
+                        },
+                        input_hash=canonical_input_hash({"intent_id": str(intent.id)}),
+                    )
+                except DomainError as exc:
+                    if exc.code is ErrorCode.IDEMPOTENCY_CONFLICT:
+                        continue
+                    raise
+                if isinstance(action, SparAction):
+                    await self._settle_spar(uow, world_id, run_id, index, intent, action, event_id)
+                elif isinstance(action, AppealAction):
+                    text = normalize(action.proposition)
+                    if not text:
+                        raise DomainError(ErrorCode.VALIDATION_FAILED, "appeals need a proposition")
+                    await fold_claim(
+                        uow,
+                        world_id,
+                        intent.author_character_id,
+                        text,
+                        action.audience_location_id,
+                        index,
+                        None,
+                        event_id,
+                    )
+                else:
+                    assert isinstance(action, TransferAction)
+                    await self._settle_transfer(uow, intent, action)
+                await uow.commit()
+
+    async def _settle_spar(
+        self,
+        uow: Any,
+        world_id: UUID,
+        run_id: UUID,
+        index: int,
+        intent: Intent,
+        action: SparAction,
+        event_id: UUID,
+    ) -> None:
+        """One seeded attack exchange between roster sheets, persisted once."""
+        roster = await uow.party.list_for_world(world_id)
+        author = await uow.characters.get(intent.author_character_id)
+        target = await uow.characters.get(action.target_character_id)
+        by_name = {member.name_key: member for member in roster}
+        attacker = by_name.get(party_name_key(author.name))
+        defender = by_name.get(party_name_key(target.name))
+        if attacker is None or defender is None:
+            raise DomainError(ErrorCode.PRECONDITION_FAILED, "bouts need seated sheets")
+        if attacker.sheet.hp is None or defender.sheet.hp is None:
+            raise DomainError(ErrorCode.PRECONDITION_FAILED, "bouts need tracked vitals")
+        weapon_key = action.weapon or (
+            attacker.sheet.weapons[0] if attacker.sheet.weapons else None
+        )
+        if weapon_key is None or weapon_key not in attacker.sheet.weapons:
+            raise DomainError(ErrorCode.VALIDATION_FAILED, "sparring needs a carried weapon")
+        tables = self._dnd_tables()
+        weapons = table(tables, "weapons")
+        weapon = entry(weapons, weapon_key)
+        bonus = weapon_attack_bonus(tables, attacker.sheet, weapon)
+        target_ac = armor_ac(tables, defender.sheet)
+        digest = hashlib.sha256(str(event_id).encode()).digest()[:8]
+        seed = int.from_bytes(digest, "big") & ((1 << 63) - 1)
+        rng = random.Random(seed).random
+        attack = roll_attack(bonus, target_ac, rng)
+        damage = dict_field(weapon, "damage")
+        dtype = str_field(damage, "type") or "damage"
+        if attack.hit:
+            rolled = roll_damage(str_field(damage, "dice"), rng, attack.crit)
+            after = max(0, defender.sheet.hp.current - rolled)
+            before_hp = defender.sheet.hp.current
+            outcome = (
+                f"{attacker.name} hits {defender.name} for {rolled} {dtype} "
+                f"({before_hp}->{after} HP)"
+            )
+        else:
+            rolled = 0
+            after = defender.sheet.hp.current
+            outcome = f"{attacker.name} misses {defender.name} ({attack.total} vs AC {target_ac})"
+        defender_sheet = defender.sheet.model_copy(deep=True)
+        assert defender_sheet.hp is not None
+        defender_sheet.hp.current = after
+        await uow.party.save_sheet(defender.id, defender_sheet, defender.version)
+        combat_id = derive_combat_event_id(event_id)
+        sequence = await uow.events.max_sequence(world_id) + 1
+        await uow.events.append_event(
+            WorldEvent(
+                id=combat_id,
+                world_id=world_id,
+                sequence=sequence,
+                event_type=EventType.ACTION_RESOLVED,
+                absolute_index=index,
+                phase_run_id=run_id,
+                participant_ids=sorted(
+                    [intent.author_character_id, action.target_character_id], key=str
+                ),
+                summary={"spar": outcome[:512]},
+                random_seed=seed,
+                random_algorithm="seeded-d20-v1",
+                random_result=outcome[:512],
+            )
+        )
+
+    async def _settle_transfer(self, uow: Any, intent: Intent, action: TransferAction) -> None:
+        """Ownership-checked handoff between co-located characters."""
+        item = await uow.inventory.get_item(action.item_instance_id)
+        if item.owner_id != intent.author_character_id:
+            raise DomainError(ErrorCode.VALIDATION_FAILED, "handover needs ownership")
+        author = await uow.characters.get(intent.author_character_id)
+        target = await uow.characters.get(action.target_character_id)
+        if target.world_id != item.world_id:
+            raise DomainError(ErrorCode.NOT_FOUND, "recipient is not in this world")
+        if target.location_id != author.location_id:
+            raise DomainError(ErrorCode.PRECONDITION_FAILED, "handoff needs shared ground")
+        await move_item(uow, item, action.target_character_id)
 
     async def _react_all(
         self,

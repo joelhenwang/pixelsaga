@@ -20,6 +20,7 @@ from worldsim.infrastructure.model_gateway.profiles import (
     OPENROUTER_CHAT_PROFILE,
     REACTION_FAKE_PROFILE,
     RESOLVER_FAKE_PROFILE,
+    STAGE0_DEFAULT_BEAT,
     SUMMARY_FAKE_PROFILE,
 )
 from worldsim.infrastructure.model_gateway.retry import RetryingGateway
@@ -70,6 +71,9 @@ def gateways_for_settings(
         profiles = {role: profile for role in ROLE_NAMES}
         return gateways, profiles
     return (
-        {role: FakeGateway(profile=FAKE_PROFILES[role]) for role in ROLE_NAMES},
+        {
+            role: FakeGateway(profile=FAKE_PROFILES[role], default_text=STAGE0_DEFAULT_BEAT)
+            for role in ROLE_NAMES
+        },
         dict(FAKE_PROFILES),
     )

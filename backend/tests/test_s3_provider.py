@@ -95,9 +95,7 @@ def test_retry_honors_rate_limit_then_succeeds() -> None:
 
 
 def test_retry_exhausts_and_raises_last() -> None:
-    inner = ScriptedGateway(
-        FAKE_TEST_PROFILE, [ModelRateLimitedError("slow", retry_after_s=120.0)]
-    )
+    inner = ScriptedGateway(FAKE_TEST_PROFILE, [ModelRateLimitedError("slow", retry_after_s=120.0)])
     gateway = RetryingGateway(inner, max_attempts=2, sleep=_ignore_sleep)
     with pytest.raises(ModelRateLimitedError):
         asyncio.run(gateway.complete(_request()))
@@ -196,9 +194,7 @@ def test_every_call_gets_a_cost_row(prov: tuple[ApiClient, FakeGateway]) -> None
         if "You resolve" in system:
             return json.dumps({"outcome": "success", "effects": [], "rationale": "Quiet."})
         if "You narrate" in system:
-            return json.dumps(
-                [{"text": "The phase passes.", "cited_fact_keys": ["attempt:wait"]}]
-            )
+            return json.dumps([{"text": "The phase passes.", "cited_fact_keys": ["attempt:wait"]}])
         if "You direct" in system:
             return json.dumps({"action": "noop", "reason": "calm stretch"})
         if "You summar" in system:

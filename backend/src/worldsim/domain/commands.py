@@ -13,7 +13,15 @@ from typing import Annotated, Literal
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from worldsim.domain.enums import ActionFamily, CommandType, UserRole
-from worldsim.domain.ids import CharacterId, CommandId, LocationId, RouteId, SnapshotId, WorldId
+from worldsim.domain.ids import (
+    CharacterId,
+    CommandId,
+    ItemInstanceId,
+    LocationId,
+    RouteId,
+    SnapshotId,
+    WorldId,
+)
 from worldsim.domain.time import utcnow
 
 
@@ -93,7 +101,38 @@ class CommunicateAction(ActionBase):
     topic: str = Field(min_length=1, max_length=256)
 
 
+class SparAction(ActionBase):
+    """Stage 3 training bout: one seeded attack exchange with a co-located character."""
+
+    family: Literal[ActionFamily.SPAR] = ActionFamily.SPAR
+    target_character_id: CharacterId
+    weapon: str | None = Field(default=None, max_length=64)
+
+
+class AppealAction(ActionBase):
+    """Stage 3 formal claim: files a proposition with audience rules at settle."""
+
+    family: Literal[ActionFamily.APPEAL] = ActionFamily.APPEAL
+    proposition: str = Field(min_length=1, max_length=512)
+    audience_location_id: LocationId | None = None
+
+
+class TransferAction(ActionBase):
+    """Stage 3 handoff: moves one owned item instance to a co-located character."""
+
+    family: Literal[ActionFamily.TRANSFER] = ActionFamily.TRANSFER
+    item_instance_id: ItemInstanceId
+    target_character_id: CharacterId
+
+
 ActionIntent = Annotated[
-    WaitAction | RestAction | ObserveAction | MoveAction | CommunicateAction,
+    WaitAction
+    | RestAction
+    | ObserveAction
+    | MoveAction
+    | CommunicateAction
+    | SparAction
+    | AppealAction
+    | TransferAction,
     Field(discriminator="family"),
 ]

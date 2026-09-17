@@ -37,8 +37,11 @@ from worldsim.application.ports.model_gateway import (
 )
 from worldsim.domain.commands import (
     ActionIntent,
+    AppealAction,
     CommunicateAction,
     MoveAction,
+    SparAction,
+    TransferAction,
     WaitAction,
 )
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -46,7 +49,7 @@ from worldsim.domain.ids import derive_intent_id
 from worldsim.domain.scenes import Intent
 
 #: Versioned role prompt file (prompt lifecycle: repository file, versioned).
-CHARACTER_PROMPT_VERSION = "character_decision.v1"
+CHARACTER_PROMPT_VERSION = "character_decision.v2"
 
 _ACTION_ADAPTER: TypeAdapter[ActionIntent] = TypeAdapter(ActionIntent)
 
@@ -114,6 +117,21 @@ def precheck_action(
     if isinstance(action, CommunicateAction):
         if str(action.target_character_id) not in known_character_ids:
             return f"unknown target: {action.target_character_id}"
+        return None
+    if isinstance(action, SparAction):
+        if str(action.target_character_id) not in known_character_ids:
+            return f"unknown sparring partner: {action.target_character_id}"
+        return None
+    if isinstance(action, AppealAction):
+        if (
+            action.audience_location_id is not None
+            and str(action.audience_location_id) not in location_ids
+        ):
+            return f"unknown audience ground: {action.audience_location_id}"
+        return None
+    if isinstance(action, TransferAction):
+        if str(action.target_character_id) not in known_character_ids:
+            return f"unknown recipient: {action.target_character_id}"
         return None
     return None
 

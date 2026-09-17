@@ -83,6 +83,7 @@ async def transfer_item(
             raise DomainError(ErrorCode.NOT_FOUND, "holder is not in this world")
     if item.owner_id == to_owner_id:
         return item
+    moved = await move_item(uow, item, to_owner_id)
     target = to_owner_id.hex if to_owner_id else "ground"
     key = f"item-transfer:{item.id.hex}:{target}:{uuid4().hex}"
     payload: dict[str, object] = {
@@ -99,8 +100,14 @@ async def transfer_item(
         payload=payload,
         input_hash=canonical_input_hash({"key": key, "payload": payload}),
     )
-    saved = await uow.inventory.save_item(
+    await uow.commit()
+    return moved
+
+
+async def move_item(
+    uow: UnitOfWork, item: ItemInstance, to_owner_id: CharacterId | None
+) -> ItemInstance:
+    """Version-guarded holder change without audit or commit (see fold_claim)."""
+    return await uow.inventory.save_item(
         item.model_copy(update={"owner_id": to_owner_id}), item.version
     )
-    await uow.commit()
-    return saved

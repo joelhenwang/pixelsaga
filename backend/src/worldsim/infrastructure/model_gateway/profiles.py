@@ -13,6 +13,9 @@ FAKE_TEST_PROFILE = ModelProfile(
     capabilities=["chat", "embed"],
 )
 
+#: Static Stage 0 narration until a narrator role promotes past the fake.
+STAGE0_DEFAULT_BEAT = "The watch turns over the vale; the company holds its course."
+
 STAGE0_SCRIPTED_PROFILE = ModelProfile(
     name="fake",
     version="stage0-v1",

@@ -9,10 +9,13 @@ from __future__ import annotations
 from worldsim.domain.characters import Character
 from worldsim.domain.commands import (
     ActionIntent,
+    AppealAction,
     CommunicateAction,
     MoveAction,
     ObserveAction,
     RestAction,
+    SparAction,
+    TransferAction,
     WaitAction,
 )
 from worldsim.domain.enums import STAGE0_ACTION_FAMILIES, ActionFamily
@@ -94,10 +97,50 @@ def check_move(
         )
 
 
+def check_spar(character: Character, action: SparAction, view: WorldView) -> None:
+    """Bout feasibility: living distinct co-located target; sheets settle later."""
+    require_alive(character)
+    if action.target_character_id == character.id:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "sparring needs a partner")
+    target = view.character(action.target_character_id)
+    require_alive(target)
+    if target.location_id != character.location_id:
+        raise DomainError(ErrorCode.PRECONDITION_FAILED, "sparring needs shared ground")
+
+
+def check_appeal(character: Character, action: AppealAction, view: WorldView) -> None:
+    """Claim feasibility: living speaker, known audience ground."""
+    require_alive(character)
+    if not action.proposition.strip():
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "appeals need a proposition")
+    if action.audience_location_id is not None:
+        view.location(action.audience_location_id)
+
+
+def check_transfer(character: Character, action: TransferAction, view: WorldView) -> None:
+    """Handoff feasibility: living distinct co-located target; ownership settles later."""
+    require_alive(character)
+    if action.target_character_id == character.id:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, "handoff needs a recipient")
+    target = view.character(action.target_character_id)
+    require_alive(target)
+    if target.location_id != character.location_id:
+        raise DomainError(ErrorCode.PRECONDITION_FAILED, "handoff needs shared ground")
+
+
 def check_intent(intent: ActionIntent, view: WorldView) -> None:
     """Dispatch one scripted intent to its feasibility check."""
-    require_stage0_family(intent.family)
     character = view.character(intent.character_id)
+    if isinstance(intent, SparAction):
+        check_spar(character, intent, view)
+        return
+    if isinstance(intent, AppealAction):
+        check_appeal(character, intent, view)
+        return
+    if isinstance(intent, TransferAction):
+        check_transfer(character, intent, view)
+        return
+    require_stage0_family(intent.family)
     match intent:
         case MoveAction():
             origin = view.location(character.location_id)

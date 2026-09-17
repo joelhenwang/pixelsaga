@@ -9,9 +9,12 @@ from __future__ import annotations
 from worldsim.domain.characters import Character
 from worldsim.domain.commands import (
     ActionIntent,
+    AppealAction,
     MoveAction,
     ObserveAction,
     RestAction,
+    SparAction,
+    TransferAction,
     WaitAction,
 )
 from worldsim.domain.effects import (
@@ -81,6 +84,10 @@ def plan_effects(intent: ActionIntent, view: WorldView) -> list[DomainEffect]:
                     )
                 )
             return effects
+        case SparAction() | AppealAction() | TransferAction():
+            # Outcomes settle post-commit from live rows, not from planned
+            # effects; the empty plan keeps the envelope determined.
+            return []
         case ObserveAction():
             return [
                 ObservationRecordedEffect(

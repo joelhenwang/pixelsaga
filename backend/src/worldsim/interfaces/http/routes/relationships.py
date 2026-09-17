@@ -8,8 +8,10 @@ from fastapi import APIRouter, Request
 
 from worldsim.application.commands.relationships import record_evidence
 from worldsim.domain.enums import RelationshipDimension
+from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.relationships import Relationship, describe
 from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role, require_role
 
 router = APIRouter(tags=["relationships"])
 
@@ -36,7 +38,10 @@ def _relationship_view(
 @router.post("/stage2/relationships/evidence", response_model=api.RelationshipView)
 async def record(body: api.RelationshipEvidenceRequest, request: Request) -> api.RelationshipView:
     """Fold one directional evidence delta into the projection."""
-    role = request.headers.get("x-worldsim-role", "watcher").lower()
+    role, viewer = await effective_role(request, body.world_id)
+    require_role(role, "watcher", "player")
+    if role == "player" and viewer != body.source_id:
+        raise DomainError(ErrorCode.FORBIDDEN, "players record only their own evidence")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         relationship = await record_evidence(

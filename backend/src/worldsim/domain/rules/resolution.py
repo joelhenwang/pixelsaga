@@ -17,13 +17,19 @@ import uuid
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from worldsim.domain.commands import CommunicateAction
+from worldsim.domain.commands import AppealAction, CommunicateAction, SparAction, TransferAction
 from worldsim.domain.effects import DomainEffect
 from worldsim.domain.enums import EffectType, ResolutionOutcome
 from worldsim.domain.errors import DomainError
 from worldsim.domain.ids import CharacterId, IntentId
 from worldsim.domain.resolution import AmbiguityPacket
-from worldsim.domain.rules.actions import check_communicate, check_intent
+from worldsim.domain.rules.actions import (
+    check_appeal,
+    check_communicate,
+    check_intent,
+    check_spar,
+    check_transfer,
+)
 from worldsim.domain.rules.scenes import mutable_aggregates
 from worldsim.domain.rules.validation import plan_effects
 from worldsim.domain.rules.views import WorldView
@@ -89,6 +95,12 @@ def build_envelope(
     try:
         if isinstance(intent.action, CommunicateAction):
             check_communicate(view.character(intent.action.character_id), intent.action)
+        elif isinstance(intent.action, SparAction):
+            check_spar(view.character(intent.action.character_id), intent.action, view)
+        elif isinstance(intent.action, AppealAction):
+            check_appeal(view.character(intent.action.character_id), intent.action, view)
+        elif isinstance(intent.action, TransferAction):
+            check_transfer(view.character(intent.action.character_id), intent.action, view)
         else:
             check_intent(intent.action, view)
     except DomainError as exc:

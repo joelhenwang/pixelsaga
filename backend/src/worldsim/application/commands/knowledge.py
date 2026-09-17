@@ -78,6 +78,16 @@ async def assert_claim(
         f"claim:{speaker_id.hex}:{text}:{refutes_claim_id.hex if refutes_claim_id else '-'}"
         f":{source_event_id.hex if source_event_id else uuid4().hex}"
     )
+    claim = await fold_claim(
+        uow,
+        world_id,
+        speaker_id,
+        text,
+        audience_location_id,
+        absolute,
+        refutes_claim_id,
+        source_event_id,
+    )
     payload: dict[str, object] = {
         "speaker_id": str(speaker_id),
         "proposition": text,
@@ -95,6 +105,30 @@ async def assert_claim(
         payload=payload,
         input_hash=canonical_input_hash({"key": key, "payload": payload}),
     )
+    await uow.commit()
+    return claim
+
+
+async def fold_claim(
+    uow: UnitOfWork,
+    world_id: WorldId,
+    speaker_id: CharacterId,
+    text: str,
+    audience_location_id: LocationId | None,
+    absolute: int,
+    refutes_claim_id: ClaimId | None = None,
+    source_event_id: EventId | None = None,
+) -> Claim:
+    """Claim and belief rows without the audit command or commit.
+
+    The API path wraps this with its command row; scene settlement
+    wraps it with a settle gate. Both commit exactly once.
+    """
+    refuted: Claim | None = None
+    if refutes_claim_id is not None:
+        refuted = await uow.knowledge.get_claim(refutes_claim_id)
+        if refuted.world_id != world_id:
+            raise DomainError(ErrorCode.NOT_FOUND, "refuted claim is elsewhere")
     claim = Claim(
         id=new_claim_id(),
         world_id=world_id,
@@ -125,7 +159,6 @@ async def assert_claim(
                     ),
                     old.version,
                 )
-    await uow.commit()
     return claim
 
 

@@ -29,6 +29,8 @@ class ActionFamily(StrEnum):
     MOVE = "move"
     CONTINUE_ACTIVITY = "continue_activity"
     COMMUNICATE = "communicate"
+    SPAR = "spar"
+    APPEAL = "appeal"
     INTERACT = "interact"
     USE_ITEM = "use_item"
     TRANSFER = "transfer"

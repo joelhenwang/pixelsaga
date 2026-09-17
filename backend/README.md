@@ -539,3 +539,37 @@ Portraits are an async cache-reading seam (`portraitFor(id,
 name)` in `frontend/src/portrait.ts`, memory cache, fixture
 render seeded by id and name). Generation plugs into the fetch
 step in Stage 4 without touching callers.
+
+## Versioned intents and verbs (S3-RULE-001)
+
+The decision contract is v2 (`character_decision.v2.md`; v1
+removed): the intent union accepts `spar`, `appeal`, and
+`transfer` alongside the v1 families, with no migration because
+v1 payloads still parse. `plan_effects` returns no planned
+effects for the new verbs — their outcomes settle post-commit
+from live rows — keeping envelopes determined.
+
+- `spar`: living distinct co-located target; at settle both
+  names resolve to roster sheets with tracked HP, one seeded
+  d20 exchange (`seeded-d20-v1`, seed from the scene event)
+  persists through version-guarded saves beside one
+  `ACTION_RESOLVED` combat event. Sheets resolve by roster
+  name; missing sheets fail loud.
+- `appeal`: files a proposition through the claim path with
+  audience rules (speaker holds, positional hearing) via the
+  shared `fold_claim` helper.
+- `give` (`transfer` family): ownership-checked handoff between
+  co-located characters through the shared `move_item` helper.
+
+Settlement runs only on successful resolutions, after narration,
+with a `settle:<intent>` gate command in the same transaction:
+replays collide on the gate and skip, so crashes cannot
+double-apply. The SceneView action bar offers all three verbs
+and `verify.mjs` files an appeal end to end.
+
+Roles prerequisite, same lane: every mutating route resolves the
+grant-selected role first (`effective_role`) with
+`watcher`/`player` allowlists on claims, items, relationships,
+and activities; bound players act only as themselves; advance,
+begin, pause, and resume are grant-aware. Read endpoints keep
+header perspective (documented boundary, unchanged behavior).

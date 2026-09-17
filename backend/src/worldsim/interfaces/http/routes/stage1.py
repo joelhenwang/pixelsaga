@@ -22,6 +22,7 @@ from worldsim.domain.ids import derive_attempt_id
 from worldsim.domain.party import PartyMember
 from worldsim.domain.scenes import Intent, Reaction
 from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role, require_role
 from worldsim.interfaces.http.state import dnd_tables
 
 router = APIRouter(tags=["stage1"])
@@ -45,19 +46,30 @@ def _party_view(member: PartyMember) -> api.PartyMemberView:
     )
 
 
-def _perspective(request: Request) -> tuple[str, UUID | None]:
-    role = request.headers.get("x-worldsim-role", "watcher").lower()
-    if role not in ("watcher", "player"):
+async def _perspective(request: Request, world_id: UUID | None = None) -> tuple[str, UUID | None]:
+    """Header perspective for reads; grant-aware gates for mutating routes."""
+    if world_id is None:
+        role = request.headers.get("x-worldsim-role", "watcher").lower()
+        if role not in ("watcher", "player"):
+            raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown role: {role}")
+        raw_character = request.headers.get("x-worldsim-character")
+        if role == "player":
+            if not raw_character:
+                raise DomainError(
+                    ErrorCode.FORBIDDEN, "player perspective needs X-Worldsim-Character"
+                )
+            try:
+                return role, UUID(raw_character)
+            except ValueError as exc:
+                raise DomainError(ErrorCode.VALIDATION_FAILED, "bad character id") from exc
+        return role, None
+    role, viewer = await effective_role(request, world_id)
+    if role not in ("watcher", "player", "director", "deity", "system"):
         raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown role: {role}")
-    raw_character = request.headers.get("x-worldsim-character")
-    if role == "player":
-        if not raw_character:
-            raise DomainError(ErrorCode.FORBIDDEN, "player perspective needs X-Worldsim-Character")
-        try:
-            return role, UUID(raw_character)
-        except ValueError as exc:
-            raise DomainError(ErrorCode.VALIDATION_FAILED, "bad character id") from exc
-    return role, None
+    require_role(role, "watcher", "player")
+    if role == "player" and viewer is None:
+        raise DomainError(ErrorCode.FORBIDDEN, "player perspective needs a bound character")
+    return role, viewer
 
 
 def _stage1(request: Request) -> Stage1Orchestrator:
@@ -150,7 +162,7 @@ async def list_characters(request: Request, world_id: UUID) -> list[api.Characte
 
 @router.get("/stage1/characters/{character_id}", response_model=api.CharacterDetail)
 async def get_character(character_id: UUID, request: Request) -> api.CharacterDetail:
-    _role, viewer = _perspective(request)
+    _role, viewer = await _perspective(request)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         character = await uow.characters.get(character_id)
@@ -186,7 +198,7 @@ async def get_character(character_id: UUID, request: Request) -> api.CharacterDe
 async def list_scenes(
     request: Request, phase_run_id: UUID, limit: int = 50
 ) -> list[api.SceneSummary]:
-    _role, viewer = _perspective(request)
+    _role, viewer = await _perspective(request)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         scenes = await uow.scenes.list_for_run(phase_run_id, limit=max(1, min(limit, 200)))
@@ -207,13 +219,13 @@ async def list_scenes(
 
 @router.get("/stage1/scenes/{scene_id}", response_model=api.SceneDetail)
 async def get_scene(scene_id: UUID, request: Request) -> api.SceneDetail:
-    _role, viewer = _perspective(request)
+    _role, viewer = await _perspective(request)
     return await _scene_detail(request, scene_id, viewer)
 
 
 @router.get("/stage1/scenes/{scene_id}/narration", response_model=list[api.BeatView])
 async def get_narration(scene_id: UUID, request: Request) -> list[api.BeatView]:
-    _role, viewer = _perspective(request)
+    _role, viewer = await _perspective(request)
     detail = await _scene_detail(request, scene_id, viewer)
     if detail.event_id is None:
         return []
@@ -234,7 +246,7 @@ async def get_narration(scene_id: UUID, request: Request) -> list[api.BeatView]:
 
 @router.get("/stage1/model-runs", response_model=list[api.ModelRunView])
 async def list_model_runs(request: Request, phase_run_id: UUID) -> list[api.ModelRunView]:
-    role, _viewer = _perspective(request)
+    role, _viewer = await _perspective(request)
     if role != "watcher":
         raise DomainError(ErrorCode.FORBIDDEN, "model runs are watcher-only")
     state = request.app.state.app_state
@@ -266,7 +278,7 @@ async def list_model_runs(request: Request, phase_run_id: UUID) -> list[api.Mode
 
 @router.post("/stage1/advance", response_model=api.Stage1AdvanceResponse)
 async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage1AdvanceResponse:
-    _role, viewer = _perspective(request)
+    _role, viewer = await _perspective(request, body.world_id)
     player_intents: dict[UUID, ActionIntent] = {}
     for raw_actor, raw_action in body.player_intents.items():
         try:
@@ -300,12 +312,20 @@ async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage
 
 @router.post("/stage1/pause", response_model=dict[str, str])
 async def pause(body: api.RunIdRequest, request: Request) -> dict[str, str]:
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        world_id = (await uow.phases.get_run(body.run_id)).world_id
+    await _perspective(request, world_id)
     await _stage1(request).pause_phase(body.run_id)
     return {"run_id": str(body.run_id), "state": "paused"}
 
 
 @router.post("/stage1/resume", response_model=dict[str, str])
 async def resume(body: api.RunIdRequest, request: Request) -> dict[str, str]:
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        world_id = (await uow.phases.get_run(body.run_id)).world_id
+    await _perspective(request, world_id)
     await _stage1(request).resume_phase(body.run_id)
     return {"run_id": str(body.run_id), "state": "resumed"}
 
@@ -313,7 +333,7 @@ async def resume(body: api.RunIdRequest, request: Request) -> dict[str, str]:
 @router.post("/stage1/party/begin", response_model=api.PartyMemberView)
 async def begin_party_member(body: api.PartyBeginRequest, request: Request) -> api.PartyMemberView:
     """Seat the player's adventurer (explicit stats or the auto build)."""
-    _role, _viewer = _perspective(request)
+    _role, _viewer = await _perspective(request, body.world_id)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         member = await begin_adventure(
@@ -332,7 +352,7 @@ async def begin_party_member(body: api.PartyBeginRequest, request: Request) -> a
 @router.get("/stage1/party", response_model=api.PartyRosterResponse)
 async def party_roster(world_id: UUID, request: Request) -> api.PartyRosterResponse:
     """Party sheets are shared party knowledge: full roster for both roles."""
-    _role, _viewer = _perspective(request)
+    _role, _viewer = await _perspective(request)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         members = await uow.party.list_for_world(world_id)

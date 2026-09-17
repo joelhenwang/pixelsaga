@@ -80,6 +80,19 @@ try {
     assert(scenes > 0, "scene strip emptied after action");
   });
 
+  await check("appeal verb files a claim", async () => {
+    await page.locator('select[aria-label="Action"]').selectOption("appeal");
+    await fill(page.locator("#topic"), "the mill stands");
+    await click(page.locator("#go"));
+    await page.waitForFunction(
+      () => document.querySelector("#queued")?.textContent?.includes("appeal"),
+      null,
+      { timeout: 60000 },
+    );
+    const queued = await page.locator("#queued").innerText();
+    assert(queued.includes("appeal"), "queued line missing appeal family");
+  });
+
   await check("keyboard moves between scenes", async () => {
     const count = await page.locator(".strip button").count();
     if (count < 2) {

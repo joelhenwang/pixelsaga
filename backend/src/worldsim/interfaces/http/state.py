@@ -24,16 +24,16 @@ from worldsim.application.transactions.canonical import CanonicalTransaction
 from worldsim.domain.rules.dnd import DataTables, load_data
 from worldsim.infrastructure.db.engine import create_engine
 from worldsim.infrastructure.model_gateway.fake import FakeGateway
-from worldsim.infrastructure.model_gateway.profiles import STAGE0_SCRIPTED_PROFILE
+from worldsim.infrastructure.model_gateway.profiles import (
+    STAGE0_DEFAULT_BEAT,
+    STAGE0_SCRIPTED_PROFILE,
+)
 from worldsim.infrastructure.repositories.unit_of_work import (
     SqlAlchemyUnitOfWork,
     create_unit_of_work,
 )
 from worldsim.infrastructure.settings import Settings
 from worldsim.infrastructure.tracing.langsmith import select_exporter
-
-#: Static Stage 0 narration until a narrator role promotes past the fake.
-STAGE0_DEFAULT_BEAT = "The watch turns over the vale; the company holds its course."
 
 SEED_DIR = Path("content/seeds/stage0")
 

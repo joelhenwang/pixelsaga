@@ -17,6 +17,7 @@ from worldsim.domain.activities import Activity
 from worldsim.domain.enums import ActivityKind
 from worldsim.domain.time import absolute_index
 from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role, require_role
 
 router = APIRouter(tags=["activities"])
 
@@ -48,6 +49,8 @@ async def _absolute_now(request: Request, world_id: UUID) -> int:
 async def start(body: api.ActivityStartRequest, request: Request) -> api.ActivityView:
     """Begin one activity for a character (one active at a time)."""
     _ACTIVITY_ADAPTER.validate_python(body)
+    role, _viewer = await effective_role(request, body.world_id)
+    require_role(role, "watcher", "player")
     state = request.app.state.app_state
     now = await _absolute_now(request, body.world_id)
     async with state.uow_factory()() as uow:
@@ -70,6 +73,8 @@ async def interrupt(activity_id: UUID, request: Request) -> api.ActivityView:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.activities.get(activity_id)).world_id
+    role, _viewer = await effective_role(request, world_id)
+    require_role(role, "watcher", "player")
     now = await _absolute_now(request, world_id)
     async with state.uow_factory()() as uow:
         result = await interrupt_activity(uow, activity_id, now)
@@ -82,6 +87,8 @@ async def resume(activity_id: UUID, request: Request) -> api.ActivityView:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.activities.get(activity_id)).world_id
+    role, _viewer = await effective_role(request, world_id)
+    require_role(role, "watcher", "player")
     now = await _absolute_now(request, world_id)
     async with state.uow_factory()() as uow:
         result = await resume_activity(uow, activity_id, now)
@@ -92,6 +99,10 @@ async def resume(activity_id: UUID, request: Request) -> api.ActivityView:
 async def cancel(activity_id: UUID, request: Request) -> api.ActivityView:
     """Terminally abandon an activity."""
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        world_id = (await uow.activities.get(activity_id)).world_id
+    role, _viewer = await effective_role(request, world_id)
+    require_role(role, "watcher", "player")
     async with state.uow_factory()() as uow:
         result = await cancel_activity(uow, activity_id)
     return activity_view(result.activity)

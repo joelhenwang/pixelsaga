@@ -13,6 +13,7 @@ const family = ref("wait");
 const topic = ref("");
 const targetId = ref("");
 const destination = ref("");
+const itemId = ref("");
 const queued = ref<string>("");
 const quietPhase = ref<boolean>(false);
 
@@ -65,6 +66,16 @@ async function submitAction(): Promise<void> {
   if (family.value === "communicate") {
     action["target_character_id"] = targetId.value;
     action["topic"] = topic.value || "hello";
+  }
+  if (family.value === "spar") {
+    action["target_character_id"] = targetId.value;
+  }
+  if (family.value === "appeal") {
+    action["proposition"] = topic.value || "the mill stands";
+  }
+  if (family.value === "transfer") {
+    action["target_character_id"] = targetId.value;
+    action["item_instance_id"] = itemId.value;
   }
   if (family.value === "move") {
     action["destination_location_id"] = destination.value;
@@ -155,11 +166,15 @@ onUnmounted(() => {
         <option value="rest">rest</option>
         <option value="move">move</option>
         <option value="communicate">communicate</option>
+        <option value="spar">spar</option>
+        <option value="appeal">appeal</option>
+        <option value="transfer">transfer</option>
       </select>
-      <select v-model="targetId" v-if="family === 'communicate'" aria-label="Target">
+      <select v-model="targetId" v-if="family === 'communicate' || family === 'spar' || family === 'transfer'" aria-label="Target">
         <option v-for="c in characters" :key="c.id" :value="c.id">{{ c.name }}</option>
       </select>
       <input v-model="destination" v-if="family === 'move'" placeholder="destination location id" aria-label="Destination">
+      <input v-model="itemId" v-if="family === 'transfer'" placeholder="item instance id" aria-label="Item">
       <input id="topic" v-model="topic" placeholder="topic or focus: blank waits" aria-label="Topic">
       <button id="go" type="button" @click="submitAction" :disabled="busy">Act</button>
       <button type="button" @click="advanceHere" :disabled="busy">advance to {{ nextIndex }}</button>

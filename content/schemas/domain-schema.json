@@ -2463,6 +2463,54 @@
     },
     "Intent": {
       "$defs": {
+        "AppealAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 formal claim: files a proposition with audience rules at settle.",
+          "properties": {
+            "audience_location_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Audience Location Id"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "appeal",
+              "default": "appeal",
+              "title": "Family",
+              "type": "string"
+            },
+            "proposition": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Proposition",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "proposition"
+          ],
+          "title": "AppealAction",
+          "type": "object"
+        },
         "CommunicateAction": {
           "additionalProperties": false,
           "description": "Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;\nuntil then only schema validation and liveness/topic checks apply.",
@@ -2664,6 +2712,93 @@
           "title": "RestAction",
           "type": "object"
         },
+        "SparAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 training bout: one seeded attack exchange with a co-located character.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "spar",
+              "default": "spar",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            },
+            "weapon": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Weapon"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "target_character_id"
+          ],
+          "title": "SparAction",
+          "type": "object"
+        },
+        "TransferAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 handoff: moves one owned item instance to a co-located character.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "transfer",
+              "default": "transfer",
+              "title": "Family",
+              "type": "string"
+            },
+            "item_instance_id": {
+              "format": "uuid",
+              "title": "Item Instance Id",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "item_instance_id",
+            "target_character_id"
+          ],
+          "title": "TransferAction",
+          "type": "object"
+        },
         "WaitAction": {
           "additionalProperties": false,
           "properties": {
@@ -2698,10 +2833,13 @@
         "action": {
           "discriminator": {
             "mapping": {
+              "appeal": "#/$defs/AppealAction",
               "communicate": "#/$defs/CommunicateAction",
               "move": "#/$defs/MoveAction",
               "observe": "#/$defs/ObserveAction",
               "rest": "#/$defs/RestAction",
+              "spar": "#/$defs/SparAction",
+              "transfer": "#/$defs/TransferAction",
               "wait": "#/$defs/WaitAction"
             },
             "propertyName": "family"
@@ -2721,6 +2859,15 @@
             },
             {
               "$ref": "#/$defs/CommunicateAction"
+            },
+            {
+              "$ref": "#/$defs/SparAction"
+            },
+            {
+              "$ref": "#/$defs/AppealAction"
+            },
+            {
+              "$ref": "#/$defs/TransferAction"
             }
           ],
           "title": "Action"
@@ -4667,6 +4814,54 @@
     },
     "Reaction": {
       "$defs": {
+        "AppealAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 formal claim: files a proposition with audience rules at settle.",
+          "properties": {
+            "audience_location_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Audience Location Id"
+            },
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "appeal",
+              "default": "appeal",
+              "title": "Family",
+              "type": "string"
+            },
+            "proposition": {
+              "maxLength": 512,
+              "minLength": 1,
+              "title": "Proposition",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "proposition"
+          ],
+          "title": "AppealAction",
+          "type": "object"
+        },
         "CommunicateAction": {
           "additionalProperties": false,
           "description": "Stage 1 dialogue intent. Effect planning arrives with S1-RESOLVE-001;\nuntil then only schema validation and liveness/topic checks apply.",
@@ -4829,6 +5024,93 @@
           "title": "RestAction",
           "type": "object"
         },
+        "SparAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 training bout: one seeded attack exchange with a co-located character.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "spar",
+              "default": "spar",
+              "title": "Family",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            },
+            "weapon": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Weapon"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "target_character_id"
+          ],
+          "title": "SparAction",
+          "type": "object"
+        },
+        "TransferAction": {
+          "additionalProperties": false,
+          "description": "Stage 3 handoff: moves one owned item instance to a co-located character.",
+          "properties": {
+            "character_id": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            },
+            "family": {
+              "const": "transfer",
+              "default": "transfer",
+              "title": "Family",
+              "type": "string"
+            },
+            "item_instance_id": {
+              "format": "uuid",
+              "title": "Item Instance Id",
+              "type": "string"
+            },
+            "snapshot_id": {
+              "format": "uuid",
+              "title": "Snapshot Id",
+              "type": "string"
+            },
+            "target_character_id": {
+              "format": "uuid",
+              "title": "Target Character Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "character_id",
+            "snapshot_id",
+            "item_instance_id",
+            "target_character_id"
+          ],
+          "title": "TransferAction",
+          "type": "object"
+        },
         "WaitAction": {
           "additionalProperties": false,
           "properties": {
@@ -4863,10 +5145,13 @@
         "action": {
           "discriminator": {
             "mapping": {
+              "appeal": "#/$defs/AppealAction",
               "communicate": "#/$defs/CommunicateAction",
               "move": "#/$defs/MoveAction",
               "observe": "#/$defs/ObserveAction",
               "rest": "#/$defs/RestAction",
+              "spar": "#/$defs/SparAction",
+              "transfer": "#/$defs/TransferAction",
               "wait": "#/$defs/WaitAction"
             },
             "propertyName": "family"
@@ -4886,6 +5171,15 @@
             },
             {
               "$ref": "#/$defs/CommunicateAction"
+            },
+            {
+              "$ref": "#/$defs/SparAction"
+            },
+            {
+              "$ref": "#/$defs/AppealAction"
+            },
+            {
+              "$ref": "#/$defs/TransferAction"
             }
           ],
           "title": "Action"

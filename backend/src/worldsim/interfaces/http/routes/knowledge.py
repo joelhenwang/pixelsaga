@@ -10,6 +10,7 @@ from worldsim.application.commands.knowledge import assert_claim
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.time import absolute_index
 from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role, require_role
 
 router = APIRouter(tags=["knowledge"])
 
@@ -17,7 +18,10 @@ router = APIRouter(tags=["knowledge"])
 @router.post("/stage2/claims", response_model=api.ClaimView)
 async def voice_claim(body: api.ClaimRequest, request: Request) -> api.ClaimView:
     """Voice a proposition; eligible listeners fold beliefs."""
-    role = request.headers.get("x-worldsim-role", "watcher").lower()
+    role, viewer = await effective_role(request, body.world_id)
+    require_role(role, "watcher", "player")
+    if role == "player" and viewer != body.speaker_id:
+        raise DomainError(ErrorCode.FORBIDDEN, "players voice only their own claims")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world = await uow.worlds.get(body.world_id)
