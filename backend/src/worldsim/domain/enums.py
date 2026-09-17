@@ -99,6 +99,7 @@ class EventType(StrEnum):
     ACTION_RESOLVED = "action_resolved"
     DEITY_OVERRIDE = "deity_override"
     SCHEDULE_FIRED = "schedule_fired"
+    WORLD_ENDED = "world_ended"
 
 
 class Visibility(StrEnum):

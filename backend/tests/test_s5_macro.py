@@ -47,7 +47,7 @@ def test_week_advance_moves_clock_and_replays(migrated_db: None) -> None:
                 events = await uow.events.list_range(wid, 0, 20)
             ticks = [e for e in events if e.event_type == EventType.MACRO_TICKED]
             assert len(ticks) == 1
-            assert ticks[0].absolute_index == 70
+            assert ticks[0].absolute_index == 69
             assert ticks[0].phase_run_id is None
 
             second = await macro.advance_period(wid, 1, MacroResolution.WEEK)

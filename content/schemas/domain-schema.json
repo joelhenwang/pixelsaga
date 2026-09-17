@@ -8373,7 +8373,8 @@
             "macro_ticked",
             "action_resolved",
             "deity_override",
-            "schedule_fired"
+            "schedule_fired",
+            "world_ended"
           ],
           "title": "EventType",
           "type": "string"
@@ -8753,7 +8754,8 @@
             "macro_ticked",
             "action_resolved",
             "deity_override",
-            "schedule_fired"
+            "schedule_fired",
+            "world_ended"
           ],
           "title": "EventType",
           "type": "string"

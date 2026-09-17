@@ -143,3 +143,20 @@ class SqlAlchemyLineageRepository:
             )
         ).scalars()
         return [self._to_focus(row) for row in rows]
+
+    async def list_deaths(
+        self, world_id: UUID, start_absolute: int, end_absolute: int
+    ) -> list[LineageCharacter]:
+        rows = (
+            await self._session.execute(
+                select(LineageCharacterRow)
+                .where(
+                    LineageCharacterRow.world_id == world_id,
+                    LineageCharacterRow.death_absolute.is_not(None),
+                    LineageCharacterRow.death_absolute >= start_absolute,
+                    LineageCharacterRow.death_absolute < end_absolute,
+                )
+                .order_by(LineageCharacterRow.death_absolute)
+            )
+        ).scalars()
+        return [self._to_record(row) for row in rows]

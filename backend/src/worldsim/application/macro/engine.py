@@ -44,6 +44,7 @@ from worldsim.domain.ids import (
     new_macro_interruption_id,
 )
 from worldsim.domain.macro import (
+    SALIENT_SCHEDULE_FLAG,
     MacroAggregateEffect,
     MacroEffectKind,
     MacroInterruption,
@@ -214,7 +215,7 @@ class MacroEngine:
                 input_hash=canonical_input_hash(
                     {"key": key, "payload": payload, "effects": [effect.model_dump(mode="json")]}
                 ),
-                absolute_index=run.end_absolute,
+                absolute_index=run.end_absolute - 1,
                 phase_run_id=None,
                 event_type=EventType.MACRO_TICKED,
                 effects=[effect],
@@ -247,6 +248,11 @@ class MacroEngine:
                             "kind": schedule.kind,
                             "due": str(schedule.due_absolute),
                             "macro_run": run.id.hex,
+                            "salient": (
+                                "true"
+                                if schedule.payload.get(SALIENT_SCHEDULE_FLAG) is True
+                                else "false"
+                            ),
                         },
                     )
                 )
