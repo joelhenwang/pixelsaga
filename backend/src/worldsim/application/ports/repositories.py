@@ -12,6 +12,7 @@ from uuid import UUID
 
 from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.characters import Character, CharacterCard
+from worldsim.domain.costs import ModelCost
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.knowledge import Belief, Claim
 from worldsim.domain.memory import MemoryDigest
@@ -181,6 +182,12 @@ class DigestRepository(Protocol):
     async def add(self, digest: MemoryDigest) -> None: ...
     async def count_versions(self, world_id: UUID, owner_id: UUID, day: int) -> int: ...
     async def list_for_owner(self, world_id: UUID, owner_id: UUID) -> list[MemoryDigest]: ...
+
+
+class CostRepository(Protocol):
+    async def add(self, cost: ModelCost, world_id: UUID | None) -> None: ...
+    async def get_for_call(self, call_id: UUID) -> ModelCost | None: ...
+    async def total_for_world(self, world_id: UUID) -> float: ...
 
 
 class RoleRepository(Protocol):

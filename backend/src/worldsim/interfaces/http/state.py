@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 import worldsim
 from worldsim.application.orchestration.service import PhaseOrchestrator
 from worldsim.application.orchestration.stage1 import Stage1Orchestrator
+from worldsim.application.ports.model_gateway import ModelGateway
 from worldsim.application.ports.traces import TraceExporter
 from worldsim.application.tasks.service import TaskService
 from worldsim.application.tracing.service import TraceService
@@ -88,23 +89,14 @@ class AppState:
         )
 
     def stage1(self) -> Stage1Orchestrator:
-        """Stage 1 orchestrator with per-role gateways and fake profiles."""
-        from worldsim.infrastructure.model_gateway.profiles import (
-            CHARACTER_FAKE_PROFILE,
-            DIRECTOR_FAKE_PROFILE,
-            NARRATOR_FAKE_PROFILE,
-            REACTION_FAKE_PROFILE,
-            RESOLVER_FAKE_PROFILE,
-            SUMMARY_FAKE_PROFILE,
-        )
+        """Stage 1 orchestrator with per-role gateways for the active profile."""
+        from worldsim.infrastructure.model_gateway.selection import gateways_for_settings
 
         factory = self.uow_factory()
-        gateways = {
-            role: self.gateway_factory()
-            for role in ("character", "reaction", "resolver", "narrator", "director", "summary")
-        }
+        override = self.gateway_factory if self.gateway_factory is not stage0_gateway else None
+        gateways, profiles = gateways_for_settings(self.settings, override)
 
-        def _for_role(role: str) -> FakeGateway:
+        def _for_role(role: str) -> ModelGateway:
             return gateways[role]
 
         return Stage1Orchestrator(
@@ -113,14 +105,7 @@ class AppState:
             TaskService(factory),
             TraceService(factory, self.exporter),
             _for_role,
-            {
-                "character": CHARACTER_FAKE_PROFILE,
-                "reaction": REACTION_FAKE_PROFILE,
-                "resolver": RESOLVER_FAKE_PROFILE,
-                "narrator": NARRATOR_FAKE_PROFILE,
-                "director": DIRECTOR_FAKE_PROFILE,
-                "summary": SUMMARY_FAKE_PROFILE,
-            },
+            profiles,
         )
 
 

@@ -16,6 +16,7 @@ from worldsim.infrastructure.repositories.characters import (
     SqlAlchemyCharacterRepository,
 )
 from worldsim.infrastructure.repositories.commands import SqlAlchemyCommandRepository
+from worldsim.infrastructure.repositories.costs import SqlAlchemyCostRepository
 from worldsim.infrastructure.repositories.digests import SqlAlchemyDigestRepository
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
@@ -57,6 +58,7 @@ class SqlAlchemyUnitOfWork:
         self._phases: SqlAlchemyPhaseRepository | None = None
         self._events: SqlAlchemyEventRepository | None = None
         self._commands: SqlAlchemyCommandRepository | None = None
+        self._costs: SqlAlchemyCostRepository | None = None
         self._versions: SqlAlchemyVersionStore | None = None
         self._tasks: SqlAlchemyTaskRepository | None = None
         self._outbox: SqlAlchemyOutboxRepository | None = None
@@ -214,6 +216,12 @@ class SqlAlchemyUnitOfWork:
         return self._summaries
 
     @property
+    def costs(self) -> SqlAlchemyCostRepository:
+        if self._costs is None:
+            self._costs = SqlAlchemyCostRepository(self._require_session())
+        return self._costs
+
+    @property
     def digests(self) -> SqlAlchemyDigestRepository:
         if self._digests is None:
             self._digests = SqlAlchemyDigestRepository(self._require_session())
@@ -263,6 +271,7 @@ class SqlAlchemyUnitOfWork:
             self._roles = None
             self._activities = None
             self._routes = None
+            self._costs = None
             self._digests = None
             self._schedules = None
             self._outbox = None

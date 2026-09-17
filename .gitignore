@@ -16,7 +16,8 @@ __pycache__/
 backend/.venv/
 .pi/skills/
 perchance-ver/
-evidence/
+evidence/*
+!evidence/stage3-live-v1/
 frontend/node_modules/
 frontend/dist/
 backend/src/worldsim.egg-info/

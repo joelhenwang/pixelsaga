@@ -510,3 +510,32 @@ into the per-phase budget like summaries.
 Raw rows are append-only (the perception repo exposes no
 update/delete) and every digest source must hash-match its current
 row; the S3 gate audits this mechanically.
+
+## Provider gateway (S3-PROV-001)
+
+`infrastructure/model_gateway/selection.py` builds per-role
+gateways from settings: `fake` (default, or an injected scripted
+factory in tests) or `openrouter`, where every role gets an
+`OpenRouterGateway` wrapped in `RetryingGateway`. No call site
+branches on provider. Settings reject the openrouter profile
+without `WORLDSIM_PROVIDER__OPENROUTER_API_KEY`.
+
+Retry policy: rate limits honor the server's `retry-after_s`
+(capped at 30s); timeouts and transport failures retry on short
+backoff; refusals and malformed responses never retry. After
+exhaustion the original error propagates and the graphs degrade
+through their existing fallbacks. `RetryingGateway` takes an
+injectable sleep so tests never wait on backoff.
+
+Every traced call writes one `model_cost` row (migration 0021)
+in `TraceService`, priced from the versioned table in
+`domain/costs.py` (`s3-prov-v1`). Calls reporting no usage are
+byte-estimated from prompt length; models absent from the table
+fall back to the default rate; both are labeled `estimated`.
+Fake calls cost $0. The bounded live sample runs under
+`docs/LIVE_RUNBOOK.md` and commits `evidence/stage3-live-v1/`.
+
+Portraits are an async cache-reading seam (`portraitFor(id,
+name)` in `frontend/src/portrait.ts`, memory cache, fixture
+render seeded by id and name). Generation plugs into the fetch
+step in Stage 4 without touching callers.

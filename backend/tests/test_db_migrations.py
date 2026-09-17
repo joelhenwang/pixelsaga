@@ -23,6 +23,8 @@ from worldsim.infrastructure.db.verify import (
 from worldsim.infrastructure.settings import Settings
 
 SCRATCH_DB = "worldsim_migtest"
+
+
 def _head() -> str:
     """Current single script head; lanes advance it without re-pinning tests."""
     heads = script_heads(_config())

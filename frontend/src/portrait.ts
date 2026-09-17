@@ -1,10 +1,11 @@
-// Deterministic fixture portraits (Stage 2 image slice).
+// Portrait seam (Stage 3 image slice, generation in Stage 4).
 //
-// Draws a 16x16 pixel face from the character id hash using the
-// pixel-saga-v1 palette, served as an SVG data URI. Stable across
-// renders and clients with zero network. The provider gateway
-// (Stage 3) replaces `portraitFor` internals; callers keep passing
-// an asset id plus a display name.
+// Async cache-reading contract: `portraitFor` resolves an SVG data
+// URI for an asset id plus display name, cached per pair. Today the
+// cache is memory-only and the source is the deterministic fixture
+// below (seeded by id AND name); Stage 4 generation plugs into the
+// fetch step without touching callers. Stable across renders and
+// clients with zero network.
 import pack from "../../content/visual-styles/pixel-saga-v1.json";
 
 const GRID = 16;
@@ -33,9 +34,26 @@ function mulberry(seed: number): () => number {
   };
 }
 
-export function portraitFor(id: string): string {
+const portraitCache = new Map<string, string>();
+
+export function clearPortraitCache(): void {
+  portraitCache.clear();
+}
+
+export async function portraitFor(id: string, name?: string): Promise<string> {
+  const key = `${id}:${name ?? ""}`;
+  const cached = portraitCache.get(key);
+  if (cached !== undefined) {
+    return cached;
+  }
+  const uri = renderFixture(id, name ?? "");
+  portraitCache.set(key, uri);
+  return uri;
+}
+
+function renderFixture(id: string, name: string): string {
   const palette = pack.palette;
-  const rand = mulberry(fnv1a(id));
+  const rand = mulberry(fnv1a(`${id}:${name}`));
   const skin = pick(rand, palette.skin);
   const hair = pick(rand, palette.hair);
   const eyes = pick(rand, palette.eyes);

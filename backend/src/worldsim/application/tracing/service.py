@@ -32,6 +32,7 @@ from worldsim.application.ports.model_gateway import (
 )
 from worldsim.application.ports.traces import StoredCompletion, TraceExporter
 from worldsim.application.unit_of_work import UnitOfWork
+from worldsim.domain.costs import compute_cost
 from worldsim.domain.enums import CallStatus
 from worldsim.domain.tracing import ContextManifest, ManifestSource, ModelCall
 
@@ -209,8 +210,13 @@ class TraceService:
                 "latency_ms": latency_ms,
             }
         )
+        prompt_chars = len(request.prompt) + len(request.system or "")
+        cost = compute_cost(
+            call_id, result.model, result.prompt_tokens, result.completion_tokens, prompt_chars
+        )
         async with self._factory() as uow:
             await uow.traces.finish_call(call_id, stored)
+            await uow.costs.add(cost, spec.world_id)
             await uow.commit()
         export = await self._exporter.export(finished, manifest, stored)
         return TracedCall(

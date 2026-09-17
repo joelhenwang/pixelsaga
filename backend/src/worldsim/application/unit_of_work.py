@@ -9,6 +9,7 @@ from worldsim.application.ports.repositories import (
     ActivityRepository,
     CharacterRepository,
     CommandRepository,
+    CostRepository,
     DigestRepository,
     EventRepository,
     InventoryRepository,
@@ -59,6 +60,8 @@ class UnitOfWork(Protocol):
     def narrative(self) -> NarrativeRepository: ...
     @property
     def summaries(self) -> SummaryRepository: ...
+    @property
+    def costs(self) -> CostRepository: ...
     @property
     def digests(self) -> DigestRepository: ...
     @property
