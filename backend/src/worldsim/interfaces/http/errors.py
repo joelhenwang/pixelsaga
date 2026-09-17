@@ -22,6 +22,7 @@ from worldsim.interfaces.http.schemas import ErrorEnvelope
 
 _STATUS_BY_CODE: dict[ErrorCode, int] = {
     ErrorCode.NOT_FOUND: 404,
+    ErrorCode.UNAUTHORIZED: 401,
     ErrorCode.FORBIDDEN: 403,
     ErrorCode.VERSION_CONFLICT: 409,
     ErrorCode.IDEMPOTENCY_CONFLICT: 409,

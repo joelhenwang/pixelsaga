@@ -20,5 +20,31 @@ services:
       retries: 20
       start_period: 10s
 
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      WORLDSIM_APP__HOST: "0.0.0.0"
+      WORLDSIM_APP__PORT: "8000"
+      WORLDSIM_DATABASE__URL: "postgresql+asyncpg://worldsim:${POSTGRES_PASSWORD:-changeme-local-only}@db:5432/${POSTGRES_DB:-worldsim}"
+      WORLDSIM_SECURITY__PUBLIC_BIND_ALLOW: "${WORLDSIM_SECURITY__PUBLIC_BIND_ALLOW:-false}"
+      WORLDSIM_SECURITY__API_KEY: "${WORLDSIM_SECURITY__API_KEY:-}"
+    ports:
+      - "${API_PORT:-8100}:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/ready')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
 volumes:
   pgdata:

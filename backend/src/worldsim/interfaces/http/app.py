@@ -19,6 +19,7 @@ from worldsim.domain.errors import DomainError
 from worldsim.infrastructure.model_gateway.fake import FakeGateway
 from worldsim.infrastructure.ops.logging import install
 from worldsim.infrastructure.settings import Settings
+from worldsim.interfaces.http.auth import ApiKeyMiddleware
 from worldsim.interfaces.http.errors import (
     RequestIdMiddleware,
     domain_error_handler,
@@ -80,6 +81,8 @@ def create_app(
         lifespan=lifespan,
     )
     app.state.app_state = state
+    key = resolved.security.api_key
+    app.add_middleware(ApiKeyMiddleware, expected_key=key.get_secret_value() if key else None)
     app.add_middleware(RequestIdMiddleware)
     app.add_exception_handler(DomainError, domain_error_handler)
     app.add_exception_handler(Exception, unhandled_error_handler)

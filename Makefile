@@ -1,7 +1,7 @@
 # S0-BOOT-001 command surface. Real implementations arrive with their owning tasks.
 UV := uv --project backend
 
-.PHONY: sync test lint typecheck versions contracts migration-status seed stage-scenario api
+.PHONY: sync test lint typecheck versions contracts migration-status seed stage-scenario api backup restore-check
 
 sync: ## Install backend dependencies (S0-BOOT-001)
 	$(UV) sync --group dev
@@ -35,3 +35,15 @@ stage1-scenario: ## Run the Stage 1 three-phase scenario and evidence bundle (S1
 
 api: ## Serve the Stage 0 HTTP boundary on loopback (S0-API-001)
 	$(UV) run --group dev python -m worldsim.interfaces.cli serve
+
+backup: ## pg_dump the compose database to backups/ (S5-HARD-001)
+	mkdir -p backups
+	docker compose exec -T db pg_dump -U $${POSTGRES_USER:-worldsim} $${POSTGRES_DB:-worldsim} > backups/worldsim-$$(date +%Y%m%d-%H%M%S).sql
+
+restore-check: ## Restore BACKUP=dump.sql into a scratch DB and compare counts (S5-HARD-001)
+	test -n "$(BACKUP)" || (echo "usage: make restore-check BACKUP=backups/<file>.sql" && exit 1)
+	docker compose exec -T db psql -U $${POSTGRES_USER:-worldsim} -d postgres -c "DROP DATABASE IF EXISTS worldsim_verify;"
+	docker compose exec -T db psql -U $${POSTGRES_USER:-worldsim} -d postgres -c "CREATE DATABASE worldsim_verify;"
+	docker compose exec -T db psql -U $${POSTGRES_USER:-worldsim} -d worldsim_verify -q -f - < $(BACKUP)
+	docker compose exec -T db psql -U $${POSTGRES_USER:-worldsim} -d worldsim_verify -t -c "SELECT (SELECT count(*) FROM world_event), (SELECT count(*) FROM world), (SELECT version_num FROM alembic_version);"
+	docker compose exec -T db psql -U $${POSTGRES_USER:-worldsim} -d postgres -c "DROP DATABASE worldsim_verify;"

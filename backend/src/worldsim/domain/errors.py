@@ -16,6 +16,7 @@ class ErrorCode(StrEnum):
     VERSION_CONFLICT = "version_conflict"
     IDEMPOTENCY_CONFLICT = "idempotency_conflict"
     FORBIDDEN = "forbidden"
+    UNAUTHORIZED = "unauthorized"
     PRECONDITION_FAILED = "precondition_failed"
     UNSUPPORTED_ACTION = "unsupported_action"
     INVARIANT_VIOLATED = "invariant_violated"
