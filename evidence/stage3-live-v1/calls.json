@@ -2,136 +2,230 @@
   "calls": [
     {
       "role": "director",
+      "status": "succeeded",
       "profile": "openrouter",
       "prompt_tokens": 255,
-      "completion_tokens": 154,
+      "completion_tokens": 177,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
       "prompt_cost_usd": 0.000255,
-      "completion_cost_usd": 0.000462,
+      "completion_cost_usd": 0.000531,
       "estimated": true
     },
     {
       "role": "director",
+      "status": "succeeded",
       "profile": "openrouter",
       "prompt_tokens": 281,
-      "completion_tokens": 160,
+      "completion_tokens": 36,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
       "prompt_cost_usd": 0.00028100000000000005,
-      "completion_cost_usd": 0.00048,
+      "completion_cost_usd": 0.000108,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1735,
-      "completion_tokens": 73,
-      "model": "stealth/union-alpha",
-      "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.0017350000000000002,
-      "completion_cost_usd": 0.00021899999999999998,
-      "estimated": true
-    },
-    {
-      "role": "character_decision",
-      "profile": "openrouter",
-      "prompt_tokens": 1611,
+      "prompt_tokens": 2617,
       "completion_tokens": 512,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.001611,
+      "prompt_cost_usd": 0.002617,
       "completion_cost_usd": 0.001536,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1658,
-      "completion_tokens": 108,
+      "prompt_tokens": 2961,
+      "completion_tokens": 139,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.001658,
-      "completion_cost_usd": 0.000324,
+      "prompt_cost_usd": 0.002961,
+      "completion_cost_usd": 0.00041700000000000005,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1650,
-      "completion_tokens": 310,
+      "prompt_tokens": 2987,
+      "completion_tokens": 124,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.00165,
-      "completion_cost_usd": 0.00093,
+      "prompt_cost_usd": 0.002987,
+      "completion_cost_usd": 0.000372,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1705,
+      "prompt_tokens": 2642,
       "completion_tokens": 512,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.0017050000000000001,
+      "prompt_cost_usd": 0.002642,
       "completion_cost_usd": 0.001536,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1675,
-      "completion_tokens": 441,
+      "prompt_tokens": 2602,
+      "completion_tokens": 55,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.001675,
-      "completion_cost_usd": 0.001323,
+      "prompt_cost_usd": 0.0026019999999999997,
+      "completion_cost_usd": 0.000165,
+      "estimated": true
+    },
+    {
+      "role": "reaction",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 2538,
+      "completion_tokens": 256,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.002538,
+      "completion_cost_usd": 0.000768,
+      "estimated": true
+    },
+    {
+      "role": "reaction",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 2563,
+      "completion_tokens": 256,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.002563,
+      "completion_cost_usd": 0.000768,
+      "estimated": true
+    },
+    {
+      "role": "reaction",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 3000,
+      "completion_tokens": 116,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.003,
+      "completion_cost_usd": 0.000348,
+      "estimated": true
+    },
+    {
+      "role": "resolver",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 4040,
+      "completion_tokens": 212,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.00404,
+      "completion_cost_usd": 0.000636,
+      "estimated": true
+    },
+    {
+      "role": "resolver",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 4066,
+      "completion_tokens": 308,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.004066,
+      "completion_cost_usd": 0.000924,
+      "estimated": true
+    },
+    {
+      "role": "narrator",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 847,
+      "completion_tokens": 56,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.000847,
+      "completion_cost_usd": 0.00016800000000000002,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1751,
-      "completion_tokens": 110,
-      "model": "stealth/union-alpha",
-      "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.001751,
-      "completion_cost_usd": 0.00033,
-      "estimated": true
-    },
-    {
-      "role": "character_decision",
-      "profile": "openrouter",
-      "prompt_tokens": 1745,
+      "prompt_tokens": 2739,
       "completion_tokens": 512,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.0017450000000000002,
+      "prompt_cost_usd": 0.002739,
       "completion_cost_usd": 0.001536,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1711,
-      "completion_tokens": 71,
+      "prompt_tokens": 2693,
+      "completion_tokens": 86,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.001711,
-      "completion_cost_usd": 0.00021299999999999997,
+      "prompt_cost_usd": 0.002693,
+      "completion_cost_usd": 0.000258,
       "estimated": true
     },
     {
       "role": "character_decision",
+      "status": "succeeded",
       "profile": "openrouter",
-      "prompt_tokens": 1770,
-      "completion_tokens": 512,
+      "prompt_tokens": 3100,
+      "completion_tokens": 115,
       "model": "stealth/union-alpha",
       "pricing_version": "s3-prov-v1",
-      "prompt_cost_usd": 0.00177,
-      "completion_cost_usd": 0.001536,
+      "prompt_cost_usd": 0.0031000000000000003,
+      "completion_cost_usd": 0.00034500000000000004,
+      "estimated": true
+    },
+    {
+      "role": "character_decision",
+      "status": "succeeded",
+      "profile": "openrouter",
+      "prompt_tokens": 3187,
+      "completion_tokens": 359,
+      "model": "stealth/union-alpha",
+      "pricing_version": "s3-prov-v1",
+      "prompt_cost_usd": 0.0031869999999999997,
+      "completion_cost_usd": 0.001077,
       "estimated": true
     }
   ],
-  "total_cost_usd": 0.027972
+  "total_cost_usd": 0.05461099999999999,
+  "phases": [
+    {
+      "absolute_index": 1,
+      "beats": [
+        "attempt:wait: ? waits",
+        "attempt:wait: Wren waits"
+      ]
+    },
+    {
+      "absolute_index": 2,
+      "beats": [
+        "Wren tells Ash that the road north looks quiet today."
+      ]
+    },
+    {
+      "absolute_index": 3,
+      "beats": [
+        "attempt:wait: ? waits",
+        "attempt:wait: ? waits"
+      ]
+    }
+  ]
 }

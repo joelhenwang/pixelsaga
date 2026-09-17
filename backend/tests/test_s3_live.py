@@ -45,10 +45,28 @@ def test_three_phases_live(migrated_db: None) -> None:
     with TestClient(app) as raw:
         seeded = raw.post("/api/v1/world/seed", headers=headers)
         assert seeded.status_code == 200, seeded.text
+        wren_id = "10000000-0000-4000-8000-000000000101"
+        ash_id = "10000000-0000-4000-8000-000000000102"
+        zero = "00000000-0000-4000-8000-000000000000"
         for index in range(1, 4):
+            intents = {}
+            if index == 2:
+                intents = {
+                    wren_id: {
+                        "family": "communicate",
+                        "character_id": wren_id,
+                        "snapshot_id": zero,
+                        "target_character_id": ash_id,
+                        "topic": "the road north looks quiet today",
+                    }
+                }
             response = raw.post(
                 "/api/v1/stage1/advance",
-                json={"world_id": str(WORLD_ID), "absolute_index": index},
+                json={
+                    "world_id": str(WORLD_ID),
+                    "absolute_index": index,
+                    "player_intents": intents,
+                },
                 headers=headers,
             )
             assert response.status_code == 200, response.text
@@ -58,15 +76,33 @@ def test_three_phases_live(migrated_db: None) -> None:
         try:
             async with create_unit_of_work(engine) as uow:
                 calls: list[dict[str, object]] = []
+                phases: list[dict[str, object]] = []
                 for index in range(1, 4):
                     run = await uow.phases.get_run(derive_run_id(WORLD_ID, index))
                     assert run.state.value == "completed"
+                    beats: list[str] = []
+                    for scene in await uow.scenes.list_for_run(run.id):
+                        if scene.event_id is None:
+                            continue
+                        for beat in await uow.scenes.narrations_for_event(scene.event_id):
+                            beats.append(beat.text)
+                    phases.append({"absolute_index": index, "beats": beats})
                     for call in await uow.traces.list_for_phase_run(run.id):
+                        if call.status != "succeeded":
+                            calls.append(
+                                {
+                                    "role": call.role,
+                                    "status": call.status,
+                                    "error": call.error_code,
+                                }
+                            )
+                            continue
                         cost = await uow.costs.get_for_call(call.id)
                         assert cost is not None, f"call {call.id} has no cost row"
                         calls.append(
                             {
                                 "role": call.role,
+                                "status": call.status,
                                 "profile": call.profile_name,
                                 "prompt_tokens": call.prompt_tokens,
                                 "completion_tokens": call.completion_tokens,
@@ -78,7 +114,7 @@ def test_three_phases_live(migrated_db: None) -> None:
                             }
                         )
                 total = await uow.costs.total_for_world(WORLD_ID)
-                return {"calls": calls, "total_cost_usd": total}
+                return {"calls": calls, "total_cost_usd": total, "phases": phases}
         finally:
             await engine.dispose()
 

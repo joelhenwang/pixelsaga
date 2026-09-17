@@ -573,3 +573,17 @@ grant-selected role first (`effective_role`) with
 and activities; bound players act only as themselves; advance,
 begin, pause, and resume are grant-aware. Read endpoints keep
 header perspective (documented boundary, unchanged behavior).
+
+## Quality metrics (S3-QUAL-001)
+
+`application/quality/metrics.py` computes deterministic metrics
+from committed rows only: repetition (1 minus distinct over total
+word bigrams, n=2 fixed), diversity (distinct cited keys over
+scenes), fallback rate, quiet ratio, and Director creations per
+phase. No thresholds, no judges in CI. Baselines commit to
+`docs/stage3-quality-baseline-v1.json` (30-phase and 70-phase
+fake runs: repetition/diversity 0.5 on identical scripted beats,
+quiet 1.0, Director no-op 1.0). Narrative hooks and arcs carry
+`created_phase_index` (migration 0022) so creations attribute per
+phase. The live sample is judged under `docs/STAGE3_JUDGE.md`
+with the record in `docs/stage3-live-judgments-v1.json`.

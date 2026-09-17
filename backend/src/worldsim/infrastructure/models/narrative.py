@@ -26,6 +26,7 @@ class NarrativeHookRow(Base):
     participant_ids: Mapped[str] = mapped_column(String(1024), default="")
     status: Mapped[str] = mapped_column(String(16), default="proposed")
     version: Mapped[int] = mapped_column(Integer, default=0)
+    created_phase_index: Mapped[int] = mapped_column(Integer, default=0)
 
     __table_args__ = (CheckConstraint("version >= 0", name="ck_hook_version"),)
 
@@ -43,5 +44,6 @@ class NarrativeArcRow(Base):
     purpose: Mapped[str] = mapped_column(String(1024), default="")
     status: Mapped[str] = mapped_column(String(16), default="proposed")
     version: Mapped[int] = mapped_column(Integer, default=0)
+    created_phase_index: Mapped[int] = mapped_column(Integer, default=0)
 
     __table_args__ = (CheckConstraint("version >= 0", name="ck_arc_version"),)

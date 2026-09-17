@@ -22,9 +22,13 @@ async def accept_decision(
     await uow.worlds.put_config(world_id, "director.last_absolute", last_absolute)
     if decision.accepted:
         if decision.hook is not None:
-            await uow.narrative.add_hook(decision.hook)
+            await uow.narrative.add_hook(
+                decision.hook.model_copy(update={"created_phase_index": last_absolute})
+            )
         if decision.arc is not None:
-            await uow.narrative.add_arc(decision.arc)
+            await uow.narrative.add_arc(
+                decision.arc.model_copy(update={"created_phase_index": last_absolute})
+            )
         payload: dict[str, object] = {
             "hook_id": str(decision.hook.id) if decision.hook else None,
             "arc_id": str(decision.arc.id) if decision.arc else None,

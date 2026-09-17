@@ -54,6 +54,7 @@ class SqlAlchemyNarrativeRepository:
             purpose=row.purpose,
             status=NarrativeStatus(row.status),
             version=row.version,
+            created_phase_index=row.created_phase_index,
         )
 
     async def add_hook(self, hook: NarrativeHook) -> None:
@@ -67,6 +68,7 @@ class SqlAlchemyNarrativeRepository:
                 participant_ids=_ids_to_row(hook.participant_ids),
                 status=hook.status.value,
                 version=hook.version,
+                created_phase_index=hook.created_phase_index,
             )
         )
         await self._session.flush()
@@ -80,6 +82,7 @@ class SqlAlchemyNarrativeRepository:
                 purpose=arc.purpose,
                 status=arc.status.value,
                 version=arc.version,
+                created_phase_index=arc.created_phase_index,
             )
         )
         await self._session.flush()

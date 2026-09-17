@@ -26,6 +26,7 @@ class NarrativeHook(BaseModel):
     participant_ids: list[CharacterId] = Field(default_factory=list)
     status: NarrativeStatus = NarrativeStatus.PROPOSED
     version: int = Field(default=0, ge=0)
+    created_phase_index: int = Field(default=0, ge=0)
 
 
 class NarrativeArc(BaseModel):
@@ -39,3 +40,4 @@ class NarrativeArc(BaseModel):
     purpose: str = Field(default="", max_length=1024)
     status: NarrativeStatus = NarrativeStatus.PROPOSED
     version: int = Field(default=0, ge=0)
+    created_phase_index: int = Field(default=0, ge=0)

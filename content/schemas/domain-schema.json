@@ -2194,6 +2194,12 @@
           "additionalProperties": false,
           "description": "One longer purpose spanning several phases.",
           "properties": {
+            "created_phase_index": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Created Phase Index",
+              "type": "integer"
+            },
             "id": {
               "format": "uuid",
               "title": "Id",
@@ -2239,6 +2245,12 @@
           "additionalProperties": false,
           "description": "One situational opening with explicit requested powers.",
           "properties": {
+            "created_phase_index": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Created Phase Index",
+              "type": "integer"
+            },
             "id": {
               "format": "uuid",
               "title": "Id",
@@ -3733,6 +3745,12 @@
       "additionalProperties": false,
       "description": "One longer purpose spanning several phases.",
       "properties": {
+        "created_phase_index": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Created Phase Index",
+          "type": "integer"
+        },
         "id": {
           "format": "uuid",
           "title": "Id",
@@ -3789,6 +3807,12 @@
       "additionalProperties": false,
       "description": "One situational opening with explicit requested powers.",
       "properties": {
+        "created_phase_index": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Created Phase Index",
+          "type": "integer"
+        },
         "id": {
           "format": "uuid",
           "title": "Id",

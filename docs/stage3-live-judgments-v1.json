@@ -1,0 +1,27 @@
+{
+  "sample": "stage3-live-v1",
+  "protocol": "docs/STAGE3_JUDGE.md",
+  "phases": [
+    {
+      "absolute_index": 1,
+      "verdict": "pass",
+      "note": "Structural fallback beats only; nothing to cohere or leak."
+    },
+    {
+      "absolute_index": 2,
+      "verdict": "pass",
+      "evidence": "Wren tells Ash that the road north looks quiet today.",
+      "continuity": "Matches the player topic; no prior beats to contradict.",
+      "perspective": "Hearth scene narrates Wren speaking; no private facts revealed. Cross-location audibility is a scene-assembly question, not a leak.",
+      "tropes": "One plain sentence; no filler skeletons."
+    },
+    {
+      "absolute_index": 3,
+      "verdict": "pass",
+      "note": "Structural fallback beats only; nothing to cohere or leak."
+    }
+  ],
+  "overall": "pass",
+  "signed_by": "agent (model-assisted draft)",
+  "countersign": "pending Joel review"
+}
