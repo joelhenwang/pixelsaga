@@ -44,6 +44,7 @@ class SqlAlchemyNarrativeRepository:
             participant_ids=_ids_to_domain(row.participant_ids),
             status=NarrativeStatus(row.status),
             version=row.version,
+            created_phase_index=row.created_phase_index,
         )
 
     def _to_arc(self, row: NarrativeArcRow) -> NarrativeArc:

@@ -215,8 +215,11 @@ budgets as the world ages.
    Director step): deterministic midnight trigger,
    code-scored candidates, digest text proposed by the
    summarizer role through the existing proposal/citation
-   validation. Counts as extra model calls — budget and cost
-   them in S3-PROV's accounting.
+   validation. At most one digest per owner per day and eight
+   total per owner (both world-config): uncapped promotion
+   re-fills the budgets it was built to protect. Counts as
+   extra model calls — budget and cost them in S3-PROV's
+   accounting.
 3. Source immutability: add a content hash and an append-only
    constraint (or documented equivalent) to perception rows so
    "every digest source ID resolves to an unmodified row" is

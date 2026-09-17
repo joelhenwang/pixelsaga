@@ -223,7 +223,10 @@ def test_same_session_counts_once(migrated_db: None) -> None:
                 )
 
             await _commit("train:one", 0)
-            await _commit("train:two", 1)
+            # No state changed, so the observed version is still 0; the
+            # store only advances for persisted rows (compare-all,
+            # bump-saved).
+            await _commit("train:two", 0)
             async with create_unit_of_work(engine) as uow:
                 skill = await uow.progress.get_skill(ids["world"], ids["wren"], "swords")
                 assert skill is not None

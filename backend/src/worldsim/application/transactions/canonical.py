@@ -165,7 +165,7 @@ class CanonicalTransaction:
                 return await self._race_retry(request, exc)
             self._fire("after_command")
             expected = {UUID(key): value for key, value in request.expected_versions.items()}
-            versions = await uow.versions.compare_and_bump(expected)
+            await uow.versions.check(expected)
             sequence = await uow.events.max_sequence(request.world_id) + 1
             event_id = uuid4()
             await uow.events.append_event(
@@ -188,8 +188,11 @@ class CanonicalTransaction:
             if request.scene_records is not None:
                 await self._persist_scene(uow, request, event_id)
                 self._fire("after_scene")
-            await self._project(uow, request)
+            saved = await self._project(uow, request)
             self._fire("after_projections")
+            versions = await uow.versions.compare_and_bump(
+                {aggregate_id: expected[aggregate_id] for aggregate_id in saved}
+            )
             observation_ids = await self._perceive(uow, request, event_id)
             self._fire("after_perception")
             outbox_ids = await self._enqueue(uow, request, event_id)
@@ -271,7 +274,7 @@ class CanonicalTransaction:
         if records.resolution is not None:
             await uow.scenes.save_resolution(records.resolution)
 
-    async def _project(self, uow: UnitOfWork, request: CommitRequest) -> None:
+    async def _project(self, uow: UnitOfWork, request: CommitRequest) -> set[UUID]:
         # Fold every effect per aggregate, then save once: the version
         # table bumps once per commit, so rows must too. Saving per
         # effect goes stale on the second touch of one aggregate.
@@ -318,6 +321,10 @@ class CanonicalTransaction:
             await uow.worlds.set_clock(target, world.day, world.phase.value, last.to_index)
         for target, character in characters.items():
             await uow.characters.save_state(character, request.expected_versions[str(target)])
+        # Only persisted rows advance the store: read-validated touches
+        # (communicate targets, spar partners) must not drift it ahead
+        # of their rows, or the next touch 409s against stale state.
+        return set(worlds) | set(characters)
 
     async def _progress_skill(
         self, uow: UnitOfWork, request: CommitRequest, effect: SkillProgressEffect

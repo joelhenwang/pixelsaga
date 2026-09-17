@@ -499,7 +499,8 @@ the full history.
 
 At each midnight commit the orchestrator promotes qualifying old
 rows (salience >= 2.0, age >= 10 phases, not already digested, at
-most one digest per owner per day) into `long_term_memory`
+most one digest per owner per day and eight total per owner, both
+configurable) into `long_term_memory`
 (migration 0020) through the summary graph with the `digest.v1`
 prompt and existing citation validation. Digests re-enter assembly
 as memory candidates with a fixed 2.5 score and render in the diary
@@ -564,7 +565,10 @@ from live rows — keeping envelopes determined.
 Settlement runs only on successful resolutions, after narration,
 with a `settle:<intent>` gate command in the same transaction:
 replays collide on the gate and skip, so crashes cannot
-double-apply. The SceneView action bar offers all three verbs
+double-apply. Canonical commits check every touched aggregate
+but bump the version store only for rows actually persisted, so
+read-validated touches (communicate targets, spar partners)
+never drift the store ahead of their rows. The SceneView action bar offers all three verbs
 and `verify.mjs` files an appeal end to end.
 
 Roles prerequisite, same lane: every mutating route resolves the

@@ -38,6 +38,8 @@ PROMOTION_MIN_AGE_KEY = "memory.promotion.min_age_phases"
 DEFAULT_PROMOTION_MIN_AGE = 10
 PROMOTION_MAX_PER_DAY_KEY = "memory.promotion.max_per_day"
 DEFAULT_PROMOTION_MAX_PER_DAY = 1
+PROMOTION_MAX_TOTAL_KEY = "memory.promotion.max_digests_per_owner"
+DEFAULT_PROMOTION_MAX_TOTAL = 8
 
 #: Fixed assembly score for digests: above memories, below identity.
 DIGEST_SCORE = 2.5

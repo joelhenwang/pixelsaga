@@ -62,3 +62,32 @@ class SqlAlchemyVersionStore:
             updated[aggregate_id] = locked[aggregate_id].version
         await self._session.flush()
         return updated
+
+    async def check(self, expected: dict[UUID, int]) -> None:
+        """Fail on stale aggregates without advancing versions.
+
+        Reads validated without writes (communicate targets, spar
+        partners) must not drift the store ahead of their rows.
+        """
+        ordered = canonical_order(list(expected))
+        rows = (
+            await self._session.execute(
+                select(AggregateVersionRow)
+                .where(AggregateVersionRow.aggregate_id.in_(ordered))
+                .order_by(AggregateVersionRow.aggregate_id)
+                .with_for_update()
+            )
+        ).scalars()
+        locked = {row.aggregate_id: row for row in rows}
+        for aggregate_id in ordered:
+            if aggregate_id not in locked:
+                raise DomainError(
+                    ErrorCode.PRECONDITION_FAILED,
+                    f"aggregate not registered: {aggregate_id}",
+                )
+            if locked[aggregate_id].version != expected[aggregate_id]:
+                raise DomainError(
+                    ErrorCode.VERSION_CONFLICT,
+                    f"stale aggregate {aggregate_id}: "
+                    f"expected={expected[aggregate_id]} actual={locked[aggregate_id].version}",
+                )

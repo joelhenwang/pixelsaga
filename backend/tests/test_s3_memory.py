@@ -248,6 +248,37 @@ def test_digest_reenters_assembly_with_fixed_score(
     assert reasons.get("permitted"), reasons
 
 
+def test_promotion_total_cap_bounds_digests(
+    mem: tuple[ApiClient, FakeGateway],
+) -> None:
+    client, gateway = mem
+    gateway.route = _route_for(probe_on_first=True)
+    headers = {"X-Worldsim-Role": "watcher"}
+    client.post("/api/v1/world/seed", headers=headers)
+
+    async def _cap() -> None:
+        engine = create_engine(Settings())
+        try:
+            async with create_unit_of_work(engine) as uow:
+                await uow.worlds.put_config(WORLD_ID, "memory.promotion.max_digests_per_owner", 1)
+                await uow.commit()
+        finally:
+            await engine.dispose()
+
+    asyncio.run(_cap())
+    _advance(client, headers, 1, 35)
+
+    async def _audit() -> int:
+        engine = create_engine(Settings())
+        try:
+            async with create_unit_of_work(engine) as uow:
+                return len(await uow.digests.list_for_owner(WORLD_ID, WREN_ID))
+        finally:
+            await engine.dispose()
+
+    assert asyncio.run(_audit()) == 1
+
+
 def test_promotion_off_flag_disables_digests(
     mem: tuple[ApiClient, FakeGateway],
 ) -> None:

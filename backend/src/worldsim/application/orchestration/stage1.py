@@ -148,6 +148,7 @@ from worldsim.domain.memory import (
     DEFAULT_CITE_BUMP,
     DEFAULT_HALF_LIFE_PHASES,
     DEFAULT_PROMOTION_MAX_PER_DAY,
+    DEFAULT_PROMOTION_MAX_TOTAL,
     DEFAULT_PROMOTION_MIN_AGE,
     DEFAULT_PROMOTION_THRESHOLD,
     DEFAULT_RECENT_PHASES,
@@ -157,6 +158,7 @@ from worldsim.domain.memory import (
     MAX_SALIENCE,
     PROMOTION_ENABLED_KEY,
     PROMOTION_MAX_PER_DAY_KEY,
+    PROMOTION_MAX_TOTAL_KEY,
     PROMOTION_MIN_AGE_KEY,
     PROMOTION_THRESHOLD_KEY,
     RECENT_PHASES_KEY,
@@ -277,23 +279,29 @@ def _config_int(config: dict[str, object], key: str, default: int) -> int:
     return int(raw) if isinstance(raw, int) else default
 
 
-def _summarize(action: ActionIntent, names: Mapping[UUID, str]) -> str:
+def _summarize(
+    action: ActionIntent, names: Mapping[UUID, str], author_id: UUID | None = None
+) -> str:
+    """One-line attempt text; falls back to the author when the model
+    returns a mismatched character_id (tolerated since S2, never fatal)."""
+    fallback = names.get(author_id, "?") if author_id is not None else "?"
+    who = names.get(action.character_id, fallback)
     if isinstance(action, MoveAction):
-        return f"{names.get(action.character_id, '?')} moves"
+        return f"{who} moves"
     if isinstance(action, CommunicateAction):
         target = names.get(action.target_character_id, "?")
-        return f"{names.get(action.character_id, '?')} says to {target}: {action.topic}"
+        return f"{who} says to {target}: {action.topic}"
     if isinstance(action, SparAction):
         target = names.get(action.target_character_id, "?")
         weapon = f" with {action.weapon}" if action.weapon else ""
-        return f"{names.get(action.character_id, '?')} spars with {target}{weapon}"
+        return f"{who} spars with {target}{weapon}"
     if isinstance(action, AppealAction):
-        return f"{names.get(action.character_id, '?')} appeals: {action.proposition}"
+        return f"{who} appeals: {action.proposition}"
     if isinstance(action, TransferAction):
         target = names.get(action.target_character_id, "?")
-        return f"{names.get(action.character_id, '?')} gives {target} an item"
+        return f"{who} gives {target} an item"
     family = action.family.value
-    return f"{names.get(action.character_id, '?')} {family}s"
+    return f"{who} {family}s"
 
 
 class Stage1Orchestrator:
@@ -929,9 +937,13 @@ class Stage1Orchestrator:
         threshold = _config_float(config, PROMOTION_THRESHOLD_KEY, DEFAULT_PROMOTION_THRESHOLD)
         min_age = _config_int(config, PROMOTION_MIN_AGE_KEY, DEFAULT_PROMOTION_MIN_AGE)
         max_per_day = _config_int(config, PROMOTION_MAX_PER_DAY_KEY, DEFAULT_PROMOTION_MAX_PER_DAY)
+        max_total = _config_int(config, PROMOTION_MAX_TOTAL_KEY, DEFAULT_PROMOTION_MAX_TOTAL)
         async with self._factory() as uow:
             taken = await uow.digests.count_versions(world_id, character.id, day)
             if taken >= max_per_day:
+                return False
+            owned = await uow.digests.list_for_owner(world_id, character.id)
+            if len(owned) >= max_total:
                 return False
             digested = {
                 str(source)
@@ -1454,7 +1466,7 @@ class Stage1Orchestrator:
                 intent_id=i.id,
                 scene_id=scene.id,
                 actor_character_id=i.author_character_id,
-                observable_summary=_summarize(i.action, names),
+                observable_summary=_summarize(i.action, names, i.author_character_id),
             )
             for i in sorted(members, key=lambda x: str(x.id))
         ]
@@ -1819,7 +1831,7 @@ class Stage1Orchestrator:
             facts = [
                 PerceivedFact(
                     key=f"attempt:{intent.action.family.value}",
-                    value=_summarize(intent.action, names),
+                    value=_summarize(intent.action, names, intent.author_character_id),
                     visibility=FactVisibility.SCENE,
                     channel=FactChannel.SIGHT,
                 )
@@ -1861,7 +1873,7 @@ class Stage1Orchestrator:
             )
             own_summary = next(
                 (
-                    _summarize(i.action, names)
+                    _summarize(i.action, names, i.author_character_id)
                     for i in members
                     if i.author_character_id == participant
                 ),

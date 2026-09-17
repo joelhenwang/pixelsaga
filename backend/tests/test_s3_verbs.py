@@ -299,6 +299,68 @@ def test_spar_bout_persists_and_replays_clean(
     assert _audit_spar() == findings
 
 
+def test_summarize_falls_back_to_author_on_mismatch() -> None:
+    from uuid import uuid4
+
+    from worldsim.application.orchestration.stage1 import _summarize
+    from worldsim.domain.commands import WaitAction
+
+    wren, ash = uuid4(), uuid4()
+    names = {wren: "Wren", ash: "Ash"}
+    assert _summarize(WaitAction(character_id=wren, snapshot_id=uuid4()), names) == "Wren waits"
+    assert (
+        _summarize(WaitAction(character_id=uuid4(), snapshot_id=uuid4()), names, wren)
+        == "Wren waits"
+    )
+
+
+def test_touch_without_save_never_desyncs(verbs: tuple[ApiClient, FakeGateway]) -> None:
+    """Communicate touches aggregates without state saves; a later
+    touching commit must not 409. Regression for the version-store
+    drift that compare-and-bump-everything introduced."""
+    client, gateway = verbs
+    gateway.route = _route_for()
+    headers = {"X-Worldsim-Role": "watcher"}
+    _setup_world(client, headers, {})
+    for index, family in (
+        (
+            1,
+            {
+                "family": "communicate",
+                "character_id": str(WREN_ID),
+                "snapshot_id": PLACEHOLDER_SNAPSHOT,
+                "target_character_id": str(ASH_ID),
+                "topic": "probe",
+            },
+        ),
+        (
+            2,
+            {
+                "family": "appeal",
+                "character_id": str(WREN_ID),
+                "snapshot_id": PLACEHOLDER_SNAPSHOT,
+                "proposition": "the mill stands",
+            },
+        ),
+    ):
+        response = client.post(
+            "/api/v1/stage1/advance",
+            json={
+                "world_id": str(WORLD_ID),
+                "absolute_index": index,
+                "player_intents": {str(WREN_ID): family},
+            },
+            headers=headers,
+        )
+        assert response.status_code == 200, response.text
+    beliefs = client.get(
+        "/api/v1/stage2/beliefs",
+        params={"world_id": str(WORLD_ID), "holder_id": str(WREN_ID)},
+        headers=headers,
+    )
+    assert any(b["proposition"] == "the mill stands" for b in beliefs.json()["members"])
+
+
 def test_appeal_files_positional_claim(verbs: tuple[ApiClient, FakeGateway]) -> None:
     client, gateway = verbs
     gateway.route = _route_for()

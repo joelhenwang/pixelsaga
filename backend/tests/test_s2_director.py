@@ -296,6 +296,7 @@ def test_director_phase_accepts_and_records(migrated_db: None) -> None:
             async with create_unit_of_work(engine) as uow:
                 hooks = await uow.narrative.list_hooks_for_world(ids["world"])
                 assert [h.title for h in hooks] == ["A peddler arrives"]
+                assert hooks[0].created_phase_index == 4
                 config = await uow.worlds.get_config(ids["world"])
                 assert config.get("director.last_absolute") == 4
                 run = await uow.phases.get_run(ids["run"])
