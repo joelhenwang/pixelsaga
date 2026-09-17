@@ -116,6 +116,16 @@ class SqlAlchemyLineageRepository:
             row.succession_eligible = record.succession_eligible
         await self._session.flush()
 
+    async def list_records(self, world_id: UUID) -> list[LineageCharacter]:
+        rows = (
+            await self._session.execute(
+                select(LineageCharacterRow)
+                .where(LineageCharacterRow.world_id == world_id)
+                .order_by(LineageCharacterRow.birth_absolute)
+            )
+        ).scalars()
+        return [self._to_record(row) for row in rows]
+
     async def add_focus(self, assignment: FocusAssignment) -> None:
         self._session.add(
             FocusAssignmentRow(

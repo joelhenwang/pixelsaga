@@ -31,7 +31,7 @@ const tabs = [
   { to: "/map", label: "map" },
   { to: "/diary", label: "diary" },
   { to: "/relations", label: "relations" },
-  { to: "/ops", label: "ops" },
+  { to: "/generations", label: "generations" },
 ];
 
 onMounted(() => {

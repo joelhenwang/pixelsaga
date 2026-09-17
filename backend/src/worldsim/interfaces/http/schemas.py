@@ -675,3 +675,143 @@ class PartyRosterResponse(BaseModel):
 
     world_id: UUID
     members: list[PartyMemberView] = Field(default_factory=list)
+
+
+class MacroEffectView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: str
+    detail: str
+    event_id: UUID | None = None
+
+
+class MacroInterruptionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    at_absolute: int
+    reason: str
+    detail: str
+
+
+class MacroRunView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    run_id: UUID
+    start_absolute: int
+    end_absolute: int
+    resolution: str
+    state: str
+    effects: list[MacroEffectView] = Field(default_factory=list)
+    interruptions: list[MacroInterruptionView] = Field(default_factory=list)
+
+
+class MacroRunsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    runs: list[MacroRunView] = Field(default_factory=list)
+
+
+class LineageLinkView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    parent_id: UUID
+    parent_name: str
+    child_id: UUID
+    child_name: str
+    birth_absolute: int
+
+
+class LineageRecordView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    character_id: UUID
+    name: str
+    birth_absolute: int
+    death_absolute: int | None = None
+    life_status: str
+    succession_eligible: bool
+
+
+class LineageResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    links: list[LineageLinkView] = Field(default_factory=list)
+    records: list[LineageRecordView] = Field(default_factory=list)
+
+
+class FocusAssignmentView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    slot: str
+    version: int
+    from_character_id: UUID | None = None
+    from_name: str | None = None
+    to_character_id: UUID
+    to_name: str
+    effective_absolute: int
+    reason: str
+
+
+class FocusResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    assignments: list[FocusAssignmentView] = Field(default_factory=list)
+
+
+class EraView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    era_id: UUID
+    owner_id: UUID
+    start_absolute: int
+    end_absolute: int
+    text: str
+    source_ids: list[str] = Field(default_factory=list)
+    version: int
+
+
+class ErasResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    eras: list[EraView] = Field(default_factory=list)
+
+
+class EndingView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: str
+    satisfied: bool
+    evaluated_absolute: int
+    window_start_absolute: int
+    evidence_event_ids: list[str] = Field(default_factory=list)
+    detail: str
+
+
+class EndingsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    endings: list[EndingView] = Field(default_factory=list)
+
+
+class MacroAdvanceRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    day: int = Field(ge=1)
+    resolution: str = Field(min_length=1, max_length=16)
+
+
+class MacroAdvanceResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    run_id: UUID
+    state: str
+    start_absolute: int
+    end_absolute: int
+    event_ids: list[UUID] = Field(default_factory=list)
+    duplicate: bool

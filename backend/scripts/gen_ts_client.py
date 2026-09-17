@@ -71,6 +71,21 @@ WANTED = (
     "ArcView",
     "HookListResponse",
     "OperationsStatus",
+    "MacroEffectView",
+    "MacroInterruptionView",
+    "MacroRunView",
+    "MacroRunsResponse",
+    "LineageLinkView",
+    "LineageRecordView",
+    "LineageResponse",
+    "FocusAssignmentView",
+    "FocusResponse",
+    "EraView",
+    "ErasResponse",
+    "EndingView",
+    "EndingsResponse",
+    "MacroAdvanceRequest",
+    "MacroAdvanceResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -111,6 +126,12 @@ ROUTES = (
     ("get", "/api/v1/stage2/director/hooks", "listDirectorHooks"),
     ("get", "/api/v1/stage2/operations/status", "readOperationsStatus"),
     ("get", "/api/v1/world/events", "listEvents"),
+    ("get", "/api/v1/macro/runs", "listMacroRuns"),
+    ("get", "/api/v1/macro/lineage", "readLineage"),
+    ("get", "/api/v1/macro/focus", "listFocus"),
+    ("get", "/api/v1/macro/eras", "listEras"),
+    ("get", "/api/v1/macro/endings", "listEndings"),
+    ("post", "/api/v1/macro/advance", "advanceMacro"),
 )
 
 

@@ -4,7 +4,13 @@ import type {
   CharacterDetail,
   CharacterSummary,
   DiaryResponse,
+  EndingsResponse,
+  ErasResponse,
+  FocusResponse,
   HookListResponse,
+  LineageResponse,
+  MacroAdvanceResponse,
+  MacroRunsResponse,
   MapResponse,
   OperationsStatus,
   PartyBeginRequest,
@@ -110,14 +116,11 @@ export const api = {
       headers,
     );
   },
-  events(after: number, limit: number, headers: Record<string, string>): Promise<{ entries: { sequence: number }[]; next_after: number }> {
-    return request(`/api/v1/world/events?after=${after}&limit=${limit}`, {}, headers);
+  timeline(worldId: string, headers: Record<string, string>, after = 0, limit = 20): Promise<TimelineResponse> {
+    return request<TimelineResponse>(`/api/v1/stage2/timeline?world_id=${worldId}&after=${after}&limit=${limit}`, {}, headers);
   },
   world(headers: Record<string, string>): Promise<{ id: string; day: number; phase: string }> {
     return request("/api/v1/world", {}, headers);
-  },
-  timeline(worldId: string, headers: Record<string, string>): Promise<TimelineResponse> {
-    return request<TimelineResponse>(`/api/v1/stage2/timeline?world_id=${worldId}`, {}, headers);
   },
   map(worldId: string, headers: Record<string, string>): Promise<MapResponse> {
     return request<MapResponse>(`/api/v1/stage2/map?world_id=${worldId}`, {}, headers);
@@ -149,6 +152,39 @@ export const api = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
+      },
+      headers,
+    );
+  },
+  macroRuns(worldId: string, headers: Record<string, string>): Promise<MacroRunsResponse> {
+    return request<MacroRunsResponse>(`/api/v1/macro/runs?world_id=${worldId}`, {}, headers);
+  },
+  lineage(worldId: string, headers: Record<string, string>): Promise<LineageResponse> {
+    return request<LineageResponse>(`/api/v1/macro/lineage?world_id=${worldId}`, {}, headers);
+  },
+  focus(worldId: string, headers: Record<string, string>): Promise<FocusResponse> {
+    return request<FocusResponse>(`/api/v1/macro/focus?world_id=${worldId}`, {}, headers);
+  },
+  eras(worldId: string, start: number, end: number, headers: Record<string, string>): Promise<ErasResponse> {
+    return request<ErasResponse>(
+      `/api/v1/macro/eras?world_id=${worldId}&start_absolute=${start}&end_absolute=${end}`, {}, headers,
+    );
+  },
+  endings(worldId: string, headers: Record<string, string>): Promise<EndingsResponse> {
+    return request<EndingsResponse>(`/api/v1/macro/endings?world_id=${worldId}`, {}, headers);
+  },
+  advanceMacro(
+    worldId: string,
+    day: number,
+    resolution: string,
+    headers: Record<string, string>,
+  ): Promise<MacroAdvanceResponse> {
+    return request<MacroAdvanceResponse>(
+      "/api/v1/macro/advance",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ world_id: worldId, day, resolution }),
       },
       headers,
     );

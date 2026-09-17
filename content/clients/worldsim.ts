@@ -396,6 +396,116 @@ export interface OperationsStatus {
   world_id: string;
 }
 
+export interface MacroEffectView {
+  detail: string;
+  event_id?: string | null;
+  kind: string;
+}
+
+export interface MacroInterruptionView {
+  at_absolute: number;
+  detail: string;
+  reason: string;
+}
+
+export interface MacroRunView {
+  effects?: MacroEffectView[] | null;
+  end_absolute: number;
+  interruptions?: MacroInterruptionView[] | null;
+  resolution: string;
+  run_id: string;
+  start_absolute: number;
+  state: string;
+}
+
+export interface MacroRunsResponse {
+  runs?: MacroRunView[] | null;
+  world_id: string;
+}
+
+export interface LineageLinkView {
+  birth_absolute: number;
+  child_id: string;
+  child_name: string;
+  parent_id: string;
+  parent_name: string;
+}
+
+export interface LineageRecordView {
+  birth_absolute: number;
+  character_id: string;
+  death_absolute?: number | null;
+  life_status: string;
+  name: string;
+  succession_eligible: boolean;
+}
+
+export interface LineageResponse {
+  links?: LineageLinkView[] | null;
+  records?: LineageRecordView[] | null;
+  world_id: string;
+}
+
+export interface FocusAssignmentView {
+  effective_absolute: number;
+  from_character_id?: string | null;
+  from_name?: string | null;
+  reason: string;
+  slot: string;
+  to_character_id: string;
+  to_name: string;
+  version: number;
+}
+
+export interface FocusResponse {
+  assignments?: FocusAssignmentView[] | null;
+  world_id: string;
+}
+
+export interface EraView {
+  end_absolute: number;
+  era_id: string;
+  owner_id: string;
+  source_ids?: string[] | null;
+  start_absolute: number;
+  text: string;
+  version: number;
+}
+
+export interface ErasResponse {
+  eras?: EraView[] | null;
+  world_id: string;
+}
+
+export interface EndingView {
+  detail: string;
+  evaluated_absolute: number;
+  evidence_event_ids?: string[] | null;
+  kind: string;
+  satisfied: boolean;
+  window_start_absolute: number;
+}
+
+export interface EndingsResponse {
+  endings?: EndingView[] | null;
+  world_id: string;
+}
+
+export interface MacroAdvanceRequest {
+  day: number;
+  resolution: string;
+  world_id: string;
+}
+
+export interface MacroAdvanceResponse {
+  duplicate: boolean;
+  end_absolute: number;
+  event_ids?: string[] | null;
+  run_id: string;
+  start_absolute: number;
+  state: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -442,4 +552,10 @@ export const ROUTES = {
   listDirectorHooks: "GET /api/v1/stage2/director/hooks",
   readOperationsStatus: "GET /api/v1/stage2/operations/status",
   listEvents: "GET /api/v1/world/events",
+  listMacroRuns: "GET /api/v1/macro/runs",
+  readLineage: "GET /api/v1/macro/lineage",
+  listFocus: "GET /api/v1/macro/focus",
+  listEras: "GET /api/v1/macro/eras",
+  listEndings: "GET /api/v1/macro/endings",
+  advanceMacro: "POST /api/v1/macro/advance",
 } as const;

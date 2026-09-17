@@ -998,6 +998,139 @@
         "title": "DirectorProposalView",
         "type": "object"
       },
+      "EndingView": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "evaluated_absolute": {
+            "title": "Evaluated Absolute",
+            "type": "integer"
+          },
+          "evidence_event_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Event Ids",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "satisfied": {
+            "title": "Satisfied",
+            "type": "boolean"
+          },
+          "window_start_absolute": {
+            "title": "Window Start Absolute",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "satisfied",
+          "evaluated_absolute",
+          "window_start_absolute",
+          "detail"
+        ],
+        "title": "EndingView",
+        "type": "object"
+      },
+      "EndingsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "endings": {
+            "items": {
+              "$ref": "#/components/schemas/EndingView"
+            },
+            "title": "Endings",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "EndingsResponse",
+        "type": "object"
+      },
+      "EraView": {
+        "additionalProperties": false,
+        "properties": {
+          "end_absolute": {
+            "title": "End Absolute",
+            "type": "integer"
+          },
+          "era_id": {
+            "format": "uuid",
+            "title": "Era Id",
+            "type": "string"
+          },
+          "owner_id": {
+            "format": "uuid",
+            "title": "Owner Id",
+            "type": "string"
+          },
+          "source_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Ids",
+            "type": "array"
+          },
+          "start_absolute": {
+            "title": "Start Absolute",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "era_id",
+          "owner_id",
+          "start_absolute",
+          "end_absolute",
+          "text",
+          "version"
+        ],
+        "title": "EraView",
+        "type": "object"
+      },
+      "ErasResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "eras": {
+            "items": {
+              "$ref": "#/components/schemas/EraView"
+            },
+            "title": "Eras",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "ErasResponse",
+        "type": "object"
+      },
       "EventEntry": {
         "additionalProperties": false,
         "properties": {
@@ -1059,6 +1192,91 @@
           "next_after"
         ],
         "title": "EventsResponse",
+        "type": "object"
+      },
+      "FocusAssignmentView": {
+        "additionalProperties": false,
+        "properties": {
+          "effective_absolute": {
+            "title": "Effective Absolute",
+            "type": "integer"
+          },
+          "from_character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Character Id"
+          },
+          "from_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Name"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "slot": {
+            "title": "Slot",
+            "type": "string"
+          },
+          "to_character_id": {
+            "format": "uuid",
+            "title": "To Character Id",
+            "type": "string"
+          },
+          "to_name": {
+            "title": "To Name",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "slot",
+          "version",
+          "to_character_id",
+          "to_name",
+          "effective_absolute",
+          "reason"
+        ],
+        "title": "FocusAssignmentView",
+        "type": "object"
+      },
+      "FocusResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "assignments": {
+            "items": {
+              "$ref": "#/components/schemas/FocusAssignmentView"
+            },
+            "title": "Assignments",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "FocusResponse",
         "type": "object"
       },
       "HTTPValidationError": {
@@ -1319,6 +1537,314 @@
           "version"
         ],
         "title": "ItemView",
+        "type": "object"
+      },
+      "LineageLinkView": {
+        "additionalProperties": false,
+        "properties": {
+          "birth_absolute": {
+            "title": "Birth Absolute",
+            "type": "integer"
+          },
+          "child_id": {
+            "format": "uuid",
+            "title": "Child Id",
+            "type": "string"
+          },
+          "child_name": {
+            "title": "Child Name",
+            "type": "string"
+          },
+          "parent_id": {
+            "format": "uuid",
+            "title": "Parent Id",
+            "type": "string"
+          },
+          "parent_name": {
+            "title": "Parent Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parent_id",
+          "parent_name",
+          "child_id",
+          "child_name",
+          "birth_absolute"
+        ],
+        "title": "LineageLinkView",
+        "type": "object"
+      },
+      "LineageRecordView": {
+        "additionalProperties": false,
+        "properties": {
+          "birth_absolute": {
+            "title": "Birth Absolute",
+            "type": "integer"
+          },
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "death_absolute": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Death Absolute"
+          },
+          "life_status": {
+            "title": "Life Status",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "succession_eligible": {
+            "title": "Succession Eligible",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "character_id",
+          "name",
+          "birth_absolute",
+          "life_status",
+          "succession_eligible"
+        ],
+        "title": "LineageRecordView",
+        "type": "object"
+      },
+      "LineageResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/LineageLinkView"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/LineageRecordView"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "LineageResponse",
+        "type": "object"
+      },
+      "MacroAdvanceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "day": {
+            "minimum": 1.0,
+            "title": "Day",
+            "type": "integer"
+          },
+          "resolution": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Resolution",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "day",
+          "resolution"
+        ],
+        "title": "MacroAdvanceRequest",
+        "type": "object"
+      },
+      "MacroAdvanceResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "duplicate": {
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "end_absolute": {
+            "title": "End Absolute",
+            "type": "integer"
+          },
+          "event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "start_absolute": {
+            "title": "Start Absolute",
+            "type": "integer"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "state",
+          "start_absolute",
+          "end_absolute",
+          "duplicate"
+        ],
+        "title": "MacroAdvanceResponse",
+        "type": "object"
+      },
+      "MacroEffectView": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "detail"
+        ],
+        "title": "MacroEffectView",
+        "type": "object"
+      },
+      "MacroInterruptionView": {
+        "additionalProperties": false,
+        "properties": {
+          "at_absolute": {
+            "title": "At Absolute",
+            "type": "integer"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at_absolute",
+          "reason",
+          "detail"
+        ],
+        "title": "MacroInterruptionView",
+        "type": "object"
+      },
+      "MacroRunView": {
+        "additionalProperties": false,
+        "properties": {
+          "effects": {
+            "items": {
+              "$ref": "#/components/schemas/MacroEffectView"
+            },
+            "title": "Effects",
+            "type": "array"
+          },
+          "end_absolute": {
+            "title": "End Absolute",
+            "type": "integer"
+          },
+          "interruptions": {
+            "items": {
+              "$ref": "#/components/schemas/MacroInterruptionView"
+            },
+            "title": "Interruptions",
+            "type": "array"
+          },
+          "resolution": {
+            "title": "Resolution",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "start_absolute": {
+            "title": "Start Absolute",
+            "type": "integer"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "start_absolute",
+          "end_absolute",
+          "resolution",
+          "state"
+        ],
+        "title": "MacroRunView",
+        "type": "object"
+      },
+      "MacroRunsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "runs": {
+            "items": {
+              "$ref": "#/components/schemas/MacroRunView"
+            },
+            "title": "Runs",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "MacroRunsResponse",
         "type": "object"
       },
       "MapPlace": {
@@ -2732,6 +3258,301 @@
         "summary": "Ready",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/macro/advance": {
+      "post": {
+        "operationId": "macro_advance_api_v1_macro_advance_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MacroAdvanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacroAdvanceResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Macro Advance",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/endings": {
+      "get": {
+        "operationId": "endings_api_v1_macro_endings_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Endings",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/eras": {
+      "get": {
+        "operationId": "eras_api_v1_macro_eras_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_absolute",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Start Absolute",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_absolute",
+            "required": false,
+            "schema": {
+              "default": 3600,
+              "minimum": 1,
+              "title": "End Absolute",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "owner_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Owner Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErasResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Eras",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/focus": {
+      "get": {
+        "operationId": "focus_api_v1_macro_focus_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FocusResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Focus",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/lineage": {
+      "get": {
+        "operationId": "lineage_api_v1_macro_lineage_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LineageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Lineage",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/runs": {
+      "get": {
+        "operationId": "macro_runs_api_v1_macro_runs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MacroRunsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Macro Runs",
+        "tags": [
+          "macro"
         ]
       }
     },

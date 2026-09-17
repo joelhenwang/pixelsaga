@@ -237,6 +237,22 @@ class SqlAlchemyMacroRepository:
         ).scalars()
         return [self._to_era(row) for row in rows]
 
+    async def list_eras_for_span(
+        self, world_id: UUID, start_absolute: int, end_absolute: int
+    ) -> list[EraSummary]:
+        rows = (
+            await self._session.execute(
+                select(EraSummaryRow)
+                .where(
+                    EraSummaryRow.world_id == world_id,
+                    EraSummaryRow.start_absolute < end_absolute,
+                    EraSummaryRow.end_absolute > start_absolute,
+                )
+                .order_by(EraSummaryRow.start_absolute, EraSummaryRow.version)
+            )
+        ).scalars()
+        return [self._to_era(row) for row in rows]
+
     async def save_end(self, evidence: EndConditionEvidence) -> None:
         self._session.add(
             EndConditionEvidenceRow(

@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import DiaryView from "./views/DiaryView.vue";
+import GenerationsView from "./views/GenerationsView.vue";
 import MapView from "./views/MapView.vue";
 import OpsView from "./views/OpsView.vue";
 import PartyView from "./views/PartyView.vue";
@@ -17,6 +18,6 @@ export const router = createRouter({
     { path: "/map", component: MapView },
     { path: "/diary", component: DiaryView },
     { path: "/relations", component: RelationsView },
-    { path: "/ops", component: OpsView },
+    { path: "/generations", component: GenerationsView },
   ],
 });
