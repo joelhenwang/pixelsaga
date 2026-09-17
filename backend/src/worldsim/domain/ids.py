@@ -218,6 +218,11 @@ def derive_macro_run_id(
     return _derive("macro-run", world_id.hex, start_absolute, end_absolute, resolution)
 
 
+def derive_lineage_child_id(schedule_id: ScheduleId) -> CharacterId:
+    """Stable birth identity: one child per birth schedule, never a second."""
+    return _derive("lineage-child", schedule_id.hex)
+
+
 def new_attempt_id() -> AttemptId:
     return uuid4()
 

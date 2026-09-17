@@ -26,6 +26,7 @@ from worldsim.application.transactions.canonical import (
     UnitOfWorkFactory,
     canonical_input_hash,
 )
+from worldsim.application.unit_of_work import UnitOfWork
 from worldsim.domain.effects import AdvanceClockEffect
 from worldsim.domain.enums import (
     EventType,
@@ -49,10 +50,14 @@ from worldsim.domain.macro import (
     MacroPeriodRun,
     resolution_range,
 )
+from worldsim.domain.schedules import ScheduledEffect
 from worldsim.domain.time import absolute_index
 
 SalienceBreak = Callable[[UUID, int, int], Awaitable[int | None]]
 """Predicate hook (owned by S5-SALIENCE-001): absolute break point in [start, end), if any."""
+ScheduleFireHook = Callable[[UnitOfWork, ScheduledEffect], Awaitable[None]]
+"""Consequence hook (owned by S5-GENEALOGY-001): runs inside the fire
+transaction so consequence rows commit atomically with the fired event."""
 
 
 @dataclass(frozen=True)
@@ -78,6 +83,7 @@ class MacroEngine:
         resolution: MacroResolution,
         *,
         salience_break: SalienceBreak | None = None,
+        on_schedule_fire: ScheduleFireHook | None = None,
         seed: int = 0,
     ) -> MacroResult:
         start, end = resolution_range(day, resolution)
@@ -130,7 +136,7 @@ class MacroEngine:
                 return await self._interrupt(run, at, "seeded break inside the period")
 
         clock_event_id = await self._commit_clock(run, world_version)
-        fired = await self._fire_due_schedules(run)
+        fired = await self._fire_due_schedules(run, on_schedule_fire)
 
         async with self._factory() as uow:
             run = await uow.macro.get_run(run_id)
@@ -216,7 +222,9 @@ class MacroEngine:
         )
         return result.event_id
 
-    async def _fire_due_schedules(self, run: MacroPeriodRun) -> list[UUID]:
+    async def _fire_due_schedules(
+        self, run: MacroPeriodRun, on_schedule_fire: ScheduleFireHook | None
+    ) -> list[UUID]:
         """Fire pending schedules due inside the period; applied rows never refire."""
         async with self._factory() as uow:
             due = [
@@ -246,5 +254,7 @@ class MacroEngine:
                     schedule.model_copy(update={"status": ScheduleStatus.APPLIED}),
                     schedule.version,
                 )
+                if on_schedule_fire is not None:
+                    await on_schedule_fire(uow, schedule)
             await uow.commit()
             return [schedule.id for schedule in due]

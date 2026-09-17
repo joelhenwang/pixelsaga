@@ -13,9 +13,17 @@ from uuid import UUID
 from worldsim.domain.activities import Activity, TravelRoute
 from worldsim.domain.characters import Character, CharacterCard
 from worldsim.domain.costs import ModelCost
+from worldsim.domain.enums import FocusSlot
 from worldsim.domain.events import CommittedEffect, WorldEvent
 from worldsim.domain.knowledge import Belief, Claim
-from worldsim.domain.macro import MacroAggregateEffect, MacroInterruption, MacroPeriodRun
+from worldsim.domain.macro import (
+    FocusAssignment,
+    LineageCharacter,
+    LineageLink,
+    MacroAggregateEffect,
+    MacroInterruption,
+    MacroPeriodRun,
+)
 from worldsim.domain.memory import MemoryDigest
 from worldsim.domain.narration import NarrationBeat
 from worldsim.domain.narrative import NarrativeArc, NarrativeHook
@@ -328,3 +336,15 @@ class MacroRepository(Protocol):
     async def find_covering_run(
         self, world_id: UUID, end_absolute: int
     ) -> MacroPeriodRun | None: ...
+
+
+class LineageRepository(Protocol):
+    """Stage 5 genealogy links, records, and focus assignments."""
+
+    async def add_link(self, link: LineageLink) -> None: ...
+    async def list_children(self, world_id: UUID, parent_id: UUID) -> list[LineageLink]: ...
+    async def list_parents(self, world_id: UUID, child_id: UUID) -> list[LineageLink]: ...
+    async def get_record(self, character_id: UUID) -> LineageCharacter: ...
+    async def put_record(self, record: LineageCharacter) -> None: ...
+    async def add_focus(self, assignment: FocusAssignment) -> None: ...
+    async def list_focus(self, world_id: UUID, slot: FocusSlot) -> list[FocusAssignment]: ...

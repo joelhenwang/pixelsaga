@@ -14,6 +14,7 @@ from worldsim.application.ports.repositories import (
     EventRepository,
     InventoryRepository,
     KnowledgeRepository,
+    LineageRepository,
     LocationRepository,
     MacroRepository,
     MonsterRepository,
@@ -63,6 +64,8 @@ class UnitOfWork(Protocol):
     def narrative(self) -> NarrativeRepository: ...
     @property
     def summaries(self) -> SummaryRepository: ...
+    @property
+    def lineage(self) -> LineageRepository: ...
     @property
     def costs(self) -> CostRepository: ...
     @property

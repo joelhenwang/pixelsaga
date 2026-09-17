@@ -20,6 +20,7 @@ from worldsim.infrastructure.repositories.costs import SqlAlchemyCostRepository
 from worldsim.infrastructure.repositories.digests import SqlAlchemyDigestRepository
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
+from worldsim.infrastructure.repositories.lineage import SqlAlchemyLineageRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
 from worldsim.infrastructure.repositories.macro import SqlAlchemyMacroRepository
 from worldsim.infrastructure.repositories.monsters import SqlAlchemyMonsterRepository
@@ -80,6 +81,7 @@ class SqlAlchemyUnitOfWork:
         self._routes: SqlAlchemyRouteRepository | None = None
         self._schedules: SqlAlchemyScheduleRepository | None = None
         self._macro: SqlAlchemyMacroRepository | None = None
+        self._lineage: SqlAlchemyLineageRepository | None = None
 
     def _require_session(self) -> AsyncSession:
         assert self._session is not None, "unit of work is not open"
@@ -223,6 +225,12 @@ class SqlAlchemyUnitOfWork:
         if self._summaries is None:
             self._summaries = SqlAlchemySummaryRepository(self._require_session())
         return self._summaries
+
+    @property
+    def lineage(self) -> SqlAlchemyLineageRepository:
+        if self._lineage is None:
+            self._lineage = SqlAlchemyLineageRepository(self._require_session())
+        return self._lineage
 
     @property
     def costs(self) -> SqlAlchemyCostRepository:
