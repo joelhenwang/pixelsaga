@@ -400,6 +400,7 @@ export interface MacroEffectView {
   detail: string;
   event_id?: string | null;
   kind: string;
+  target_ids?: string[] | null;
 }
 
 export interface MacroInterruptionView {
@@ -506,6 +507,32 @@ export interface MacroAdvanceResponse {
   state: string;
 }
 
+export interface EraComposeRequest {
+  end_absolute: number;
+  owner_id: string;
+  start_absolute: number;
+  world_id: string;
+}
+
+export interface EndingsEvaluateRequest {
+  at_absolute: number;
+  world_id: string;
+}
+
+export interface FocusAssignRequest {
+  effective_absolute: number;
+  from_character_id?: string | null;
+  reason: string;
+  slot: string;
+  to_character_id: string;
+  world_id: string;
+}
+
+export interface ScheduleCancelResponse {
+  schedule_id: string;
+  status: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -558,4 +585,8 @@ export const ROUTES = {
   listEras: "GET /api/v1/macro/eras",
   listEndings: "GET /api/v1/macro/endings",
   advanceMacro: "POST /api/v1/macro/advance",
+  composeEra: "POST /api/v1/macro/eras/compose",
+  evaluateEndings: "POST /api/v1/macro/endings/evaluate",
+  assignFocus: "POST /api/v1/macro/focus/assign",
+  cancelSchedule: "POST /api/v1/macro/schedules/{schedule_id}/cancel",
 } as const;

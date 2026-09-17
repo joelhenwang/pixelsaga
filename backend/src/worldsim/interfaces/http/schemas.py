@@ -683,6 +683,7 @@ class MacroEffectView(BaseModel):
     kind: str
     detail: str
     event_id: UUID | None = None
+    target_ids: list[UUID] = Field(default_factory=list)
 
 
 class MacroInterruptionView(BaseModel):
@@ -815,3 +816,37 @@ class MacroAdvanceResponse(BaseModel):
     end_absolute: int
     event_ids: list[UUID] = Field(default_factory=list)
     duplicate: bool
+
+
+class EraComposeRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    owner_id: UUID
+    start_absolute: int = Field(ge=0)
+    end_absolute: int = Field(ge=1)
+
+
+class EndingsEvaluateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    at_absolute: int = Field(ge=0)
+
+
+class FocusAssignRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    slot: str = Field(min_length=1, max_length=16)
+    to_character_id: UUID
+    reason: str = Field(min_length=1, max_length=500)
+    effective_absolute: int = Field(ge=0)
+    from_character_id: UUID | None = None
+
+
+class ScheduleCancelResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    schedule_id: UUID
+    status: str

@@ -10,6 +10,7 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     String,
     UniqueConstraint,
@@ -60,14 +61,15 @@ class WorldEventRow(Base):
     __table_args__ = (
         CheckConstraint("sequence >= 1", name="ck_event_sequence"),
         CheckConstraint(
-            "event_type IN ('world_seeded','world_ticked','action_resolved',"
-            "'schedule_fired','deity_override')",
+            "event_type IN ('world_seeded','world_ticked','macro_ticked','action_resolved',"
+            "'schedule_fired','deity_override','world_ended')",
             name="ck_event_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_event_schema"),
         CheckConstraint("absolute_index >= 0", name="ck_event_index"),
         CheckConstraint("visibility IN ('public','private')", name="ck_event_visibility"),
         UniqueConstraint("world_id", "sequence", name="uq_event_world_sequence"),
+        Index("ix_event_world_absolute", "world_id", "absolute_index"),
     )
 
 

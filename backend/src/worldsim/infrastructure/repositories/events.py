@@ -134,6 +134,22 @@ class SqlAlchemyEventRepository:
         ).scalars()
         return [self._to_domain(row) for row in rows]
 
+    async def list_by_absolute(
+        self, world_id: UUID, start_absolute: int, end_absolute: int
+    ) -> list[WorldEvent]:
+        rows = (
+            await self._session.execute(
+                select(WorldEventRow)
+                .where(
+                    WorldEventRow.world_id == world_id,
+                    WorldEventRow.absolute_index >= start_absolute,
+                    WorldEventRow.absolute_index < end_absolute,
+                )
+                .order_by(WorldEventRow.sequence)
+            )
+        ).scalars()
+        return [self._to_domain(row) for row in rows]
+
     async def count_events(self, world_id: UUID) -> int:
         value = (
             await self._session.execute(

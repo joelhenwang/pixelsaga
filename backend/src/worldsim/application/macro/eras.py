@@ -26,16 +26,7 @@ async def window_events(
     uow: UnitOfWork, world_id: UUID, start_absolute: int, end_absolute: int
 ) -> list[WorldEvent]:
     """Every event with fictional position inside [start, end), sequence order."""
-    found: list[WorldEvent] = []
-    after = 0
-    while True:
-        batch = await uow.events.list_range(world_id, after, 200)
-        if not batch:
-            return found
-        for event in batch:
-            after = event.sequence
-            if start_absolute <= event.absolute_index < end_absolute:
-                found.append(event)
+    return await uow.events.list_by_absolute(world_id, start_absolute, end_absolute)
 
 
 async def compose_era(

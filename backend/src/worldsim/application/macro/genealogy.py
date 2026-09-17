@@ -42,14 +42,15 @@ def age_phases(record: LineageCharacter, at_absolute: int) -> int:
     return max(0, at_absolute - record.birth_absolute)
 
 
-async def apply_schedule_consequence(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
+async def apply_schedule_consequence(uow: UnitOfWork, schedule: ScheduledEffect) -> list[UUID]:
     if schedule.kind == BIRTH_KIND:
-        await _apply_birth(uow, schedule)
+        return [await _apply_birth(uow, schedule)]
     elif schedule.kind == DEATH_KIND:
-        await _apply_death(uow, schedule)
+        return [await _apply_death(uow, schedule)]
+    return []
 
 
-async def _apply_birth(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
+async def _apply_birth(uow: UnitOfWork, schedule: ScheduledEffect) -> UUID:
     payload = schedule.payload
     name = payload.get("name")
     if not isinstance(name, str) or not name.strip():
@@ -57,7 +58,7 @@ async def _apply_birth(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
     child_id = derive_lineage_child_id(schedule.id)
     try:
         await uow.characters.get(child_id)
-        return
+        return child_id
     except DomainError:
         pass
     parent_ids = [UUID(str(raw)) for raw in payload.get("parent_ids", [])]
@@ -109,9 +110,10 @@ async def _apply_birth(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
             succession_eligible=payload.get("succession_eligible", False) is True,
         )
     )
+    return child_id
 
 
-async def _apply_death(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
+async def _apply_death(uow: UnitOfWork, schedule: ScheduledEffect) -> UUID:
     raw = schedule.payload.get("character_id")
     if not isinstance(raw, str):
         raise DomainError(ErrorCode.VALIDATION_FAILED, "death schedule needs a character_id")
@@ -124,7 +126,7 @@ async def _apply_death(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
         ) from None
     character = await uow.characters.get(character_id)
     if character.life_status == LifeStatus.DEAD:
-        return
+        return character_id
     saved = await uow.characters.save_state(
         character.model_copy(update={"life_status": LifeStatus.DEAD}), character.version
     )
@@ -138,6 +140,7 @@ async def _apply_death(uow: UnitOfWork, schedule: ScheduledEffect) -> None:
         )
     )
     await _succeed_focus(uow, schedule.world_id, character_id, schedule.due_absolute)
+    return character_id
 
 
 async def current_focus(

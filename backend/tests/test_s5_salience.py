@@ -11,10 +11,11 @@ import pytest
 from worldsim.application.macro.engine import MacroEngine
 from worldsim.application.macro.salience import find_break, macro_covers, select_resolution
 from worldsim.application.transactions.canonical import CanonicalTransaction
-from worldsim.domain.enums import MacroResolution, MacroRunState
+from worldsim.domain.enums import MacroResolution, MacroRunState, ScheduleStatus
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import new_schedule_id, new_world_id
 from worldsim.domain.schedules import ScheduledEffect
+from worldsim.domain.time import absolute_index
 from worldsim.domain.world import World
 from worldsim.infrastructure.db.engine import create_engine
 from worldsim.infrastructure.repositories.unit_of_work import create_unit_of_work
@@ -162,6 +163,95 @@ def test_detailed_resumes_at_macro_clock(migrated_db: None) -> None:
             await stage1._require_previous_complete(wid, 70)
             with pytest.raises(DomainError, match="previous phase 70"):
                 await stage1._require_previous_complete(wid, 71)
+        finally:
+            await engine.dispose()
+
+    _run(_inner())
+
+
+def test_cancelled_break_unblocks_the_same_period(migrated_db: None) -> None:
+    async def _inner() -> None:
+        engine = create_engine(Settings())
+        try:
+            factory = lambda: create_unit_of_work(engine)  # noqa: E731
+            macro = MacroEngine(factory, CanonicalTransaction(factory))
+            async with factory() as uow:
+                wid = new_world_id()
+                await uow.worlds.add(World(id=wid, name="Vale", seed_version="s5-test"))
+                await uow.versions.ensure(wid, wid, "world")
+                await uow.schedules.add(
+                    ScheduledEffect(
+                        id=new_schedule_id(),
+                        world_id=wid,
+                        due_absolute=25,
+                        kind="invasion",
+                        payload={"salient": True},
+                    )
+                )
+                await uow.commit()
+
+            async def _hook(world_id: UUID, start: int, end: int) -> int | None:
+                return await find_break(factory, world_id, start, end)
+
+            blocked = await macro.advance_period(wid, 1, MacroResolution.WEEK, salience_break=_hook)
+            assert blocked.run.state == MacroRunState.INTERRUPTED
+
+            async with factory() as uow:
+                pending = await uow.schedules.list_due(wid, 69)
+                assert len(pending) == 1
+                await uow.schedules.save(
+                    pending[0].model_copy(update={"status": ScheduleStatus.CANCELLED}),
+                    pending[0].version,
+                )
+                await uow.commit()
+
+            cleared = await macro.advance_period(wid, 1, MacroResolution.WEEK, salience_break=_hook)
+            assert cleared.run.state == MacroRunState.COMPLETED
+            assert cleared.run.id == blocked.run.id
+            async with factory() as uow:
+                world = await uow.worlds.get(wid)
+                assert absolute_index(world.day, world.phase) == 70
+                records = await uow.macro.list_interruptions(blocked.run.id)
+                assert len(records) == 1
+        finally:
+            await engine.dispose()
+
+    _run(_inner())
+
+
+def test_still_blocked_retry_replays_without_new_rows(migrated_db: None) -> None:
+    async def _inner() -> None:
+        engine = create_engine(Settings())
+        try:
+            factory = lambda: create_unit_of_work(engine)  # noqa: E731
+            macro = MacroEngine(factory, CanonicalTransaction(factory))
+            async with factory() as uow:
+                wid = new_world_id()
+                await uow.worlds.add(World(id=wid, name="Vale", seed_version="s5-test"))
+                await uow.versions.ensure(wid, wid, "world")
+                await uow.schedules.add(
+                    ScheduledEffect(
+                        id=new_schedule_id(),
+                        world_id=wid,
+                        due_absolute=25,
+                        kind="invasion",
+                        payload={"salient": True},
+                    )
+                )
+                await uow.commit()
+
+            async def _hook(world_id: UUID, start: int, end: int) -> int | None:
+                return await find_break(factory, world_id, start, end)
+
+            blocked = await macro.advance_period(wid, 1, MacroResolution.WEEK, salience_break=_hook)
+            again = await macro.advance_period(wid, 1, MacroResolution.WEEK, salience_break=_hook)
+            assert again.run.state == MacroRunState.INTERRUPTED
+            assert again.duplicate is True
+            async with factory() as uow:
+                world = await uow.worlds.get(wid)
+                assert absolute_index(world.day, world.phase) == 0
+                records = await uow.macro.list_interruptions(blocked.run.id)
+                assert len(records) == 1
         finally:
             await engine.dispose()
 

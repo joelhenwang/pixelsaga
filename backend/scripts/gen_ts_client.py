@@ -86,6 +86,10 @@ WANTED = (
     "EndingsResponse",
     "MacroAdvanceRequest",
     "MacroAdvanceResponse",
+    "EraComposeRequest",
+    "EndingsEvaluateRequest",
+    "FocusAssignRequest",
+    "ScheduleCancelResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -132,6 +136,10 @@ ROUTES = (
     ("get", "/api/v1/macro/eras", "listEras"),
     ("get", "/api/v1/macro/endings", "listEndings"),
     ("post", "/api/v1/macro/advance", "advanceMacro"),
+    ("post", "/api/v1/macro/eras/compose", "composeEra"),
+    ("post", "/api/v1/macro/endings/evaluate", "evaluateEndings"),
+    ("post", "/api/v1/macro/focus/assign", "assignFocus"),
+    ("post", "/api/v1/macro/schedules/{schedule_id}/cancel", "cancelSchedule"),
 )
 
 

@@ -104,6 +104,23 @@ def _seed() -> dict[str, UUID]:
     return _run(_inner())
 
 
+def _add_schedule(wid: UUID, due: int) -> UUID:
+    async def _inner() -> UUID:
+        engine = create_engine(Settings())
+        try:
+            async with create_unit_of_work(engine) as uow:
+                sid = new_schedule_id()
+                await uow.schedules.add(
+                    ScheduledEffect(id=sid, world_id=wid, due_absolute=due, kind="note")
+                )
+                await uow.commit()
+                return sid
+        finally:
+            await engine.dispose()
+
+    return _run(_inner())
+
+
 HEADERS = {"X-Worldsim-Role": "watcher"}
 
 
@@ -172,3 +189,90 @@ def test_advance_rejects_player_and_bad_resolution(client: TestClient) -> None:
 
     allowed = client.get("/api/v1/macro/runs", params={"world_id": wid}, headers=player)
     assert allowed.status_code == 200
+
+
+def test_compose_evaluate_assign_cancel(client: TestClient) -> None:
+    ids = _seed()
+    wid = str(ids["world"])
+    bram = str(ids["bram"])
+    player = {"X-Worldsim-Role": "player", "X-Worldsim-Character": bram}
+    other = {"X-Worldsim-Role": "player", "X-Worldsim-Character": str(ids["home"])}
+
+    compose = client.post(
+        "/api/v1/macro/eras/compose",
+        json={"world_id": wid, "owner_id": bram, "start_absolute": 0, "end_absolute": 70},
+        headers=HEADERS,
+    )
+    assert compose.status_code == 200, compose.text
+    assert compose.json()["version"] == 1
+
+    mine = client.post(
+        "/api/v1/macro/eras/compose",
+        json={"world_id": wid, "owner_id": bram, "start_absolute": 0, "end_absolute": 70},
+        headers=player,
+    )
+    assert mine.status_code == 200 and mine.json()["version"] == 2
+
+    foreign = client.post(
+        "/api/v1/macro/eras/compose",
+        json={"world_id": wid, "owner_id": bram, "start_absolute": 0, "end_absolute": 70},
+        headers=other,
+    )
+    assert foreign.status_code == 403
+
+    bad_range = client.post(
+        "/api/v1/macro/eras/compose",
+        json={"world_id": wid, "owner_id": bram, "start_absolute": 70, "end_absolute": 70},
+        headers=HEADERS,
+    )
+    assert bad_range.status_code in (400, 422)
+
+    evaluate = client.post(
+        "/api/v1/macro/endings/evaluate",
+        json={"world_id": wid, "at_absolute": 5},
+        headers=HEADERS,
+    )
+    assert evaluate.status_code == 200, evaluate.text
+    kinds = {row["kind"] for row in evaluate.json()["endings"]}
+    assert kinds == {"sustained_peace", "maximum_day"}
+
+    assign = client.post(
+        "/api/v1/macro/focus/assign",
+        json={
+            "world_id": wid,
+            "slot": "main",
+            "to_character_id": bram,
+            "reason": "Founding",
+            "effective_absolute": 0,
+        },
+        headers=HEADERS,
+    )
+    assert assign.status_code == 200, assign.text
+    assert assign.json()["to_name"] == "Bram"
+
+    bad_slot = client.post(
+        "/api/v1/macro/focus/assign",
+        json={
+            "world_id": wid,
+            "slot": "extra",
+            "to_character_id": bram,
+            "reason": "Coup",
+            "effective_absolute": 1,
+        },
+        headers=HEADERS,
+    )
+    assert bad_slot.status_code in (400, 422)
+
+    schedule_id = _add_schedule(ids["world"], 9)
+    cancel = client.post(f"/api/v1/macro/schedules/{schedule_id}/cancel", headers=HEADERS)
+    assert cancel.status_code == 200
+    assert cancel.json()["status"] == "cancelled"
+    again = client.post(f"/api/v1/macro/schedules/{schedule_id}/cancel", headers=HEADERS)
+    assert again.json()["status"] == "cancelled"
+
+    denied = client.post(
+        "/api/v1/macro/endings/evaluate",
+        json={"world_id": wid, "at_absolute": 5},
+        headers=player,
+    )
+    assert denied.status_code == 403

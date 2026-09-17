@@ -1039,6 +1039,27 @@
         "title": "EndingView",
         "type": "object"
       },
+      "EndingsEvaluateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "at_absolute": {
+            "minimum": 0.0,
+            "title": "At Absolute",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "at_absolute"
+        ],
+        "title": "EndingsEvaluateRequest",
+        "type": "object"
+      },
       "EndingsResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1059,6 +1080,39 @@
           "world_id"
         ],
         "title": "EndingsResponse",
+        "type": "object"
+      },
+      "EraComposeRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "end_absolute": {
+            "minimum": 1.0,
+            "title": "End Absolute",
+            "type": "integer"
+          },
+          "owner_id": {
+            "format": "uuid",
+            "title": "Owner Id",
+            "type": "string"
+          },
+          "start_absolute": {
+            "minimum": 0.0,
+            "title": "Start Absolute",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "owner_id",
+          "start_absolute",
+          "end_absolute"
+        ],
+        "title": "EraComposeRequest",
         "type": "object"
       },
       "EraView": {
@@ -1192,6 +1246,59 @@
           "next_after"
         ],
         "title": "EventsResponse",
+        "type": "object"
+      },
+      "FocusAssignRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "effective_absolute": {
+            "minimum": 0.0,
+            "title": "Effective Absolute",
+            "type": "integer"
+          },
+          "from_character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Character Id"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Reason",
+            "type": "string"
+          },
+          "slot": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Slot",
+            "type": "string"
+          },
+          "to_character_id": {
+            "format": "uuid",
+            "title": "To Character Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "slot",
+          "to_character_id",
+          "reason",
+          "effective_absolute"
+        ],
+        "title": "FocusAssignRequest",
         "type": "object"
       },
       "FocusAssignmentView": {
@@ -1743,6 +1850,14 @@
           "kind": {
             "title": "Kind",
             "type": "string"
+          },
+          "target_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Target Ids",
+            "type": "array"
           }
         },
         "required": [
@@ -2778,6 +2893,26 @@
         "title": "SceneSummary",
         "type": "object"
       },
+      "ScheduleCancelResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "schedule_id": {
+            "format": "uuid",
+            "title": "Schedule Id",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "schedule_id",
+          "status"
+        ],
+        "title": "ScheduleCancelResponse",
+        "type": "object"
+      },
       "SeedResponse": {
         "additionalProperties": false,
         "properties": {
@@ -3345,6 +3480,47 @@
         ]
       }
     },
+    "/api/v1/macro/endings/evaluate": {
+      "post": {
+        "operationId": "evaluate_endings_view_api_v1_macro_endings_evaluate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EndingsEvaluateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EndingsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Evaluate Endings View",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
     "/api/v1/macro/eras": {
       "get": {
         "operationId": "eras_api_v1_macro_eras_get",
@@ -3427,6 +3603,47 @@
         ]
       }
     },
+    "/api/v1/macro/eras/compose": {
+      "post": {
+        "operationId": "compose_era_view_api_v1_macro_eras_compose_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EraComposeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EraView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compose Era View",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
     "/api/v1/macro/focus": {
       "get": {
         "operationId": "focus_api_v1_macro_focus_get",
@@ -3465,6 +3682,47 @@
           }
         },
         "summary": "Focus",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/focus/assign": {
+      "post": {
+        "operationId": "assign_focus_view_api_v1_macro_focus_assign_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FocusAssignRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FocusAssignmentView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Assign Focus View",
         "tags": [
           "macro"
         ]
@@ -3551,6 +3809,49 @@
           }
         },
         "summary": "Macro Runs",
+        "tags": [
+          "macro"
+        ]
+      }
+    },
+    "/api/v1/macro/schedules/{schedule_id}/cancel": {
+      "post": {
+        "operationId": "cancel_schedule_api_v1_macro_schedules__schedule_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "schedule_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Schedule Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleCancelResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Schedule",
         "tags": [
           "macro"
         ]

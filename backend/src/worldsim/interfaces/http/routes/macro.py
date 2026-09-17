@@ -12,11 +12,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
 
+from worldsim.application.macro.endings import evaluate_endings
 from worldsim.application.macro.engine import MacroEngine
-from worldsim.application.macro.genealogy import apply_schedule_consequence
+from worldsim.application.macro.eras import compose_era
+from worldsim.application.macro.genealogy import apply_schedule_consequence, assign_focus
 from worldsim.application.macro.salience import find_break
 from worldsim.application.transactions.canonical import CanonicalTransaction
-from worldsim.domain.enums import FocusSlot, MacroResolution
+from worldsim.domain.enums import FocusSlot, MacroResolution, ScheduleStatus
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role, require_role
@@ -53,6 +55,7 @@ async def macro_runs(world_id: UUID, request: Request) -> api.MacroRunsResponse:
                             kind=effect.kind.value,
                             detail=effect.detail,
                             event_id=effect.event_id,
+                            target_ids=effect.target_ids,
                         )
                         for effect in effects
                     ],
@@ -230,3 +233,108 @@ async def macro_advance(
         event_ids=result.event_ids,
         duplicate=result.duplicate,
     )
+
+
+@router.post("/macro/eras/compose", response_model=api.EraView)
+async def compose_era_view(body: api.EraComposeRequest, request: Request) -> api.EraView:
+    role, viewer = await effective_role(request, body.world_id)
+    require_role(role, "watcher", "player")
+    if role != "watcher" and viewer != body.owner_id:
+        raise DomainError(ErrorCode.FORBIDDEN, "era digests are holder-private")
+    state = request.app.state.app_state
+    try:
+        era = await compose_era(
+            state.uow_factory(),
+            body.world_id,
+            body.owner_id,
+            body.start_absolute,
+            body.end_absolute,
+        )
+    except ValueError as exc:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, str(exc)) from exc
+    return api.EraView(
+        era_id=era.id,
+        owner_id=era.owner_id,
+        start_absolute=era.start_absolute,
+        end_absolute=era.end_absolute,
+        text=era.text,
+        source_ids=era.source_ids,
+        version=era.version,
+    )
+
+
+@router.post("/macro/endings/evaluate", response_model=api.EndingsResponse)
+async def evaluate_endings_view(
+    body: api.EndingsEvaluateRequest, request: Request
+) -> api.EndingsResponse:
+    role, _ = await effective_role(request, body.world_id)
+    require_role(role, "watcher")
+    state = request.app.state.app_state
+    rows = await evaluate_endings(state.uow_factory(), body.world_id, body.at_absolute)
+    return api.EndingsResponse(
+        world_id=body.world_id,
+        endings=[
+            api.EndingView(
+                kind=row.kind.value,
+                satisfied=row.satisfied,
+                evaluated_absolute=row.evaluated_absolute,
+                window_start_absolute=row.window_start_absolute,
+                evidence_event_ids=[event_id.hex for event_id in row.evidence_event_ids],
+                detail=row.detail,
+            )
+            for row in rows
+        ],
+    )
+
+
+@router.post("/macro/focus/assign", response_model=api.FocusAssignmentView)
+async def assign_focus_view(
+    body: api.FocusAssignRequest, request: Request
+) -> api.FocusAssignmentView:
+    role, _ = await effective_role(request, body.world_id)
+    require_role(role, "watcher")
+    try:
+        slot = FocusSlot(body.slot)
+    except ValueError as exc:
+        raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown slot: {body.slot}") from exc
+    state = request.app.state.app_state
+    assignment = await assign_focus(
+        state.uow_factory(),
+        body.world_id,
+        slot,
+        body.to_character_id,
+        body.reason,
+        body.effective_absolute,
+        from_character_id=body.from_character_id,
+    )
+    async with state.uow_factory()() as uow:
+        characters = await uow.characters.list_for_world(body.world_id)
+        names = {character.id: character.name for character in characters}
+    from_name = names.get(assignment.from_character_id) if assignment.from_character_id else None
+    return api.FocusAssignmentView(
+        slot=assignment.slot.value,
+        version=assignment.version,
+        from_character_id=assignment.from_character_id,
+        from_name=from_name,
+        to_character_id=assignment.to_character_id,
+        to_name=str(names.get(assignment.to_character_id, assignment.to_character_id)),
+        effective_absolute=assignment.effective_absolute,
+        reason=assignment.reason,
+    )
+
+
+@router.post("/macro/schedules/{schedule_id}/cancel", response_model=api.ScheduleCancelResponse)
+async def cancel_schedule(schedule_id: UUID, request: Request) -> api.ScheduleCancelResponse:
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        schedule = await uow.schedules.get(schedule_id)
+        role, _ = await effective_role(request, schedule.world_id)
+        require_role(role, "watcher")
+        if schedule.status != ScheduleStatus.PENDING:
+            return api.ScheduleCancelResponse(schedule_id=schedule.id, status=schedule.status.value)
+        saved = await uow.schedules.save(
+            schedule.model_copy(update={"status": ScheduleStatus.CANCELLED}),
+            schedule.version,
+        )
+        await uow.commit()
+    return api.ScheduleCancelResponse(schedule_id=saved.id, status=saved.status.value)

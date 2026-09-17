@@ -5,7 +5,9 @@ import type {
   CharacterSummary,
   DiaryResponse,
   EndingsResponse,
+  EraView,
   ErasResponse,
+  FocusAssignmentView,
   FocusResponse,
   HookListResponse,
   LineageResponse,
@@ -20,6 +22,7 @@ import type {
   RelationshipListResponse,
   SceneDetail,
   SceneSummary,
+  ScheduleCancelResponse,
   Stage1AdvanceResponse,
   TimelineResponse,
   WatcherHeaders,
@@ -188,5 +191,49 @@ export const api = {
       },
       headers,
     );
+  },
+  composeEra(
+    worldId: string, ownerId: string, start: number, end: number,
+    headers: Record<string, string>,
+  ): Promise<EraView> {
+    return request<EraView>(
+      "/api/v1/macro/eras/compose",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ world_id: worldId, owner_id: ownerId, start_absolute: start, end_absolute: end }),
+      },
+      headers,
+    );
+  },
+  evaluateEndings(
+    worldId: string, at: number, headers: Record<string, string>,
+  ): Promise<EndingsResponse> {
+    return request<EndingsResponse>(
+      "/api/v1/macro/endings/evaluate",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ world_id: worldId, at_absolute: at }),
+      },
+      headers,
+    );
+  },
+  assignFocus(
+    worldId: string, slot: string, to: string, reason: string, at: number,
+    headers: Record<string, string>,
+  ): Promise<FocusAssignmentView> {
+    return request<FocusAssignmentView>(
+      "/api/v1/macro/focus/assign",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ world_id: worldId, slot, to_character_id: to, reason, effective_absolute: at }),
+      },
+      headers,
+    );
+  },
+  cancelSchedule(scheduleId: string, headers: Record<string, string>): Promise<ScheduleCancelResponse> {
+    return request<ScheduleCancelResponse>(`/api/v1/macro/schedules/${scheduleId}/cancel`, { method: "POST" }, headers);
   },
 };

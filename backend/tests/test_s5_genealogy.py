@@ -100,8 +100,9 @@ def test_birth_creates_recorded_child(migrated_db: None) -> None:
                 assert (record.birth_absolute, record.succession_eligible) == (5, False)
                 assert age_phases(record, 10) == 5
                 await uow.versions.check({child_id: 0})
-                memories = await uow.perception.memories_for_owner(child_id, 10)
-                assert memories == []
+                effects = await uow.macro.list_effects(result.run.id)
+                birth_row = next(e for e in effects if e.kind.value == "schedule_progress")
+                assert birth_row.target_ids == [child_id]
         finally:
             await engine.dispose()
 

@@ -107,7 +107,7 @@ class SqlAlchemyMacroRepository:
                 run_id=effect.run_id,
                 world_id=effect.world_id,
                 kind=effect.kind.value,
-                target_ids=list(effect.target_ids),
+                target_ids=[target.hex for target in effect.target_ids],
                 detail=effect.detail,
                 event_id=effect.event_id,
             )

@@ -27,6 +27,9 @@ from worldsim.domain.ids import new_end_evidence_id
 from worldsim.domain.macro import EndConditionEvidence
 from worldsim.domain.time import PHASES_PER_DAY
 
+#: Default peace window: 300 phases (30 days, one game-month of quiet).
+#: Long enough that a single calm scene or a lucky week can never
+#: satisfy it, short enough to fit inside one macro year.
 DEFAULT_PEACE_WINDOW_PHASES = 300
 PEACE_WINDOW_KEY = "ending.peace_window_phases"
 MAX_DAY_KEY = "ending.max_day"

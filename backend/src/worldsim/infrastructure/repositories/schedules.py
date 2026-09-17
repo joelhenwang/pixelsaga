@@ -42,6 +42,12 @@ class SqlAlchemyScheduleRepository:
         )
         await self._session.flush()
 
+    async def get(self, schedule_id: UUID) -> ScheduledEffect:
+        row = await self._session.get(ScheduledEffectRow, schedule_id)
+        if row is None:
+            raise missing("scheduled effect", schedule_id)
+        return self._to_domain(row)
+
     async def list_due(self, world_id: UUID, absolute: int) -> list[ScheduledEffect]:
         rows = (
             await self._session.execute(

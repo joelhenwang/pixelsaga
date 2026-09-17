@@ -223,6 +223,13 @@ def derive_lineage_child_id(schedule_id: ScheduleId) -> CharacterId:
     return _derive("lineage-child", schedule_id.hex)
 
 
+def derive_macro_effect_id(
+    run_id: MacroRunId, kind: str, event_id: EventId
+) -> MacroAggregateEffectId:
+    """Stable aggregate ID: resuming a period re-links its events, never duplicates rows."""
+    return _derive("macro-effect", run_id.hex, kind, event_id.hex)
+
+
 def new_attempt_id() -> AttemptId:
     return uuid4()
 
