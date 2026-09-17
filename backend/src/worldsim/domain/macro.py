@@ -44,6 +44,18 @@ DAYS_PER_WEEK = 7
 DAYS_PER_MONTH = 30
 DAYS_PER_YEAR = 360
 
+#: Schedule payload flag marking a seeded major event: macro must stop
+#: for detailed simulation at its due phase instead of firing past it.
+SALIENT_SCHEDULE_FLAG = "salient"
+
+
+class MacroPolicy(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    max_pending_schedules: int = Field(default=64, ge=1)
+    max_window_phases: int = Field(default=DAYS_PER_YEAR * PHASES_PER_DAY, ge=1)
+
+
 RESOLUTION_DAYS: dict[MacroResolution, int] = {
     MacroResolution.DAY: 1,
     MacroResolution.WEEK: DAYS_PER_WEEK,

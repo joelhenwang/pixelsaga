@@ -128,6 +128,24 @@ class SqlAlchemyMacroRepository:
         )
         await self._session.flush()
 
+    async def find_covering_run(self, world_id: UUID, end_absolute: int) -> MacroPeriodRun | None:
+        row = (
+            (
+                await self._session.execute(
+                    select(MacroPeriodRunRow)
+                    .where(
+                        MacroPeriodRunRow.world_id == world_id,
+                        MacroPeriodRunRow.end_absolute == end_absolute,
+                        MacroPeriodRunRow.state == MacroRunState.COMPLETED.value,
+                    )
+                    .order_by(MacroPeriodRunRow.start_absolute)
+                )
+            )
+            .scalars()
+            .first()
+        )
+        return self._to_run(row) if row is not None else None
+
     async def list_interruptions(self, run_id: UUID) -> list[MacroInterruption]:
         rows = (
             await self._session.execute(

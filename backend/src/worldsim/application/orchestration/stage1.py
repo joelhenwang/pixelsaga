@@ -486,10 +486,16 @@ class Stage1Orchestrator:
             async with self._factory() as uow:
                 previous = await uow.phases.get_run(previous_id)
         except DomainError:
-            raise DomainError(
-                ErrorCode.PRECONDITION_FAILED,
-                f"previous phase {index - 1} never ran; advance consecutively",
-            ) from None
+            # A completed macro run ending exactly here covers every prior
+            # phase; detailed simulation resumes at the macro clock.
+            async with self._factory() as uow:
+                covered = await uow.macro.find_covering_run(world_id, index)
+            if covered is None:
+                raise DomainError(
+                    ErrorCode.PRECONDITION_FAILED,
+                    f"previous phase {index - 1} never ran; advance consecutively",
+                ) from None
+            return
         if previous.state.value != PhaseRunState.COMPLETED.value:
             raise DomainError(
                 ErrorCode.PRECONDITION_FAILED,
