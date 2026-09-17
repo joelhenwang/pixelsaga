@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mock A · era bands</title>
+<style>
+:root { color-scheme: dark; --bg:#000; --fg:#e8e8e8; --dim:#9a9a9a; --line:#2c2c2c; --acc:#7dd87d; --warn:#e0a23c; --bad:#e06c6c; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; margin: 0; padding: 12px 16px; }
+h1 { font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+.dim { color: var(--dim); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+button { background: none; border: 1px solid var(--line); color: var(--fg); padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
+button[aria-pressed="true"] { border-color: var(--acc); color: var(--acc); }
+.band { margin-top: 12px; }
+.bandhead { font-size: 12px; color: var(--dim); margin-bottom: 4px; }
+.track { position: relative; height: 26px; border-bottom: 1px solid var(--line); }
+.seg { position: absolute; top: 4px; height: 18px; background: #1d3a1d; border-left: 2px solid var(--acc); cursor: pointer; }
+.seg.inter { background: #3a2f16; border-left-color: var(--warn); }
+.seg.sel { outline: 1px solid var(--fg); }
+.tick { position: absolute; top: 0; width: 1px; height: 26px; background: var(--line); }
+.mark { position: absolute; top: -2px; font-size: 11px; color: var(--warn); cursor: pointer; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th { text-align: left; color: var(--dim); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0; }
+td { border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0; vertical-align: top; }
+.ev { cursor: pointer; } .ev:hover td { background: #111; }
+.pane { border-left: 1px solid var(--line); padding-left: 16px; }
+.kv { font-size: 12px; color: var(--dim); }
+.kv b { color: var(--fg); font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>generations · era bands <span class="dim">mock A, static</span></h1>
+<div class="row" role="group" aria-label="resolution">
+  <span class="dim">advance</span>
+  <button data-r="day">day</button>
+  <button data-r="week" aria-pressed="true">week</button>
+  <button data-r="month">month</button>
+  <button data-r="year">year</button>
+  <span class="dim" id="sel">week · largest runnable from 3600</span>
+</div>
+<div id="bands"></div>
+<div class="grid">
+  <div>
+    <h1>run detail</h1>
+    <div id="detail" class="kv">select a segment</div>
+  </div>
+  <div class="pane">
+    <h1>era digest · year 2</h1>
+    <div class="kv" id="digest"></div>
+    <h1 style="margin-top:12px">source events</h1>
+    <table id="sources"><tr><th>seq</th><th>type</th><th>phase</th><th>detail</th></tr></table>
+  </div>
+</div>
+<div class="grid">
+  <div>
+    <h1>focus chain · main</h1>
+    <table><tr><th>v</th><th>holder</th><th>from phase</th><th>reason</th></tr>
+    <tr><td class="dim">0</td><td>Bram</td><td class="dim">0</td><td>Founding</td></tr>
+    <tr><td class="dim">1</td><td>Cora</td><td class="dim">3800</td><td>Bram falls, Cora rises</td></tr></table>
+  </div>
+  <div class="pane">
+    <h1>ending evidence</h1>
+    <table><tr><th>kind</th><th>met</th><th>evidence</th></tr>
+    <tr><td>sustained peace</td><td>yes</td><td class="dim">no deaths, no major events across 300 phases</td></tr>
+    <tr><td>maximum day</td><td>yes</td><td class="dim">clock 7200 past day 721 start</td></tr></table>
+  </div>
+</div>
+<script>
+const RUNS = [
+  {s:0,e:3600,res:"year",state:"completed",events:[["macro_ticked",3599],["schedule_fired birth Cora",100],["schedule_fired harvest",200]]},
+  {s:3600,e:3900,res:"month",state:"interrupted",at:3700,events:[]},
+  {s:3700,e:3710,res:"day",state:"completed",events:[["macro_ticked",3709]]},
+  {s:3710,e:3780,res:"week",state:"completed",events:[["macro_ticked",3779]]},
+  {s:3780,e:3850,res:"week",state:"completed",events:[["macro_ticked",3849],["schedule_fired death Bram",3800]]},
+  {s:3850,e:3920,res:"week",state:"completed",events:[["macro_ticked",3919]]},
+  {s:4200,e:4500,res:"month",state:"completed",events:[["macro_ticked",4499]]},
+  {s:6900,e:7200,res:"month",state:"completed",events:[["macro_ticked",7199]]},
+];
+const YEARS = [{n:1,s:0,e:3600},{n:2,s:3600,e:7200}];
+const DIGEST = "Phases 3600 to 7200: 1 death, 14 macro ticks across 19 runs with 1 interruption; 0 owned memories cited.";
+const SOURCES = [["41","schedule_fired","3800","death Bram"],["38","macro_ticked","3779","week 3710 to 3780"],["52","macro_ticked","7199","month 6900 to 7200"]];
+document.querySelectorAll("[data-r]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-r]").forEach(x => x.removeAttribute("aria-pressed"));
+  b.setAttribute("aria-pressed","true");
+  sel.textContent = b.dataset.r + " · largest runnable from 3600";
+});
+const bands = document.getElementById("bands");
+YEARS.forEach(y => {
+  const d = document.createElement("div"); d.className = "band";
+  d.innerHTML = `<div class="bandhead">year ${y.n} · phases ${y.s} to ${y.e}</div>`;
+  const t = document.createElement("div"); t.className = "track";
+  RUNS.filter(r => r.s >= y.s && r.s < y.e).forEach((r,i) => {
+    const s = document.createElement("div");
+    s.className = "seg" + (r.state === "interrupted" ? " inter" : "");
+    s.style.left = ((r.s - y.s)/(y.e - y.s)*100) + "%";
+    s.style.width = Math.max(1.5,(r.e - r.s)/(y.e - y.s)*100) + "%";
+    s.title = `${r.res} ${r.s} to ${r.e} · ${r.state}`;
+    s.onclick = () => {
+      document.querySelectorAll(".seg").forEach(x => x.classList.remove("sel"));
+      s.classList.add("sel");
+      detail.innerHTML = `<b>${r.res}</b> ${r.s} to ${r.e} · ${r.state}` +
+        (r.at ? `<br>break at <b>${r.at}</b> · seeded invasion` : "") +
+        `<br>${r.events.length} events · aggregate rows link each event`;
+    };
+    t.appendChild(s);
+  });
+  if (y.n === 2) {
+    const m = document.createElement("div"); m.className = "mark"; m.textContent = "▲ 3700 invasion";
+    m.style.left = ((3700-3600)/3600*100) + "%"; m.title = "salient schedule · macro stopped, no state change";
+    t.appendChild(m);
+  }
+  d.appendChild(t); bands.appendChild(d);
+});
+digest.textContent = DIGEST;
+SOURCES.forEach(([q,ty,ph,what]) => {
+  const tr = document.createElement("tr"); tr.className = "ev";
+  tr.innerHTML = `<td class="dim">${q}</td><td>${ty}</td><td class="dim">${ph}</td><td>${what}</td>`;
+  sources.appendChild(tr);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mock C · console ledger</title>
+<style>
+:root { color-scheme: dark; --bg:#000; --fg:#e8e8e8; --dim:#9a9a9a; --line:#2c2c2c; --acc:#7dd87d; --warn:#e0a23c; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 13px/1.45 ui-monospace, monospace; margin: 0; padding: 12px 16px; }
+h1 { font-family: system-ui, sans-serif; font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+h2 { font-family: system-ui, sans-serif; font-size: 13px; margin: 14px 0 4px; font-weight: 600; }
+.dim { color: var(--dim); }
+.ctrl { display: flex; gap: 8px; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 8px; flex-wrap: wrap; }
+button { background: none; border: 1px solid var(--line); color: var(--fg); padding: 3px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+button:disabled { color: var(--dim); cursor: default; }
+table { border-collapse: collapse; width: 100%; }
+th { text-align: left; color: var(--dim); font-weight: 600; font-size: 11px; border-bottom: 1px solid var(--line); padding: 3px 8px 3px 0; }
+td { border-bottom: 1px solid var(--line); padding: 3px 8px 3px 0; vertical-align: top; }
+tr.row { cursor: pointer; } tr.row:hover td { background: #111; }
+tr.sub td { color: var(--dim); border-bottom: 1px dotted var(--line); padding-left: 24px; }
+.warn { color: var(--warn); } .ok { color: var(--acc); }
+</style>
+</head>
+<body>
+<h1>generations · ledger <span class="dim">mock C, static</span></h1>
+<div class="ctrl">
+  <span class="dim">clock 7200 · ended · select then advance</span>
+  <button data-r="day">day</button><button data-r="week">week</button>
+  <button data-r="month">month</button><button data-r="year">year</button>
+  <button id="go" disabled>advance</button>
+  <span class="dim" id="pick">no resolution selected</span>
+</div>
+<h2>macro runs · 20</h2>
+<table id="runs"><tr><th>period</th><th>res</th><th>state</th><th>events</th></tr></table>
+<h2>interruptions · 1</h2>
+<table><tr><th>run</th><th>at</th><th>reason</th><th>detail</th></tr>
+<tr><td class="dim">[3600,3900)</td><td class="warn">3700</td><td>seeded_event</td><td class="dim">seeded break inside the period · no state change</td></tr></table>
+<h2>focus ledger · main</h2>
+<table><tr><th>v</th><th>from</th><th>to</th><th>at</th><th>reason</th></tr>
+<tr><td class="dim">0</td><td class="dim">—</td><td>Bram</td><td class="dim">0</td><td class="dim">Founding</td></tr>
+<tr><td class="dim">1</td><td class="dim">Bram</td><td>Cora</td><td class="dim">3800</td><td class="dim">Bram falls, Cora rises</td></tr></table>
+<h2>ending evidence · 2</h2>
+<table><tr><th>kind</th><th>met</th><th>window</th><th>detail</th></tr>
+<tr><td>sustained_peace</td><td class="ok">yes</td><td class="dim">[6900,7200]</td><td class="dim">no deaths, no major events across 300 phases</td></tr>
+<tr><td>maximum_day</td><td class="ok">yes</td><td class="dim">[7200,7200]</td><td class="dim">clock 7200 past day 721 start · 1 world-ended event</td></tr></table>
+<script>
+const RUNS = [
+  ["[0,3600)","year","completed",3],["[3600,3900)","month","interrupted",0],
+  ["[3700,3710)","day","completed",1],["[3710,3780)","week","completed",1],
+  ["[3780,3850)","week","completed",2],["[3850,3920)","week","completed",1],
+  ["[4200,4500)","month","completed",1],["[4500,4800)","month","completed",1],
+  ["[4800,5100)","month","completed",1],["[6900,7200)","month","completed",1],
+];
+const DETAIL = {
+  "[0,3600)": [["clock_advance","tick 3599","year 0 to 3600"],["schedule_progress","birth Cora at 100","fire plus consequence rows"],["schedule_progress","harvest at 200","fire only"]],
+  "[3600,3900)": [["none","no commits","interrupted before any write"]],
+  "[3780,3850)": [["clock_advance","tick 3849","week 3780 to 3850"],["schedule_progress","death Bram at 3800","fire plus state and lineage rows"]],
+};
+const t = document.getElementById("runs");
+RUNS.forEach(([p,res,st,n]) => {
+  const tr = document.createElement("tr"); tr.className = "row";
+  const cls = st === "interrupted" ? "warn" : "";
+  tr.innerHTML = `<td class="dim">${p}</td><td>${res}</td><td class="${cls}">${st}</td><td class="dim">${n}</td>`;
+  t.appendChild(tr);
+});
+t.onclick = e => {
+  const tr = e.target.closest("tr.row"); if (!tr) return;
+  document.querySelectorAll("tr.sub").forEach(x => x.remove());
+  const p = tr.firstChild.textContent;
+  let anchor = tr;
+  (DETAIL[p] || [["clock_advance","tick","quiet span"]]).forEach(([k,what,how]) => {
+    const s = document.createElement("tr"); s.className = "sub";
+    s.innerHTML = `<td>${k}</td><td colspan="3">${what} · ${how}</td>`;
+    anchor.after(s); anchor = s;
+  });
+};
+document.querySelectorAll("[data-r]").forEach(b => b.onclick = () => {
+  go.disabled = false;
+  pick.textContent = b.dataset.r + " · runnable only if window starts at clock";
+});
+</script>
+</body>
+</html>

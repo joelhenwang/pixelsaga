@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mock B · lineage tree</title>
+<style>
+:root { color-scheme: dark; --bg:#000; --fg:#e8e8e8; --dim:#9a9a9a; --line:#2c2c2c; --acc:#7dd87d; --warn:#e0a23c; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 system-ui, sans-serif; margin: 0; padding: 12px 16px; }
+h1 { font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+.dim { color: var(--dim); }
+.cols { display: grid; grid-template-columns: 300px 1fr; gap: 0; margin-top: 8px; }
+.tree { border-right: 1px solid var(--line); padding-right: 16px; font-family: ui-monospace, monospace; font-size: 13px; }
+.node { padding: 6px 8px; cursor: pointer; border-left: 2px solid transparent; }
+.node:hover { background: #111; }
+.node[aria-selected="true"] { border-left-color: var(--acc); background: #0e1a0e; }
+.node .dead { color: var(--dim); }
+.life { position: relative; height: 10px; background: #161616; margin: 4px 0 2px 20px; }
+.life i { position: absolute; top: 0; bottom: 0; background: var(--acc); }
+.life i.dead { background: var(--dim); }
+.life em { position: absolute; top: -3px; color: var(--warn); font-style: normal; font-size: 10px; }
+.detail { padding-left: 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; margin-top: 6px; }
+th { text-align: left; color: var(--dim); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0; }
+td { border-bottom: 1px solid var(--line); padding: 4px 8px 4px 0; vertical-align: top; }
+.strip { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; font-size: 12px; }
+.kv { font-size: 13px; } .kv b { font-weight: 600; }
+button { background: none; border: 1px solid var(--line); color: var(--fg); padding: 4px 10px; font-size: 12px; cursor: pointer; }
+</style>
+</head>
+<body>
+<h1>generations · lineage <span class="dim">mock B, static</span></h1>
+<div class="cols">
+  <div class="tree" role="tree" aria-label="lineage">
+    <div class="node" role="treeitem" aria-selected="true" data-who="bram">
+      Bram <span class="dead">0 to 3800</span>
+      <div class="life"><i style="left:0%;width:52.7%"></i><i class="dead" style="left:52.7%;width:47.3%"></i><em style="left:52.7%">▲</em></div>
+      <div class="node" role="treeitem" aria-selected="false" data-who="cora" style="margin-left:18px">
+        └ Cora <span>100 to … · heir</span>
+        <div class="life"><i style="left:1.4%;width:98.6%"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="detail">
+    <h1 id="who">Bram</h1>
+    <div class="kv" id="rec"></div>
+    <h1 style="margin-top:12px">era digests covering this life</h1>
+    <table id="eras"><tr><th>span</th><th>text</th><th>v</th></tr></table>
+    <h1 style="margin-top:12px">focus assignments</h1>
+    <table id="focus"><tr><th>slot</th><th>v</th><th>from phase</th><th>reason</th></tr></table>
+    <div class="strip"><span class="dim">advance from 7200 · world ended</span>
+      <button disabled>day</button> <button disabled>week</button> <button disabled>month</button> <button disabled>year</button>
+    </div>
+  </div>
+</div>
+<script>
+const PEOPLE = {
+  bram: { name: "Bram", born: 0, died: 3800, eligible: "yes", memories: 14,
+    eras: [["0 to 3600", "1 birth, 1 note, 1 tick; Cora born 100", 1]],
+    focus: [["main", 0, 0, "Founding"]] },
+  cora: { name: "Cora", born: 100, died: null, eligible: "yes", memories: 0,
+    eras: [["0 to 3600", "born 100 of Bram", 1], ["3600 to 7200", "1 death, 14 ticks, 1 interruption", 1]],
+    focus: [["main", 1, 3800, "Bram falls, Cora rises"]] },
+};
+function show(who) {
+  document.querySelectorAll(".node[data-who]").forEach(n =>
+    n.setAttribute("aria-selected", n.dataset.who === who ? "true" : "false"));
+  const p = PEOPLE[who];
+  who_el.textContent = p.name;
+  rec.innerHTML = `born <b>${p.born}</b> · died <b>${p.died ?? "living"}</b> · age <b>${(p.died ?? 7200) - p.born} phases</b>` +
+    `<br>succession eligible <b>${p.eligible}</b> · owned memories <b>${p.memories}</b> (never inherited)`;
+  eras.innerHTML = "<tr><th>span</th><th>text</th><th>v</th></tr>" + p.eras.map(e =>
+    `<tr><td class="dim">${e[0]}</td><td>${e[1]}</td><td class="dim">${e[2]}</td></tr>`).join("");
+  focus.innerHTML = "<tr><th>slot</th><th>v</th><th>from phase</th><th>reason</th></tr>" + p.focus.map(f =>
+    `<tr><td>${f[0]}</td><td class="dim">${f[1]}</td><td class="dim">${f[2]}</td><td>${f[3]}</td></tr>`).join("");
+}
+const who_el = document.getElementById("who");
+document.querySelectorAll(".node[data-who]").forEach(n => n.onclick = e => { e.stopPropagation(); show(n.dataset.who); });
+show("bram");
+</script>
+</body>
+</html>
