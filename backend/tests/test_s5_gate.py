@@ -218,12 +218,11 @@ def test_two_year_succession(migrated_db: None) -> None:
                     clock = absolute_index(world.day, world.phase)
             assert clock == 7200
 
-            succession = await assign_focus(
-                factory, wid, FocusSlot.MAIN, cora, "Bram falls, Cora rises", 3800
-            )
-            assert succession.from_character_id == bram and succession.version == 1
             holder = await current_focus(factory, wid, FocusSlot.MAIN)
             assert holder is not None and holder.to_character_id == cora
+            assert holder.from_character_id == bram and holder.version == 1
+            assert holder.effective_absolute == 3800
+            assert "succession on death" in holder.reason
             log["focus"] = [
                 {"holder": "Bram", "at": 0, "version": 0},
                 {"holder": "Cora", "at": 3800, "version": 1},

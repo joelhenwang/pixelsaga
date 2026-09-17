@@ -91,3 +91,24 @@ class SqlAlchemyVersionStore:
                     f"stale aggregate {aggregate_id}: "
                     f"expected={expected[aggregate_id]} actual={locked[aggregate_id].version}",
                 )
+
+    async def sync_version(
+        self, aggregate_id: UUID, world_id: UUID, kind: str, version: int
+    ) -> None:
+        """Set the store to an applier-owned row version.
+
+        Only the macro consequence applier uses this, immediately after
+        writes that bypass canonical (birth/death/succession rows). It
+        restores the row/store lockstep invariant so later canonical
+        touches read live versions without conflict.
+        """
+        row = await self._session.get(AggregateVersionRow, aggregate_id)
+        if row is None:
+            self._session.add(
+                AggregateVersionRow(
+                    aggregate_id=aggregate_id, world_id=world_id, kind=kind, version=version
+                )
+            )
+        else:
+            row.version = version
+        await self._session.flush()

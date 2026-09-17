@@ -209,13 +209,33 @@ def test_focus_succession_is_explicit_and_gated(migrated_db: None) -> None:
             factory = lambda: create_unit_of_work(engine)  # noqa: E731
             async with factory() as uow:
                 wid = new_world_id()
+                home = new_location_id()
                 founder = new_character_id()
                 heir = new_character_id()
                 stranger = new_character_id()
                 await uow.worlds.add(World(id=wid, name="Vale", seed_version="s5-test"))
-                await uow.characters.add_identity(founder, wid, "Founder")
-                await uow.characters.add_identity(heir, wid, "Heir")
-                await uow.characters.add_identity(stranger, wid, "Stranger")
+                await uow.locations.add(Location(id=home, world_id=wid, name="Hearth"))
+                for cid, name in (
+                    (founder, "Founder"),
+                    (heir, "Heir"),
+                    (stranger, "Stranger"),
+                ):
+                    await uow.characters.add_identity(cid, wid, name)
+                    await uow.characters.add_card(
+                        CharacterCard(id=new_card_id(), character_id=cid, name=name)
+                    )
+                    await uow.characters.add_state(
+                        Character(
+                            id=cid,
+                            world_id=wid,
+                            name=name,
+                            card_version=1,
+                            location_id=home,
+                            stamina=80,
+                            mana=40,
+                        )
+                    )
+                    await uow.versions.ensure(cid, wid, "character")
                 await uow.lineage.put_record(
                     LineageCharacter(
                         character_id=founder,
@@ -276,7 +296,24 @@ def test_engine_never_assigns_focus(migrated_db: None) -> None:
 
             newcomer = new_character_id()
             async with factory() as uow:
+                home = new_location_id()
+                await uow.locations.add(Location(id=home, world_id=wid, name="Hearth"))
                 await uow.characters.add_identity(newcomer, wid, "Newcomer")
+                await uow.characters.add_card(
+                    CharacterCard(id=new_card_id(), character_id=newcomer, name="Newcomer")
+                )
+                await uow.characters.add_state(
+                    Character(
+                        id=newcomer,
+                        world_id=wid,
+                        name="Newcomer",
+                        card_version=1,
+                        location_id=home,
+                        stamina=80,
+                        mana=40,
+                    )
+                )
+                await uow.versions.ensure(newcomer, wid, "character")
                 await uow.commit()
             await assign_focus(factory, wid, FocusSlot.COMPANION, newcomer, "Joins", 70)
             companion = await current_focus(factory, wid, FocusSlot.COMPANION)

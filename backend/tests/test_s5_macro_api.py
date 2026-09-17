@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -38,7 +39,7 @@ def _run(awaitable: Any) -> Any:
 
 
 @pytest.fixture
-def client(migrated_db: None) -> TestClient:
+def client(migrated_db: None) -> Iterator[TestClient]:
     gateway = FakeGateway(profile=FAKE_TEST_PROFILE)
     app = create_app(
         Settings(),
@@ -67,22 +68,32 @@ def _seed() -> dict[str, UUID]:
                 )
                 await uow.characters.add_state(
                     Character(
-                        id=bram, world_id=wid, name="Bram", card_version=1,
-                        location_id=home, stamina=80, mana=40,
+                        id=bram,
+                        world_id=wid,
+                        name="Bram",
+                        card_version=1,
+                        location_id=home,
+                        stamina=80,
+                        mana=40,
                     )
                 )
                 await uow.versions.ensure(wid, wid, "world")
                 await uow.versions.ensure(bram, wid, "character")
                 await uow.lineage.put_record(
                     LineageCharacter(
-                        character_id=bram, world_id=wid,
-                        birth_absolute=0, succession_eligible=True,
+                        character_id=bram,
+                        world_id=wid,
+                        birth_absolute=0,
+                        succession_eligible=True,
                     )
                 )
                 await uow.schedules.add(
                     ScheduledEffect(
-                        id=new_schedule_id(), world_id=wid, due_absolute=5,
-                        kind="note", payload={"text": "market opens"},
+                        id=new_schedule_id(),
+                        world_id=wid,
+                        due_absolute=5,
+                        kind="note",
+                        payload={"text": "market opens"},
                     )
                 )
                 await uow.commit()
