@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mock A01-A: Home, art-led (fixture)</title>
+<title>Mock A01-A v2: Home, reference layout (fixture)</title>
 <style>
 :root{
   --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
@@ -13,49 +13,65 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface-page);color:var(--text-primary);
-  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
-h1,h2,h3{font-family:Georgia,"Source Serif 4",serif;margin:0}
+  font:15px/1.5 Georgia,"Source Serif 4",serif}
 .topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
   background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
 .topbar .brand{font-family:Georgia,serif;font-size:17px}
 .topbar nav{display:flex;gap:2px}
-.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
-.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
-.topbar .side{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px;color:var(--text-secondary)}
+.topbar nav a{font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:14px;
+  color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:var(--action-primary);border-bottom:2px solid var(--action-primary);border-radius:0}
+.topbar .side{margin-left:auto;display:flex;gap:10px;align-items:center;
+  font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:13px;color:var(--text-secondary)}
 .topbar .avatar{width:30px;height:30px;border-radius:50%;background:var(--action-primary);color:#fff;
-  display:flex;align-items:center;justify-content:center;font-size:13px}
-.wrap{max-width:1200px;margin:0 auto;padding:20px}
-.hero{position:relative;border-radius:12px;overflow:hidden;background:#e8e2d4;min-height:300px}
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-family:-apple-system,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.hero{position:relative;border-radius:12px;overflow:hidden;background:#e8e2d4;min-height:430px;
+  border:1px solid var(--border-subtle)}
 .hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.continue{position:absolute;left:20px;top:20px;max-width:420px;background:rgba(20,16,8,.62);
-  border-radius:12px;padding:16px 20px;color:#fff}
-.continue .kicker{font-size:12px;letter-spacing:.08em;color:#f0d9a8}
-.continue h1{font-size:30px;color:#fff}
-.continue p{margin:6px 0;font-size:14px;color:#fff}
-.row{display:flex;gap:10px;margin-top:12px}
-.btn{border:0;border-radius:8px;height:42px;padding:0 18px;font:inherit;font-size:14px;cursor:pointer}
+.info{position:absolute;left:18px;bottom:18px;right:170px;background:var(--surface-panel);
+  border:1px solid var(--accent-gold);border-radius:12px;padding:14px 18px}
+.info .kicker{font-size:12px;letter-spacing:.1em;color:var(--accent-gold)}
+.info h1{font-size:32px;margin:0}
+.info h1 .ii{font-size:16px;color:var(--text-secondary);vertical-align:middle}
+.info .meta{font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:13px;color:var(--text-secondary);margin:2px 0 6px}
+.info p{font-size:14px;margin:4px 0;font-style:italic}
+.go{position:absolute;right:18px;bottom:18px;width:140px}
+.btn{border:0;border-radius:8px;min-height:42px;padding:10px 18px;font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;
+  font-size:14px;cursor:pointer;width:100%}
 .btn.primary{background:var(--action-primary);color:#fff}
-.btn.ghost{background:transparent;color:#fff;border:1px solid #fff}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px}
-.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px}
-.panel h2{font-size:19px;margin-bottom:8px}
-.story{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--border-subtle)}
-.story:first-of-type{border-top:0}
-.story img{width:52px;height:52px;border-radius:8px;object-fit:cover}
-.story b{display:block;font-size:14px}
-@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
-.story .go{margin-left:auto}
-.link{background:none;border:0;color:var(--action-primary);font:inherit;font-size:14px;cursor:pointer;padding:8px}
-.newcard{text-align:center}
-.newcard p{font-size:14px;color:var(--text-secondary)}
-.states{margin-top:16px;font-size:13px;color:var(--text-secondary)}
+.btn.plain{border:1px solid var(--accent-gold);background:var(--surface-panel);color:var(--text-primary);margin-top:8px}
+.quote{font-style:italic;font-size:13px;color:var(--text-secondary);text-align:center;margin:10px 0 0}
+.side{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface-panel);border:1px solid var(--accent-gold);border-radius:12px;padding:16px 18px}
+.card h2{font-size:23px;text-align:center}
+.card h2 .star{color:var(--accent-gold)}
+.card .rule{text-align:center;color:var(--accent-gold);margin:2px 0 8px}
+.card p{font-size:14px}
+.card .openrow{display:flex;align-items:center;justify-content:space-between}
+.card .openrow h2{text-align:left;font-size:19px}
+.link{background:none;border:0;color:var(--action-primary);font-family:-apple-system,sans-serif;
+  font-size:14px;cursor:pointer;padding:8px;white-space:nowrap}
+.minis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.mini{border:1px solid var(--border-subtle);border-radius:8px;overflow:hidden;background:#fff}
+.mini img{width:100%;height:74px;object-fit:cover;display:block}
+.mini b{display:block;font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:12.5px;padding:4px 8px}
+.mini span{display:block;font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:11.5px;
+  color:var(--text-secondary);padding:0 8px 6px}
+.minis.chars{grid-template-columns:1fr 1fr 1fr}
+.minis.chars img{height:86px}
+.seclabel{font-family:-apple-system,sans-serif;font-size:12px;letter-spacing:.08em;color:var(--text-secondary);margin:12px 0 2px}
+.states{margin-top:16px;font-family:-apple-system,sans-serif;font-size:13px;color:var(--text-secondary)}
 .states button{font:inherit;font-size:13px;margin-right:6px;padding:6px 10px;border-radius:8px;
   border:1px solid var(--border-subtle);background:var(--surface-panel);cursor:pointer}
-.notice{border:1px solid var(--accent-gold);border-radius:8px;padding:8px 12px;margin-top:12px;font-size:14px}
+.notice{border:1px solid var(--accent-gold);border-radius:8px;padding:8px 12px;margin-top:12px;
+  font-family:-apple-system,sans-serif;font-size:14px}
 .error{border-color:var(--status-danger);color:var(--status-danger)}
 .hidden{display:none}
 :focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
-@media (max-width:768px){.grid{grid-template-columns:1fr}.continue{left:12px;right:12px;top:12px;max-width:none}}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.info{right:18px}.go{position:static;width:auto;margin:0 18px 18px}}
+@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
 </style>
 </head>
 <body>
@@ -68,63 +84,57 @@ h1,h2,h3{font-family:Georgia,"Source Serif 4",serif;margin:0}
   <span class="side"><a href="settings.html" style="color:inherit">Help</a><span class="avatar" title="Local profile">J</span></span>
 </header>
 <main class="wrap">
-  <section class="hero" aria-label="Continue">
-    <img src="../../content/assets/revamp/hearth-background-v1.png" alt="Hearth market at dawn">
-    <div class="continue">
-      <div class="kicker">CONTINUE &middot; EMBER VALE &middot; DAY 3 MORNING</div>
-      <h1>The Sealed Gate</h1>
-      <p>Watching &middot; a cryptic marking at the forge</p>
-      <div class="row">
-        <button class="btn primary" type="button">Continue story</button>
-        <button class="btn ghost" type="button">View setup</button>
-      </div>
-    </div>
-  </section>
   <div class="grid">
-    <section class="panel" aria-label="Recent stories" id="recentPanel">
-      <h2>Recent stories</h2>
-      <div id="recentList">
-        <div class="story">
-          <img src="../../content/assets/revamp/market-background-v1.png" alt="">
-          <div><b>Ashes Beneath the Snow</b><span>Ember Vale &middot; Watcher &middot; Day 8</span></div>
-          <button class="go link" type="button">Open</button>
-        </div>
-        <div class="story">
-          <img src="../../content/assets/revamp/wren-portrait-v1.png" alt="Wren portrait">
-          <div><b>The Lantern Road</b><span>Ember Vale &middot; Player as Wren &middot; Day 2</span></div>
-          <button class="go link" type="button">Open</button>
-        </div>
+    <section class="hero" aria-label="Continue story">
+      <img src="../../content/assets/revamp/hearth-background-v1.png" alt="Hearth market cover art">
+      <div class="info">
+        <div class="kicker">&#10022; CURRENT STORY</div>
+        <h1>The Sealed Gate <span class="ii" title="Open original setup">&#9432;</span></h1>
+        <p class="meta">Day 3 &middot; Morning &middot; The Market Forge</p>
+        <p>A cryptic marking at the forge. Someone must know what they mean, and the old archive keeps its silence.</p>
       </div>
-      <div class="notice hidden" id="emptyState">No stories yet. Begin your first tale.</div>
-      <div class="notice error hidden" id="errorState">Could not load stories. <button class="link" type="button" id="retryBtn">Retry</button></div>
+      <div class="go">
+        <button class="btn primary" type="button">Continue Story &rsaquo;</button>
+        <p class="quote">Small people. Large stories.</p>
+      </div>
     </section>
-    <section class="panel newcard" aria-label="New story">
-      <h2>New story</h2>
-      <p>World, cast, play mode, then review. About six steps.</p>
-      <button class="btn primary" type="button">Start a new story</button>
-      <p><button class="link" type="button">Quick start from Ember Vale</button></p>
-    </section>
+    <div class="side">
+      <section class="card" aria-label="Begin a new tale">
+        <h2><span class="star">&#10022;</span> Begin a new tale</h2>
+        <div class="rule">&#10022;</div>
+        <p>New lands, new people, new possibilities. Shape what comes next in Ember Vale.</p>
+        <button class="btn primary" type="button">New Story &rsaquo;</button>
+        <button class="btn plain" type="button">Quick Start: Ember Vale</button>
+        <p class="quote">Curiosity is a kind of courage.</p>
+      </section>
+      <section class="card" aria-label="Your library">
+        <div class="openrow"><h2>Your Library</h2><button class="link" type="button">Open Library &rsaquo;</button></div>
+        <div class="seclabel">WORLDS &middot; 2 PLACES TO EXPLORE</div>
+        <div class="minis" id="libWorlds">
+          <div class="mini"><img src="../../content/assets/revamp/ember-vale-map-display-v1.webp" alt="Ember Vale map"><b>Ember Vale</b><span>2 locations</span></div>
+          <div class="mini"><img src="../../content/assets/revamp/market-background-v1.png" alt="Market"><b>Market Ward</b><span>district draft</span></div>
+        </div>
+        <div class="seclabel">CHARACTERS &middot; 6 PEOPLE YOU HAVE MET</div>
+        <div class="minis chars" id="libChars">
+          <div class="mini"><img src="../../content/assets/revamp/wren-portrait-v1.png" alt="Wren portrait"><b>Wren</b><span>Traveler</span></div>
+          <div class="mini"><img src="../../content/assets/revamp/ash-portrait-v1.png" alt="Ash portrait"><b>Ash</b><span>Wanderer</span></div>
+          <div class="mini"><img src="../../content/assets/revamp/character-creation-preview-v1.png" alt="New character"><b>+ New</b><span>create</span></div>
+        </div>
+        <div class="notice error hidden" id="libError">Library is unreachable. <button class="link" type="button" id="libRetry">Retry</button></div>
+      </section>
+    </div>
   </div>
   <p class="states">Fixture states:
     <button type="button" data-s="normal">Normal</button>
-    <button type="button" data-s="empty">Empty</button>
-    <button type="button" data-s="error">Error</button>
-    <span>Narrow: test at 390px, panels stack.</span>
+    <button type="button" data-s="error">Library error</button>
   </p>
 </main>
 <script>
-const list = document.getElementById('recentList');
-const empty = document.getElementById('emptyState');
-const err = document.getElementById('errorState');
+const err = document.getElementById('libError');
 document.querySelectorAll('[data-s]').forEach(b => b.addEventListener('click', () => {
-  const s = b.dataset.s;
-  list.classList.toggle('hidden', s !== 'normal');
-  empty.classList.toggle('hidden', s !== 'empty');
-  err.classList.toggle('hidden', s !== 'error');
+  err.classList.toggle('hidden', b.dataset.s !== 'error');
 }));
-document.getElementById('retryBtn').addEventListener('click', () => {
-  err.classList.add('hidden'); list.classList.remove('hidden');
-});
+document.getElementById('libRetry').addEventListener('click', () => err.classList.add('hidden'));
 </script>
 </body>
 </html>

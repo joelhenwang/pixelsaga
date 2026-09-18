@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mock A01: Library and preset editor (fixture)</title>
+<title>Mock A01: Library, worlds and characters split (fixture)</title>
 <style>
 :root{
   --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
@@ -13,45 +13,53 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface-page);color:var(--text-primary);
-  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
-h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0}
+  font:15px/1.5 Georgia,"Source Serif 4",serif}
+h1,h2{margin:0}
 .topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
   background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
 .topbar .brand{font-family:Georgia,serif;font-size:17px}
 .topbar nav{display:flex;gap:2px}
-.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
-.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
-.wrap{max-width:1200px;margin:0 auto;padding:20px}
+.topbar nav a{font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:14px;
+  color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:var(--action-primary);border-bottom:2px solid var(--action-primary);border-radius:0}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
 h1.page{font-size:30px}
-.sub{color:var(--text-secondary);font-size:14px;margin:0 0 12px}
-.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.tabs button{font:inherit;font-size:14px;padding:8px 14px;border-radius:8px;cursor:pointer;
-  border:1px solid var(--border-subtle);background:var(--surface-panel)}
-.tabs button[aria-pressed="true"]{background:var(--action-primary);border-color:var(--action-primary);color:#fff}
-.main{display:grid;grid-template-columns:3fr 2fr;gap:16px}
-.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px}
-.panel h2{font-size:19px;margin-bottom:8px}
-.presets{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.preset{border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;background:#fff;text-align:left;font:inherit;padding:0;cursor:pointer}
-.preset img{width:100%;height:120px;object-fit:cover;display:block}
-.preset .body{padding:8px 10px}
-.preset b{font-size:14px}.preset span{display:block;font-size:12.5px;color:var(--text-secondary)}
+.sub{font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;color:var(--text-secondary);font-size:14px;margin:0 0 12px}
+.split{display:grid;grid-template-columns:1fr 1px 1fr;gap:16px}
+.divider{background:var(--accent-gold);opacity:.5;border-radius:1px}
+.pane h2{font-size:22px}
+.pane .count{font-family:-apple-system,sans-serif;font-size:13px;color:var(--text-secondary)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-top:10px}
+.preset{border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;background:#fff;
+  text-align:left;font:inherit;padding:0;cursor:pointer}
+.preset img{width:100%;height:150px;object-fit:cover;display:block}
+.preset .body{padding:8px 12px 10px}
+.preset b{display:block;font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;font-size:14px}
+.preset span{display:block;font-family:-apple-system,"Source Sans 3",Segoe UI,sans-serif;
+  font-size:12.5px;color:var(--text-secondary)}
 .preset[aria-pressed="true"]{outline:2px solid var(--action-primary)}
-.chip{display:inline-block;font-size:11.5px;border:1px solid var(--border-subtle);border-radius:6px;padding:1px 7px;margin:2px 4px 0 0}
-label.field{display:block;font-size:14px;margin:10px 0}
-label.field span{display:block;font-size:13px;color:var(--text-secondary)}
-input[type=text],textarea,select{font:inherit;font-size:14px;border:1px solid var(--border-subtle);
-  border-radius:8px;padding:8px 10px;width:100%;background:#fff;color:var(--text-primary)}
-textarea{min-height:64px;resize:vertical}
-.btn{border:0;border-radius:8px;height:42px;padding:0 18px;font:inherit;font-size:14px;cursor:pointer}
+.chip{display:inline-block;font-family:-apple-system,sans-serif;font-size:11.5px;
+  border:1px solid var(--border-subtle);border-radius:6px;padding:1px 7px;margin:3px 4px 0 0}
+label.field{display:block;font-family:-apple-system,sans-serif;font-size:14px;margin:10px 0}
+input[type=text],textarea{font:inherit;font-family:-apple-system,sans-serif;font-size:14px;
+  border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;width:100%;background:#fff;color:var(--text-primary)}
+.btn{border:0;border-radius:8px;height:42px;padding:0 18px;font-family:-apple-system,sans-serif;font-size:14px;cursor:pointer}
 .btn.primary{background:var(--action-primary);color:#fff}
 .btn.plain{border:1px solid var(--border-subtle);background:var(--surface-panel)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
-.dirty{font-size:13px;color:var(--accent-gold);min-height:20px}
-.note{font-size:13px;color:var(--text-secondary)}
+.editor{margin-top:16px;background:var(--surface-panel);border:1px solid var(--accent-gold);
+  border-radius:12px;padding:14px 16px}
+.editor h2{font-size:19px}
+.dirty{font-family:-apple-system,sans-serif;font-size:13px;color:var(--accent-gold);min-height:20px}
+.note{font-family:-apple-system,sans-serif;font-size:13px;color:var(--text-secondary)}
+.more{margin-top:16px}
+.more summary{font-size:17px;cursor:pointer}
+.more .row{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap}
+.more .preset{max-width:230px}
 .hidden{display:none}
+:focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
+@media (max-width:900px){.split{grid-template-columns:1fr}.divider{display:none}}
 @media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
-@media (max-width:768px){.main{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -63,18 +71,26 @@ textarea{min-height:64px;resize:vertical}
   </nav>
 </header>
 <main class="wrap">
-  <h1 class="page">Library</h1>
-  <p class="sub">Reusable presets. Editing saves a new revision; stories pinned to older revisions never change.</p>
-  <div class="tabs" role="group" aria-label="Preset category">
-    <button type="button" aria-pressed="false" data-cat="worlds">Worlds (1)</button>
-    <button type="button" aria-pressed="true" data-cat="chars">Characters (2)</button>
-    <button type="button" aria-pressed="false" data-cat="styles">Style Packs (1)</button>
-    <button type="button" aria-pressed="false" data-cat="templates">Templates (1)</button>
-  </div>
-  <div class="main">
-    <section class="panel" aria-label="Presets">
-      <h2 id="catTitle">Characters</h2>
-      <div class="presets" id="grid">
+  <h1 class="page">&#10022; Library</h1>
+  <p class="sub">Worlds and characters side by side. Editing saves a new revision; pinned stories never change.</p>
+  <div class="split">
+    <section class="pane" aria-label="World presets">
+      <h2>Worlds <span class="count">&middot; 2 places to explore</span></h2>
+      <div class="cards">
+        <button class="preset" type="button" aria-pressed="true">
+          <img src="../../content/assets/revamp/ember-vale-map-display-v1.webp" alt="Ember Vale map">
+          <span class="body"><b>Ember Vale</b><span>Hearth, Market &middot; rev 1 &middot; built-in</span></span>
+        </button>
+        <button class="preset" type="button" aria-pressed="false">
+          <img src="../../content/assets/revamp/market-background-v1.png" alt="Market ward">
+          <span class="body"><b>Market Ward</b><span>district draft &middot; rev 2</span></span>
+        </button>
+      </div>
+    </section>
+    <div class="divider" aria-hidden="true"></div>
+    <section class="pane" aria-label="Character presets">
+      <h2>Characters <span class="count">&middot; 6 people you have met</span></h2>
+      <div class="cards" id="charGrid">
         <button class="preset" type="button" aria-pressed="true" data-name="Wren">
           <img src="../../content/assets/revamp/wren-portrait-v1.png" alt="Wren portrait">
           <span class="body"><b>Wren</b><span>Traveler &middot; rev 1 &middot; used in 2 stories</span>
@@ -86,59 +102,52 @@ textarea{min-height:64px;resize:vertical}
           <span><span class="chip">Human</span><span class="chip">Player-ready</span></span></span>
         </button>
       </div>
-      <p class="note" id="builtIn">Wren and Ash are built-in: duplicate before editing. The original stays read-only.</p>
-    </section>
-    <section class="panel" aria-label="Preset editor">
-      <h2>Edit &middot; <span id="editName">Wren</span></h2>
-      <p class="dirty" id="dirty"></p>
-      <label class="field"><span>Display name</span><input type="text" id="fName" value="Wren"></label>
-      <label class="field"><span>Personality</span><textarea id="fDesc">Quick eyes, a quicker smile, and a habit of asking what if.</textarea></label>
-      <label class="field"><span>Tags</span><input type="text" id="fTags" value="Human, Explorer, Player-ready"></label>
-      <div style="display:flex;gap:10px;margin-top:10px">
-        <button class="btn primary" type="button" id="saveBtn" disabled>Save revision</button>
-        <button class="btn plain" type="button">Duplicate</button>
-      </div>
-      <p class="note">Save writes rev 2 alongside rev 1. Switching tabs with unsaved edits asks Save / Discard / Stay.</p>
     </section>
   </div>
+  <section class="editor" aria-label="Preset editor">
+    <h2>Edit &middot; <span id="editName">Wren</span></h2>
+    <p class="dirty" id="dirty"></p>
+    <label class="field">Display name<input type="text" id="fName" value="Wren"></label>
+    <div style="display:flex;gap:10px;margin-top:10px">
+      <button class="btn primary" type="button" id="saveBtn" disabled>Save revision</button>
+      <button class="btn plain" type="button">Duplicate</button>
+    </div>
+    <p class="note">Built-ins are read-only: duplicate before editing. Save writes rev 2 alongside rev 1.</p>
+  </section>
+  <details class="more">
+    <summary>Style Packs (1) and Templates (1)</summary>
+    <div class="row">
+      <div class="preset"><img src="../../content/assets/revamp/hearth-background-v1.png" alt="Anime saga style"><span class="body"><b>Anime Saga</b><span>anime-saga-v1 &middot; built-in</span></span></div>
+      <div class="preset"><span class="body"><b>Ember Vale opening</b><span>world + cast + tone template &middot; rev 1</span></span></div>
+    </div>
+  </details>
 </main>
 <script>
-const original = { name: 'Wren', desc: 'Quick eyes, a quicker smile, and a habit of asking what if.', tags: 'Human, Explorer, Player-ready' };
-const fName = document.getElementById('fName'), fDesc = document.getElementById('fDesc'), fTags = document.getElementById('fTags');
+const fName = document.getElementById('fName');
 const dirty = document.getElementById('dirty'), saveBtn = document.getElementById('saveBtn');
+let saved = 'Wren';
 function check() {
-  const d = fName.value !== original.name || fDesc.value !== original.desc || fTags.value !== original.tags;
+  const d = fName.value !== saved;
   dirty.textContent = d ? 'Unsaved changes (will become rev 2).' : '';
   saveBtn.disabled = !d;
 }
-[fName, fDesc, fTags].forEach(f => f.addEventListener('input', check));
+fName.addEventListener('input', check);
 saveBtn.addEventListener('click', () => {
-  Object.assign(original, { name: fName.value, desc: fDesc.value, tags: fTags.value });
-  document.getElementById('editName').textContent = original.name;
+  saved = fName.value;
+  document.getElementById('editName').textContent = saved;
   check();
   dirty.textContent = 'Saved as rev 2. Stories pinned to rev 1 are unchanged.';
   saveBtn.disabled = true;
 });
-document.getElementById('grid').addEventListener('click', e => {
+document.getElementById('charGrid').addEventListener('click', e => {
   const c = e.target.closest('.preset'); if (!c) return;
-  if (fName.value !== original.name) {
-    if (!window.confirm('Discard unsaved edits to switch presets?')) return;
-  }
-  document.querySelectorAll('.preset').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
-  const n = c.dataset.name;
-  document.getElementById('editName').textContent = n;
-  fName.value = n; fDesc.value = n === 'Wren' ? original.desc : 'A steady presence shaped by long roads and hard winters.';
-  Object.assign(original, { name: n, desc: fDesc.value, tags: fTags.value });
+  if (fName.value !== saved && !window.confirm('Discard unsaved edits to switch presets?')) return;
+  document.querySelectorAll('#charGrid .preset').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+  saved = c.dataset.name;
+  document.getElementById('editName').textContent = saved;
+  fName.value = saved;
   check();
 });
-document.querySelectorAll('[data-cat]').forEach(b => b.addEventListener('click', () => {
-  if (saveBtn.disabled === false) {
-    if (!window.confirm('Unsaved edits. Save, Discard, or Stay? (fixture: OK discards)')) return;
-    Object.assign(original, { name: document.getElementById('editName').textContent, desc: fDesc.value, tags: fTags.value });
-  }
-  document.querySelectorAll('[data-cat]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-  document.getElementById('catTitle').textContent = b.textContent.replace(/ \([0-9]+\)/, '');
-}));
 </script>
 </body>
 </html>
