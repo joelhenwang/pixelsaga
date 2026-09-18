@@ -81,6 +81,17 @@ async def guarded[T](
     slot = await admit(factory, world_id, scope, owner, run_id)
     try:
         result = await work()
+    except DomainError as error:
+        if error.code in (
+            ErrorCode.VALIDATION_FAILED,
+            ErrorCode.FORBIDDEN,
+            ErrorCode.NOT_FOUND,
+            ErrorCode.PRECONDITION_FAILED,
+        ):
+            await TaskService(factory).reset_slot(slot.id, owner)
+        else:
+            await release(factory, slot, owner, False)
+        raise
     except Exception:
         await release(factory, slot, owner, False)
         raise
