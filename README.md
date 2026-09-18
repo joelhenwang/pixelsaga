@@ -54,7 +54,7 @@ make migration-status
 ```
 
 Frontend: `npm run typecheck`, `npm run build`. Backend migrations live
-in `backend/migrations/versions/` (head `0026`); never edit a landed
+in `backend/migrations/versions/` (head `0029`); never edit a landed
 migration, always add one.
 
 ## Configure it
@@ -75,6 +75,10 @@ optional bearer key persisted from the toolbar key field.
   `docker compose up -d api`. The entrypoint migrates before serving;
   readiness reports database, migration, extension, seed, and profile
   checks.
+- Web: `docker compose up -d web` serves the production bundle on
+  `${WEB_PORT:-8080}` with `/api` proxied to the API service and SPA
+  fallback for deep links. No bearer secrets ship in the bundle; the
+  key field persists locally in the browser.
 - Back up: `make backup` dumps to `backups/` (gitignored).
   `make restore-check BACKUP=backups/<file>.sql` restores into a
   scratch database and compares event, world, and alembic counts.
@@ -94,6 +98,11 @@ optional bearer key persisted from the toolbar key field.
 - Hardening: bearer-key enforcement, deploy image, verified backup
   round trip. Stage 4 (local model topology) is deferred, pending
   hardware.
+- Revamp: Adventure Journal plus World Observatory over capability
+  policy, presentation/chronicle contracts, asset pipeline with
+  curated starter art, single-writer admission, durable intervention
+  queue, linked creation, and persistent world conditions. Roles:
+  Watch, Direct, God, Play. See `docs/pixelsaga-revamp/HANDOFF.md`.
 
 `perchance-ver/` and `MONOLITH_MIGRATION_REFERENCE.md` are the legacy
 monolith and its migration notes, kept for reference only.

@@ -106,8 +106,10 @@ WANTED = (
     "InterventionRequest",
     "InterventionStepView",
     "InterventionView",
-    "InterventionEditRequest",
     "InterventionCancelRequest",
+    "SuggestionView",
+    "ConditionView",
+    "ConditionsResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -140,8 +142,7 @@ ROUTES = (
     ("get", "/api/v1/stage2/skills", "listSkills"),
     ("post", "/api/v1/stage2/roles/select", "selectRole"),
     ("get", "/api/v1/stage2/roles", "readRole"),
-    ("post", "/api/v1/stage2/director/proposals", "proposeDirectorHook"),
-    ("post", "/api/v1/stage2/deity/overrides", "applyDeityOverride"),
+    ("get", "/api/v1/world/conditions", "readConditions"),
     ("get", "/api/v1/stage2/timeline", "listTimeline"),
     ("get", "/api/v1/stage2/map", "readMap"),
     ("get", "/api/v1/stage2/characters/{character_id}/diary", "readDiary"),

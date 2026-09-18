@@ -160,7 +160,7 @@ async def _character_places(world_id: UUID) -> dict[str, UUID]:
         async with create_unit_of_work(engine) as uow:
             characters = await uow.characters.list_for_world(world_id)
             locations = {loc.id: loc.name for loc in await uow.locations.list_for_world(world_id)}
-            out = {}
+            out: dict[str, UUID] = {}
             for character in characters:
                 out[locations[character.location_id].lower()] = character.location_id
             return out
