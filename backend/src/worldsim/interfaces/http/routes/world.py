@@ -150,7 +150,8 @@ async def get_presentation(world_id: UUID, request: Request) -> api.Presentation
     role, viewer = await effective_role(request, world_id)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
-        return await presentation_query(uow, world_id, parse_role(role), viewer)
+        root = state.seed_dir.parent.parent / "assets"
+        return await presentation_query(uow, world_id, parse_role(role), viewer, root)
 
 
 @router.get("/world/chronicle", response_model=api.ChronicleResponse)

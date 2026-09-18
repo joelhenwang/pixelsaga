@@ -102,6 +102,20 @@ class SqlAlchemyAssetRepository:
         ).scalars()
         return [self._to_asset(row) for row in rows]
 
+    async def list_ready_for_world(self, world_id: UUID, kind: str) -> list[AssetRecord]:
+        rows = (
+            await self._session.execute(
+                select(AssetRow)
+                .where(
+                    AssetRow.world_id == world_id,
+                    AssetRow.kind == kind,
+                    AssetRow.status == "ready",
+                )
+                .order_by(AssetRow.subject_visual_version.desc())
+            )
+        ).scalars()
+        return [self._to_asset(row) for row in rows]
+
     async def add_job(self, job: ImageJob) -> None:
         self._session.add(
             ImageJobRow(

@@ -200,6 +200,10 @@ def test_link_existing_member_with_version_check(client: ApiClient) -> None:
 
 
 def test_presentation_snapshot_shape(client: ApiClient) -> None:
+    ensured = client.post(
+        "/api/v1/assets/ensure-starter", json={"world_id": str(WORLD)}, headers=_watcher()
+    )
+    assert ensured.status_code == 200, ensured.text
     response = client.get(
         "/api/v1/world/presentation", params={"world_id": str(WORLD)}, headers=_watcher()
     )
@@ -207,9 +211,14 @@ def test_presentation_snapshot_shape(client: ApiClient) -> None:
     body = response.json()
     assert body["capabilities"]["role"] == "watcher"
     assert "advance" in body["capabilities"]["capabilities"]
-    assert body["manifest"]["schematic"] is True
-    assert len(body["manifest"]["anchors"]) == 2
-    assert {c["character_id"] for c in body["cast"]} == {str(WREN), str(ASH)}
+    assert body["manifest"]["schematic"] is False
+    assert body["manifest"]["asset_id"] is not None
+    anchors = {a["location_id"]: (a["x"], a["y"]) for a in body["manifest"]["anchors"]}
+    assert anchors[str(HEARTH)] == (0.22, 0.34)
+    assert anchors[str(MARKET)] == (0.8, 0.44)
+    cast = {c["character_id"]: c for c in body["cast"]}
+    assert set(cast) == {str(WREN), str(ASH)}
+    assert cast[str(WREN)]["portrait_asset_id"] is not None
     assert body["revision"] >= 0
 
 

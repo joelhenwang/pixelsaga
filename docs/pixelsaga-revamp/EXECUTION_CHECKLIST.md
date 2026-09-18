@@ -5,7 +5,7 @@
 - [x] P02 shell, tokens, errors, shared state. Next: P03.
 - [x] P03 capability policy, identity linkage, presentation contracts. Next: P04.
 - [x] P04 asset pipeline and starter visual content. Next: P05.
-- [ ] P05 world map, chronicle, selection.
+- [x] P05 world map, chronicle, selection. Next: P06.
 - [ ] P06 reliable manual progression and autoplay.
 - [ ] P07 durable interventions and typed execution.
 - [ ] P08 adventure, player actions, character creation.

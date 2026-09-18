@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useRoute } from "vue-router";
 import { onMounted, onUnmounted, ref } from "vue";
 import type { BeatView, SceneDetail, SceneSummary } from "@gen";
 import { api } from "../api";
@@ -110,10 +111,12 @@ function onKey(event: KeyboardEvent): void {
 
 onMounted(() => {
   window.addEventListener("keydown", onKey);
-  void refresh();
-});
-onUnmounted(() => {
-  window.removeEventListener("keydown", onKey);
+  const linked = useRoute().query.scene;
+  if (typeof linked === "string" && linked) {
+    void selectScene(linked);
+  } else {
+    void refresh();
+  }
 });
 </script>
 

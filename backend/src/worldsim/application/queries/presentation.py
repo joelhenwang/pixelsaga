@@ -9,12 +9,16 @@ world row version, which every canonical write bumps.
 from __future__ import annotations
 
 import hashlib
+import json
+from pathlib import Path
 from uuid import UUID
 
 from worldsim.application.capabilities import capabilities_for, is_omniscient
 from worldsim.application.unit_of_work import UnitOfWork
+from worldsim.domain.activities import Activity
 from worldsim.domain.enums import NarrativeStatus, UserRole, Visibility
 from worldsim.domain.time import absolute_index
+from worldsim.domain.world import Location
 from worldsim.interfaces.http import schemas as api
 
 
@@ -29,6 +33,7 @@ async def presentation(
     world_id: UUID,
     role: UserRole,
     viewer: UUID | None,
+    assets_root: Path | None = None,
 ) -> api.PresentationResponse:
     """Assemble the world presentation snapshot for one effective role."""
     world = await uow.worlds.get(world_id)
@@ -49,16 +54,26 @@ async def presentation(
         or location.discovered
         or any(c.id == viewer and c.location_id == location.id for c in characters)
     }
+    portraits = await _newest_by_subject(uow, world_id, "portrait")
     cast = [
         api.CastEntry(
             character_id=character.id,
             name=character.name,
             life_status=character.life_status.value,
             location_id=character.location_id,
+            portrait_asset_id=portraits.get(character.id),
         )
         for character in characters
         if omniscient or character.location_id in visible_locations or character.id == viewer
     ]
+    manifest = _schematic_manifest(world_id, locations)
+    if assets_root is not None:
+        curated = _curated_manifest(assets_root, locations)
+        if curated is not None:
+            manifest = curated
+            maps = await uow.assets.list_ready_for_world(world_id, "map")
+            if maps:
+                manifest = manifest.model_copy(update={"asset_id": maps[0].id})
     recent = await uow.events.list_range(world_id, max(0, high - 1), 1)
     return api.PresentationResponse(
         world_id=world_id,
@@ -74,31 +89,9 @@ async def presentation(
             character_id=viewer,
             capabilities=[c.value for c in sorted(capabilities_for(role))],
         ),
-        manifest=api.MapManifestView(
-            id=f"schematic:{world_id.hex}",
-            version=1,
-            schematic=True,
-            anchors=[
-                api.MapAnchorView(location_id=location.id, x=x, y=y)
-                for location in locations
-                for x, y in [_anchor(location.id)]
-            ],
-        ),
+        manifest=manifest,
         cast=cast,
-        activities=[
-            api.ActivityView(
-                id=activity.id,
-                world_id=activity.world_id,
-                character_id=activity.character_id,
-                kind=activity.kind.value,
-                status=activity.status.value,
-                start_absolute=activity.start_absolute,
-                duration_phases=activity.duration_phases,
-                progress_phases=activity.progress_phases,
-                version=activity.version,
-            )
-            for activity in activities
-        ],
+        activities=[_activity_view(activity) for activity in activities],
         recent_event_id=recent[0].id if recent else None,
         threads=[
             hook.title for hook in hooks if hook.status == NarrativeStatus.ACTIVE and omniscient
@@ -160,3 +153,78 @@ async def chronicle(
         has_more=high > scanned,
         watermark=high,
     )
+
+def _schematic_manifest(world_id: UUID, locations: list[Location]) -> api.MapManifestView:
+    """Deterministic fallback anchors, explicitly labelled schematic."""
+    return api.MapManifestView(
+        id=f"schematic:{world_id.hex}",
+        version=1,
+        schematic=True,
+        anchors=[
+            api.MapAnchorView(location_id=location.id, x=x, y=y)
+            for location in locations
+            for x, y in [_anchor(location.id)]
+        ],
+    )
+
+def _as_uuid(raw: object) -> UUID | None:
+    if isinstance(raw, UUID):
+        return raw
+    if isinstance(raw, str):
+        try:
+            return UUID(raw)
+        except ValueError:
+            return None
+    return None
+
+
+def _activity_view(activity: Activity) -> api.ActivityView:
+    """Typed activity projection with travel route data (no payload leak)."""
+    payload = activity.payload
+    return api.ActivityView(
+        id=activity.id,
+        world_id=activity.world_id,
+        character_id=activity.character_id,
+        kind=activity.kind.value,
+        status=activity.status.value,
+        start_absolute=activity.start_absolute,
+        duration_phases=activity.duration_phases,
+        progress_phases=activity.progress_phases,
+        from_location_id=_as_uuid(payload.get("from_location_id")),
+        to_location_id=_as_uuid(payload.get("to_location_id")),
+        route_id=_as_uuid(payload.get("route_id")),
+        effective_progress_phases=activity.progress_phases
+        if activity.kind.value == "travel"
+        else None,
+        version=activity.version,
+    )
+
+def _curated_manifest(assets_root: Path, locations: list[Location]) -> api.MapManifestView | None:
+    """Curated anchors by location name; None unless every location resolves."""
+    manifest_path = assets_root / "revamp" / "ember-vale-manifest-v1.json"
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, ValueError):
+        return None
+    by_name = {location.name: location.id for location in locations}
+    anchors: list[api.MapAnchorView] = []
+    for entry in manifest.get("anchors", []):
+        location_id = by_name.get(entry.get("location", ""))
+        if location_id is None:
+            return None
+        anchors.append(api.MapAnchorView(location_id=location_id, x=entry["x"], y=entry["y"]))
+    return api.MapManifestView(
+        id=manifest.get("id", "curated"),
+        version=1,
+        schematic=False,
+        anchors=anchors,
+    )
+
+
+async def _newest_by_subject(uow: UnitOfWork, world_id: UUID, kind: str) -> dict[UUID, UUID]:
+    """Newest ready asset id per subject for one world and kind."""
+    newest: dict[UUID, UUID] = {}
+    for asset in await uow.assets.list_ready_for_world(world_id, kind):
+        if asset.subject_id is not None and asset.subject_id not in newest:
+            newest[asset.subject_id] = asset.id
+    return newest
