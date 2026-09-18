@@ -3,96 +3,135 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prototype: Adventure Journal (fixture)</title>
+<title>Prototype: Adventure Journal v2 (fixture)</title>
 <style>
 :root{
   --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
   --text-primary:#253247; --text-secondary:#627084;
   --action-primary:#216B63; --accent-magic:#7155A5; --accent-social:#B84F68;
   --accent-gold:#A8792B; --status-danger:#BA5148; --border-subtle:#DDD8CE;
-  --radius-panel:12px; --radius-control:8px;
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface-page);color:var(--text-primary);
-  font:16px/1.55 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
-h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px}
-.topbar{display:flex;gap:16px;align-items:center;padding:10px 16px;
+  font:14px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2{font-family:Georgia,"Source Serif 4",serif}
+.topbar{display:flex;gap:14px;align-items:center;padding:6px 16px;min-height:44px;
   background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
-.topbar nav{display:flex;gap:12px}
-.topbar nav button{border:0;background:none;font:inherit;color:var(--text-secondary);cursor:pointer;padding:6px 8px;border-radius:var(--radius-control)}
+.topbar .brand{font-family:Georgia,serif;font-size:15px}
+.topbar nav{display:flex;gap:4px}
+.topbar nav button{border:0;background:none;font-size:13px;color:var(--text-secondary);cursor:pointer;padding:5px 10px;border-radius:8px}
 .topbar nav button[aria-current="true"]{color:var(--surface-panel);background:var(--action-primary)}
-.layout{display:grid;grid-template-columns:minmax(0,1020px) 360px;gap:16px;
-  max-width:1440px;margin:0 auto;padding:16px}
+.topbar .clock{margin-left:auto;font-size:12px;color:var(--text-secondary)}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;
+  max-width:1440px;margin:0 auto;padding:14px}
 .panel{background:var(--surface-panel);border:1px solid var(--border-subtle);
-  border-radius:var(--radius-panel);padding:16px}
-.scene-art{width:100%;height:320px;object-fit:cover;border-radius:var(--radius-control);display:block;background:#e8e2d4}
-.meta{color:var(--text-secondary);font-size:13px;margin:8px 0}
-.narration{font-size:17px;line-height:1.6}
-.dialogue{display:flex;gap:10px;align-items:center;background:#f3efe4;border-radius:var(--radius-control);padding:8px 12px;margin:12px 0}
-.dialogue img{width:48px;height:48px;border-radius:50%;object-fit:cover}
-.suggest{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-.suggest button{border:1px solid var(--action-primary);background:#fff;color:var(--action-primary);
-  border-radius:var(--radius-control);padding:8px 12px;cursor:pointer}
-.composer textarea{width:100%;min-height:64px;border:1px solid var(--border-subtle);
-  border-radius:var(--radius-control);padding:8px;font:inherit}
-.composer button{background:var(--action-primary);color:#fff;border:0;border-radius:var(--radius-control);padding:8px 16px;cursor:pointer;margin-top:8px}
-.sidebar .row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
-.sidebar img{width:44px;height:44px;border-radius:50%;object-fit:cover}
-.map-preview{width:100%;border-radius:var(--radius-control);display:block;margin-top:8px}
-.fixture-bar{position:sticky;bottom:0;background:#253247;color:#fff;padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fixture-bar button{border-radius:6px;border:1px solid #fff;background:none;color:#fff;padding:4px 10px;cursor:pointer}
-.notice{border:1px solid var(--accent-gold);border-radius:var(--radius-control);padding:8px 12px;margin:12px 0;font-size:14px}
+  border-radius:12px;padding:14px}
+/* Hero: tall art with overlaid title, translucent scrim behind text only */
+.hero{position:relative;border-radius:8px;overflow:hidden;background:#e8e2d4}
+.hero img{display:block;width:100%;height:420px;object-fit:cover}
+.hero .scrim{position:absolute;inset:auto 0 0 0;padding:40px 16px 12px;
+  background:linear-gradient(transparent, rgba(20,16,8,.62));color:#fff}
+.hero .scrim h1{margin:0;font-size:24px;color:#fff;opacity:1}
+.hero .scrim p{margin:2px 0 0;font-size:12.5px;color:#fff;opacity:1}
+.narration{font-size:15px;line-height:1.6;margin:12px 0}
+.narration .quote{color:var(--text-primary)}
+.choices{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.choice{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;
+  border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;width:100%}
+.choice .icon{flex:none;width:34px;height:34px;border-radius:50%;background:var(--action-primary);
+  color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px}
+.choice.magic .icon{background:var(--accent-magic)}
+.choice b{display:block;font-size:14px}
+.choice span{display:block;font-size:12px;color:var(--text-secondary)}
+.choice .chev{margin-left:auto;color:var(--text-secondary)}
+.choice .chip{margin-left:auto;font-size:11.5px;background:#efe8f6;color:var(--accent-magic);
+  border-radius:6px;padding:2px 8px;white-space:nowrap}
+/* Composer: short input with send arrow inside */
+.composer{position:relative;margin-top:10px}
+.composer input{width:100%;height:40px;border:1px solid var(--border-subtle);
+  border-radius:8px;padding:0 44px 0 12px;font:inherit;background:#fff}
+.composer button{position:absolute;right:4px;top:4px;width:32px;height:32px;border:0;border-radius:6px;
+  background:var(--action-primary);color:#fff;font-size:16px;cursor:pointer;line-height:1}
+.notice{border:1px solid var(--accent-gold);border-radius:8px;padding:6px 10px;margin:10px 0;font-size:13px}
 .error{border-color:var(--status-danger);color:var(--status-danger)}
 .hidden{display:none}
-@media (max-width:1100px){.layout{grid-template-columns:1fr}}
+/* Sidebar: dense cards, no section chrome */
+.party-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pcard{border:1px solid var(--border-subtle);border-radius:8px;overflow:hidden;background:#fff}
+.pcard img{width:100%;height:96px;object-fit:cover;display:block}
+.pcard .pbody{padding:6px 8px;font-size:12px}
+.pcard .pname{display:flex;justify-content:space-between;font-weight:700;font-size:13px}
+.bar{height:5px;border-radius:3px;background:#e8e2d4;margin-top:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--status-danger)}
+.bar.mp i{background:var(--accent-magic)}
+.pcard .nums{color:var(--text-secondary);font-size:11px;margin-top:2px}
+.threads{font-size:12.5px;margin:10px 0}
+.threads p{margin:4px 0}
+.sidewrap{display:flex;flex-direction:column;min-height:100%}
+.maprect{margin-top:auto;width:100%;border-radius:8px;display:block;border:1px solid var(--border-subtle)}
+.maplink{display:block;text-align:right;font-size:12px;color:var(--action-primary);margin-top:4px;background:none;border:0;cursor:pointer;padding:0}
+.fixture-bar{position:sticky;bottom:0;background:#253247;color:#fff;padding:6px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.fixture-bar button{border-radius:6px;border:1px solid #fff;background:none;color:#fff;padding:2px 10px;cursor:pointer}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}.hero img{height:300px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
 <div class="topbar">
-  <strong>PixelSaga</strong>
+  <span class="brand">Ember Vale</span>
   <nav aria-label="Primary">
     <button aria-current="true">Adventure</button><button>World</button><button>Party</button><button>Journal</button>
   </nav>
-  <span class="meta" style="margin-left:auto">FIXTURE PROTOTYPE · no backend</span>
+  <span class="clock">Day 1 · Dawn · fixture</span>
 </div>
 <div class="layout">
   <main class="panel" id="main">
-    <h1 id="sceneTitle">Hearth, day 1 · dawn</h1>
-    <p class="meta" id="sceneMeta">Scene sc-fixture-1 · Ember Vale · Hearth</p>
-    <img class="scene-art" id="sceneArt" src="../../docs/pixelsaga-revamp/assets/images/hearth-background-v1.png" alt="Hearth traveler hall with a lit fireplace">
+    <div class="hero" id="heroBlock">
+      <img id="sceneArt" src="../../docs/pixelsaga-revamp/assets/images/hearth-background-v1.png" alt="Hearth traveler hall with a lit fireplace">
+      <div class="scrim">
+        <h1>The Hearth Fire</h1>
+        <p>Hearth · Day 1, dawn</p>
+      </div>
+    </div>
     <div id="stateEmpty" class="notice hidden">No scene yet. Seed a world, then advance one phase.</div>
     <div id="stateLoading" class="notice hidden">Loading scene…</div>
     <div id="stateError" class="notice error hidden">Scene failed to load (fixture error state). Draft preserved below.</div>
     <div id="sceneBody">
-      <p class="narration">Rain drums the shutters while Wren feeds the last log to the Hearth fire. A traveler shakes water from a Market cloak and asks after the toll road.</p>
-      <div class="dialogue">
-        <img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="Wren portrait">
-        <p><strong>Wren:</strong> “The tolls rose again. If you take the bridge road, go before dusk.”</p>
-      </div>
-      <p class="meta">Outcome: Wren shares a rumor. No check required. Event ev-fixture-7.</p>
-      <h2>What does Wren attempt?</h2>
-      <div class="suggest" id="suggest">
-        <button>Offer the traveler shelter</button>
-        <button>Ask about the Market tolls</button>
-        <button>Bank the fire and rest</button>
+      <p class="narration">Rain drums the shutters while Wren feeds the last log to the Hearth fire. A traveler shakes water from a Market cloak and asks after the toll road.<br><span class="quote">“You are keeping the fire for all of us, aren’t you?”</span></p>
+      <div class="choices">
+        <button class="choice"><span class="icon">◌</span><span><b>Offer the traveler shelter</b><span>A dry corner by the fire, no questions asked.</span></span><span class="chev">›</span></button>
+        <button class="choice magic"><span class="icon">✦</span><span><b>Read the traveler's manner</b><span>Sense whether this one means trouble.</span></span><span class="chip">Insight · DC 12</span></button>
+        <button class="choice"><span class="icon">◌</span><span><b>Ask about the Market tolls</b><span>Learn what changed on the bridge road.</span></span><span class="chev">›</span></button>
       </div>
       <div class="composer">
-        <textarea id="draft" aria-label="Custom action" placeholder="Describe Wren's attempt…"></textarea>
-        <button id="send" type="button">Attempt action</button>
+        <input id="draft" aria-label="Custom action" placeholder="Try something else…">
+        <button id="send" type="button" aria-label="Send action">→</button>
       </div>
-      <div id="queued" class="notice hidden">Queued: <span id="queuedText"></span>. Queued is not executed; it applies at the next phase boundary.</div>
+      <div id="queued" class="notice hidden">Queued: <span id="queuedText"></span>. Queued is not executed.</div>
     </div>
   </main>
-  <aside class="panel sidebar">
-    <h2>Party</h2>
-    <div class="row"><img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="Wren"><div><strong>Wren</strong><br><span class="meta">Hearth · bound character</span></div></div>
-    <div class="row"><img src="../../docs/pixelsaga-revamp/assets/images/ash-portrait-v1.png" alt="Ash"><div><strong>Ash</strong><br><span class="meta">Market · companion</span></div></div>
-    <h2>Story threads</h2>
-    <p class="meta">Accepted hooks only. No fabricated quest tracker.</p>
-    <p>· Rising tolls on the bridge road (hook-fixture-2)</p>
-    <h2>Map</h2>
-    <img class="map-preview" src="../../docs/pixelsaga-revamp/assets/images/ember-vale-map-display-v1.webp" alt="Ember Vale schematic preview">
+  <aside class="panel sidewrap">
+    <div class="party-cards">
+      <div class="pcard">
+        <img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="Wren">
+        <div class="pbody"><div class="pname"><span>Wren</span><span>Lv 1</span></div>
+          <div class="bar"><i style="width:80%"></i></div><div class="nums">HP 80/100</div>
+          <div class="bar mp"><i style="width:50%"></i></div><div class="nums">MP 50/100</div></div>
+      </div>
+      <div class="pcard">
+        <img src="../../docs/pixelsaga-revamp/assets/images/ash-portrait-v1.png" alt="Ash">
+        <div class="pbody"><div class="pname"><span>Ash</span><span>Lv 1</span></div>
+          <div class="bar"><i style="width:70%"></i></div><div class="nums">HP 70/100</div>
+          <div class="bar mp"><i style="width:60%"></i></div><div class="nums">MP 60/100</div></div>
+      </div>
+    </div>
+    <div class="threads">
+      <p><b>Find the sealed gate</b> · follow the toll-road clues <span style="color:var(--text-secondary)">(hook-fixture-2)</span></p>
+    </div>
+    <div>
+      <img class="maprect" src="../../docs/pixelsaga-revamp/assets/images/ember-vale-map-display-v1.webp" alt="Ember Vale map">
+      <button class="maplink">View World →</button>
+    </div>
   </aside>
 </div>
 <div class="fixture-bar" aria-label="Fixture states">
@@ -102,14 +141,13 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px}
   <button data-s="loading">loading</button>
   <button data-s="error">error</button>
   <button data-s="imgfail">image failure</button>
-  <button id="themeBtn">theme: light</button>
 </div>
 <script>
-const root = document.documentElement;
 const states = ["stateEmpty","stateLoading","stateError"];
 function setState(s){
   states.forEach(id => document.getElementById(id).classList.add("hidden"));
   document.getElementById("sceneBody").classList.toggle("hidden", s !== "normal" && s !== "imgfail");
+  document.getElementById("heroBlock").classList.toggle("hidden", s === "empty" || s === "loading");
   if(s === "empty") document.getElementById("stateEmpty").classList.remove("hidden");
   if(s === "loading") document.getElementById("stateLoading").classList.remove("hidden");
   if(s === "error") document.getElementById("stateError").classList.remove("hidden");
@@ -120,19 +158,20 @@ function setState(s){
 document.querySelectorAll(".fixture-bar [data-s]").forEach(b =>
   b.addEventListener("click", () => setState(b.dataset.s)));
 document.getElementById("sceneArt").addEventListener("error", function(){
-  this.alt = "Scene art unavailable (fixture fallback)"; this.style.height = "64px";
+  this.alt = "Scene art unavailable (fixture fallback)"; this.style.height = "48px";
 });
-document.getElementById("send").addEventListener("click", () => {
+function submit(){
   const draft = document.getElementById("draft").value.trim() || "Wren waits.";
   document.getElementById("queuedText").textContent = draft;
   document.getElementById("queued").classList.remove("hidden");
-});
-document.getElementById("themeBtn").addEventListener("click", function(){
-  const dark = root.style.colorScheme !== "dark";
-  root.style.colorScheme = dark ? "dark" : "light";
-  root.style.filter = dark ? "invert(0.92) hue-rotate(180deg)" : "";
-  this.textContent = "theme: " + (dark ? "dark* (proto)" : "light");
-});
+}
+document.getElementById("send").addEventListener("click", submit);
+document.getElementById("draft").addEventListener("keydown", e => { if(e.key === "Enter") submit(); });
+document.querySelectorAll(".choice").forEach(c =>
+  c.addEventListener("click", () => {
+    document.getElementById("queuedText").textContent = c.querySelector("b").textContent;
+    document.getElementById("queued").classList.remove("hidden");
+  }));
 </script>
 </body>
 </html>

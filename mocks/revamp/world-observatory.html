@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prototype: World Observatory (fixture)</title>
+<title>Prototype: World Observatory v2 (fixture)</title>
 <style>
 :root{
   --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
@@ -13,40 +13,49 @@
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--surface-page);color:var(--text-primary);
-  font:16px/1.55 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
-h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px;font-size:18px}
-.toolbar{display:flex;gap:8px;align-items:center;padding:8px 16px;min-height:56px;
+  font:14px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px;font-size:17px}
+.toolbar{display:flex;gap:8px;align-items:center;padding:6px 14px;min-height:48px;
   background:var(--surface-panel);border-bottom:2px solid var(--accent-gold);flex-wrap:wrap}
 .toolbar button{border:1px solid var(--action-primary);background:#fff;color:var(--action-primary);
-  border-radius:8px;padding:6px 12px;cursor:pointer;font:inherit}
+  border-radius:8px;padding:5px 12px;cursor:pointer;font:inherit;font-size:13px}
 .toolbar button.primary{background:var(--action-primary);color:#fff}
-.toolbar select{font:inherit;border-radius:8px;border:1px solid var(--border-subtle);padding:6px}
-.workspace{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:0;height:calc(100vh - 57px)}
+.toolbar select{font:inherit;font-size:13px;border-radius:8px;border:1px solid var(--border-subtle);padding:5px}
+.toolbar .clock{color:var(--text-secondary);font-size:12px}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:0;height:calc(100vh - 49px)}
 .mapcol{position:relative;overflow:hidden;background:#e8e2d4}
 .mapcol img.map{width:100%;height:100%;object-fit:cover;display:block}
-.token{position:absolute;transform:translate(-50%,-100%);background:var(--surface-panel);
-  border:2px solid var(--action-primary);border-radius:24px;padding:2px 10px 2px 2px;
-  display:flex;gap:6px;align-items:center;cursor:pointer;font-size:13px}
-.token img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-.token.selected{border-color:var(--accent-gold);box-shadow:0 0 0 2px var(--accent-gold)}
-.badge{background:var(--accent-magic);color:#fff;border-radius:10px;padding:0 8px;font-size:12px}
-.inspector{position:absolute;left:12px;bottom:12px;background:var(--surface-panel);
-  border:1px solid var(--border-subtle);border-radius:12px;padding:12px;max-width:320px}
+/* Token: portrait circle, filled name plate, action caption */
+.token{position:absolute;transform:translate(-50%,-50%);background:none;border:0;padding:0;
+  display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.token img{width:48px;height:48px;border-radius:50%;object-fit:cover;display:block;
+  border:2px solid var(--surface-panel);outline:2px solid var(--action-primary)}
+.token.selected img{outline-color:var(--accent-gold)}
+.token .nameplate{background:var(--action-primary);color:#fff;border-radius:4px;
+  padding:1px 10px;font-size:12.5px;margin-top:2px;white-space:nowrap}
+.token.selected .nameplate{background:var(--accent-gold)}
+.token .action{font-size:11.5px;color:var(--text-primary);background:rgba(255,252,247,.9);
+  border-radius:4px;padding:0 8px;margin-top:2px;white-space:nowrap}
+/* Inspector sits above the composer: bottom 84px clears it */
+.inspector{position:absolute;left:12px;bottom:84px;background:var(--surface-panel);
+  border:1px solid var(--border-subtle);border-radius:12px;padding:12px;max-width:320px;z-index:3}
+.inspector p{font-size:13px}
 .composer{position:absolute;left:50%;transform:translateX(-50%);bottom:12px;width:min(560px,90%);
   background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:8px;display:flex;gap:8px}
-.composer input{flex:1;font:inherit;border:1px solid var(--border-subtle);border-radius:8px;padding:8px}
-.composer button{background:var(--action-primary);color:#fff;border:0;border-radius:8px;padding:8px 14px;cursor:pointer}
+.composer input{flex:1;font:inherit;font-size:13px;border:1px solid var(--border-subtle);border-radius:8px;padding:7px}
+.composer button{background:var(--action-primary);color:#fff;border:0;border-radius:8px;padding:7px 14px;cursor:pointer}
 .chronicle{background:var(--surface-panel);border-left:1px solid var(--border-subtle);
-  overflow-y:auto;padding:12px 16px}
+  overflow-y:auto;padding:12px 14px}
 .chronicle.collapsed{display:none}
-.entry{border-bottom:1px solid var(--border-subtle);padding:8px 0;font-size:14px}
-.entry .meta{color:var(--text-secondary);font-size:12px}
+.entry{border-bottom:1px solid var(--border-subtle);padding:7px 0;font-size:13px}
+.entry .meta{color:var(--text-secondary);font-size:11.5px}
 .filters{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
-.filters button{border:1px solid var(--border-subtle);background:#fff;border-radius:14px;padding:2px 10px;cursor:pointer;font-size:13px}
+.filters button{border:1px solid var(--border-subtle);background:#fff;border-radius:14px;padding:2px 10px;cursor:pointer;font-size:12.5px}
 .filters button[aria-pressed="true"]{background:var(--action-primary);color:#fff;border-color:var(--action-primary)}
-.fixture-bar{position:fixed;bottom:0;left:0;right:0;background:#253247;color:#fff;padding:6px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px}
+.fixture-bar{position:fixed;bottom:0;left:0;right:0;background:#253247;color:#fff;padding:5px 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:12.5px}
 .fixture-bar button{border-radius:6px;border:1px solid #fff;background:none;color:#fff;padding:2px 10px;cursor:pointer}
-.queue{font-size:13px;border-top:1px solid var(--border-subtle);margin-top:8px;padding-top:8px}
+.queue{font-size:12.5px;border-top:1px solid var(--border-subtle);margin-top:8px;padding-top:8px}
+.hidden{display:none}
 @media (max-width:1100px){
   .workspace{grid-template-columns:1fr}
   .chronicle{position:fixed;left:0;right:0;bottom:0;max-height:45vh;border-top:2px solid var(--accent-gold);z-index:5}
@@ -61,21 +70,23 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px;font-size:18px}
   <button class="primary" id="nextPhase">Next phase</button>
   <button id="playBtn">Play</button>
   <select aria-label="Pacing"><option>Normal</option><option>Slow</option><option>Fast</option></select>
-  <span class="meta" id="clock" style="color:var(--text-secondary);font-size:13px">Ember Vale · day 1, dawn · fixture</span>
+  <span class="clock" id="clock">Ember Vale · day 1, dawn · fixture</span>
   <button id="collapseBtn" style="margin-left:auto">Collapse chronicle</button>
 </div>
 <div class="workspace">
   <div class="mapcol" id="mapcol">
     <img class="map" id="mapImg" src="../../docs/pixelsaga-revamp/assets/images/ember-vale-map-display-v1.webp" alt="Ember Vale map: Hearth homestead west, Market square east, river bridge south">
-    <button class="token" id="tokWren" style="left:22%;top:34%" aria-label="Wren at Hearth">
-      <img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="">Wren <span class="badge">Resting</span>
+    <button class="token" id="tokWren" style="left:22%;top:32%" aria-label="Wren at Hearth, resting">
+      <img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="">
+      <span class="nameplate">Wren</span><span class="action">Resting</span>
     </button>
-    <button class="token" id="tokAsh" style="left:80%;top:44%" aria-label="Ash at Market">
-      <img src="../../docs/pixelsaga-revamp/assets/images/ash-portrait-v1.png" alt="">Ash <span class="badge">Trading</span>
+    <button class="token" id="tokAsh" style="left:80%;top:42%" aria-label="Ash at Market, trading">
+      <img src="../../docs/pixelsaga-revamp/assets/images/ash-portrait-v1.png" alt="">
+      <span class="nameplate">Ash</span><span class="action">Trading</span>
     </button>
     <div class="inspector hidden" id="inspector">
       <h2 id="inspName">Wren</h2>
-      <p class="meta" id="inspMeta" style="color:var(--text-secondary);font-size:13px">Hearth · canonical location</p>
+      <p class="meta" id="inspMeta" style="color:var(--text-secondary);font-size:12px">Hearth · canonical location</p>
       <p id="inspBody">Resting. Travelling tokens would read “Travelling to …” and never claim arrival.</p>
       <button id="inspClose">Close (Esc)</button>
     </div>
@@ -105,20 +116,19 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px;font-size:18px}
 </div>
 <script>
 const insp = document.getElementById("inspector");
-function select(name, meta, body){
+function selectToken(el, name, meta, body){
   document.querySelectorAll(".token").forEach(t => t.classList.remove("selected"));
+  el.classList.add("selected");
   document.getElementById("inspName").textContent = name;
   document.getElementById("inspMeta").textContent = meta;
   document.getElementById("inspBody").textContent = body;
   insp.classList.remove("hidden");
 }
 document.getElementById("tokWren").addEventListener("click", function(){
-  this.classList.add("selected");
-  select("Wren", "Hearth · canonical location", "Resting at the Hearth. No destination-only actions available.");
+  selectToken(this, "Wren", "Hearth · canonical location", "Resting at the Hearth. No destination-only actions available.");
 });
 document.getElementById("tokAsh").addEventListener("click", function(){
-  this.classList.add("selected");
-  select("Ash", "Market · canonical location", "Trading at the Market stall. Tolls rose on the bridge road.");
+  selectToken(this, "Ash", "Market · canonical location", "Trading at the Market stall. Tolls rose on the bridge road.");
 });
 document.getElementById("inspClose").addEventListener("click", () => insp.classList.add("hidden"));
 document.addEventListener("keydown", e => { if(e.key === "Escape") insp.classList.add("hidden"); });
@@ -147,7 +157,7 @@ document.getElementById("mapImg").addEventListener("error", function(){
 document.querySelectorAll(".fixture-bar [data-s]").forEach(b =>
   b.addEventListener("click", () => {
     const s = b.dataset.s;
-    if(s === "imgfail"){ const m = document.getElementById("mapImg"); m.src = "missing-fixture.webp"; }
+    if(s === "imgfail"){ document.getElementById("mapImg").src = "missing-fixture.webp"; }
     if(s === "collapse"){ document.getElementById("chronicle").classList.add("collapsed"); }
     if(s === "normal"){ location.reload(); }
   }));
