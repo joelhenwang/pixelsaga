@@ -196,11 +196,13 @@ function onKey(event: KeyboardEvent): void {
   }
 }
 
+const route = useRoute();
+
 onMounted(() => {
   window.addEventListener("keydown", onKey);
   void refresh().then(() => {
     void loadContext();
-    const linked = useRoute().query.scene;
+    const linked = route.query.scene;
     if (typeof linked === "string" && linked) {
       void selectScene(linked);
       return;
