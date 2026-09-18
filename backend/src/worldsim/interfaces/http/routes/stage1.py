@@ -9,6 +9,7 @@ orchestrator's idempotent keys: repeats return stored reports.
 
 from __future__ import annotations
 
+from functools import partial
 from uuid import UUID
 
 from fastapi import APIRouter, Request
@@ -16,12 +17,14 @@ from pydantic import TypeAdapter
 
 from worldsim.application.capabilities import Capability, parse_role, require_capability
 from worldsim.application.commands.party import begin_adventure, create_character, link_member
+from worldsim.application.execution import guarded, new_owner, phase_run_id, phase_scope
 from worldsim.application.orchestration.stage1 import Stage1Orchestrator
 from worldsim.domain.commands import ActionIntent
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import derive_attempt_id
 from worldsim.domain.party import PartyMember
 from worldsim.domain.scenes import Intent, Reaction
+from worldsim.domain.time import absolute_index
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role, require_role
 from worldsim.interfaces.http.state import dnd_tables
@@ -302,8 +305,16 @@ async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage
         if viewer is not None and actor != viewer:
             raise DomainError(ErrorCode.FORBIDDEN, "players substitute only themselves")
         player_intents[actor] = _ACTION_ADAPTER.validate_python(raw_action)
-    report = await _stage1(request).advance_phase(
-        body.world_id, body.absolute_index, player_intents
+
+    state = request.app.state.app_state
+    owner = new_owner("http")
+    report = await guarded(
+        state.uow_factory(),
+        body.world_id,
+        phase_scope(body.absolute_index),
+        owner,
+        phase_run_id(body.world_id, body.absolute_index),
+        partial(_stage1(request).advance_phase, body.world_id, body.absolute_index, player_intents),
     )
     return api.Stage1AdvanceResponse(
         run_id=report.run_id,
@@ -332,6 +343,25 @@ async def pause(body: api.RunIdRequest, request: Request) -> dict[str, str]:
     await _perspective(request, world_id)
     await _stage1(request).pause_phase(body.run_id)
     return {"run_id": str(body.run_id), "state": "paused"}
+
+
+@router.get("/simulation/status", response_model=api.SimulationStatus)
+async def simulation_status(world_id: UUID, request: Request) -> api.SimulationStatus:
+    """Reconcile open and latest runs without starting work."""
+    await _perspective(request, world_id)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        world = await uow.worlds.get(world_id)
+        open_run = await uow.phases.find_open_run(world_id)
+        latest = await uow.phases.latest_run(world_id)
+    return api.SimulationStatus(
+        world_id=world_id,
+        absolute_index=absolute_index(world.day, world.phase),
+        open_run_id=open_run.id if open_run is not None else None,
+        open_run_state=open_run.state.value if open_run is not None else None,
+        latest_run_id=latest.id if latest is not None else None,
+        latest_run_state=latest.state.value if latest is not None else None,
+    )
 
 
 @router.post("/stage1/resume", response_model=dict[str, str])

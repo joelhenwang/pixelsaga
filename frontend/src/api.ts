@@ -24,6 +24,7 @@ import type {
   PresentationResponse,
   RoleGrantView,
   SceneDetail,
+  SimulationStatus,
   SceneSummary,
   ScheduleCancelResponse,
   Stage1AdvanceResponse,
@@ -332,6 +333,9 @@ export const api = {
       { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
       headers,
     );
+  },
+  simulationStatus(worldId: string, headers: Record<string, string>): Promise<SimulationStatus> {
+    return request<SimulationStatus>(`/api/v1/simulation/status?world_id=${worldId}`, {}, headers);
   },
   presentation(worldId: string, headers: Record<string, string>): Promise<PresentationResponse> {
     return request<PresentationResponse>(`/api/v1/world/presentation?world_id=${worldId}`, {}, headers);

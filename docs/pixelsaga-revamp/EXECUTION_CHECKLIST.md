@@ -6,7 +6,7 @@
 - [x] P03 capability policy, identity linkage, presentation contracts. Next: P04.
 - [x] P04 asset pipeline and starter visual content. Next: P05.
 - [x] P05 world map, chronicle, selection. Next: P06.
-- [ ] P06 reliable manual progression and autoplay.
+- [x] P06 reliable manual progression and autoplay. Next: P07.
 - [ ] P07 durable interventions and typed execution.
 - [ ] P08 adventure, player actions, character creation.
 - [ ] P09 persistent world events and multi-step direction.

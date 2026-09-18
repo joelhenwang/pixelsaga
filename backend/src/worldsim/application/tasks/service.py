@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Protocol
 from uuid import UUID, uuid4
 
+from sqlalchemy.exc import IntegrityError
 from worldsim.application.tasks.backoff import backoff_s
 from worldsim.application.unit_of_work import UnitOfWork
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -51,8 +52,18 @@ class TaskService:
                         f"task key reused for another kind: {key}",
                     )
                 return existing
-            task = await uow.tasks.create(uuid4(), world_id, kind, key, max_attempts)
-            await uow.commit()
+            try:
+                task = await uow.tasks.create(uuid4(), world_id, kind, key, max_attempts)
+                await uow.commit()
+            except IntegrityError:
+                await uow.rollback()
+                raced = await uow.tasks.find_by_key(world_id, key)
+                if raced is None or raced.kind != kind:
+                    raise DomainError(
+                        ErrorCode.IDEMPOTENCY_CONFLICT,
+                        f"task key reused for another kind: {key}",
+                    ) from None
+                return raced
             return task
 
     async def claim_available(
@@ -69,6 +80,13 @@ class TaskService:
             claimed = await uow.tasks.claim(task_id, owner, lease)
             await uow.commit()
             return claimed
+
+    async def reset_slot(self, task_id: UUID, owner: str) -> bool:
+        """Recycle a terminal execution slot for a new cycle."""
+        async with self._factory() as uow:
+            ok = await uow.tasks.reset(task_id, owner)
+            await uow.commit()
+            return ok
 
     async def heartbeat(self, task_id: UUID, owner: str, lease_s: float) -> bool:
         async with self._factory() as uow:

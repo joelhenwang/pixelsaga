@@ -8,6 +8,7 @@ Advancing the clock is an operator action: watcher only.
 
 from __future__ import annotations
 
+from functools import partial
 from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
@@ -18,6 +19,7 @@ from worldsim.application.capabilities import (
     parse_role,
     require_capability,
 )
+from worldsim.application.execution import guarded, new_owner
 from worldsim.application.macro.endings import evaluate_endings
 from worldsim.application.macro.engine import MacroEngine
 from worldsim.application.macro.eras import compose_era
@@ -224,12 +226,20 @@ async def macro_advance(
     async def _hook(world_id: UUID, start: int, end: int) -> int | None:
         return await find_break(factory, world_id, start, end)
 
-    result = await engine.advance_period(
+    result = await guarded(
+        factory,
         body.world_id,
-        body.day,
-        resolution,
-        salience_break=_hook,
-        on_schedule_fire=apply_schedule_consequence,
+        "macro",
+        new_owner("http"),
+        None,
+        partial(
+            engine.advance_period,
+            body.world_id,
+            body.day,
+            resolution,
+            salience_break=_hook,
+            on_schedule_fire=apply_schedule_consequence,
+        ),
     )
     return api.MacroAdvanceResponse(
         run_id=result.run.id,

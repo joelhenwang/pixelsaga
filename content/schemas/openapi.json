@@ -3707,6 +3707,72 @@
         "title": "SeedResponse",
         "type": "object"
       },
+      "SimulationStatus": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "latest_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Run Id"
+          },
+          "latest_run_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Run State"
+          },
+          "open_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Run Id"
+          },
+          "open_run_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Run State"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "absolute_index"
+        ],
+        "title": "SimulationStatus",
+        "type": "object"
+      },
       "SkillListResponse": {
         "additionalProperties": false,
         "properties": {
@@ -4896,6 +4962,50 @@
         "summary": "Get Task",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/simulation/status": {
+      "get": {
+        "description": "Reconcile open and latest runs without starting work.",
+        "operationId": "simulation_status_api_v1_simulation_status_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SimulationStatus"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Simulation Status",
+        "tags": [
+          "stage1"
         ]
       }
     },

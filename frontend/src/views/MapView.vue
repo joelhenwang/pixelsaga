@@ -5,6 +5,17 @@ import { assetUrl } from "../assets";
 import { portraitFor } from "../portrait";
 import { checkNew, entries, hasMore, loadOlder, loadProjection, presentation } from "../composables/useProjection";
 import { fail, headers, worldId } from "../store";
+import {
+  controlNotice,
+  controlState,
+  nextPhase,
+  pace,
+  pause,
+  play,
+  reconcile,
+  resetControl,
+  type PhaseOutcome,
+} from "../composables/useSimulationControl";
 
 const router = useRouter();
 type Filter = "meaningful" | "all" | "following" | "major";
@@ -130,11 +141,34 @@ async function reload(): Promise<void> {
   await resolveFaces();
 }
 
+const lastSeenIndex = ref<number>(0);
+
+async function onResolve(): Promise<PhaseOutcome> {
+  await reload();
+  const fresh = entries.value.filter((e) => e.absolute_index > lastSeenIndex.value);
+  lastSeenIndex.value = Math.max(lastSeenIndex.value, ...entries.value.map((e) => e.absolute_index), 0);
+  const major = fresh.some((e) => MAJOR_TYPES.has(e.event_type));
+  return major ? "pause" : "continue";
+}
+
+function togglePlay(): void {
+  if (controlState.value === "idle" || controlState.value === "paused" || controlState.value === "failed") {
+    resetControl();
+    void play(onResolve);
+  } else {
+    pause();
+  }
+}
+
 onMounted(() => {
   window.addEventListener("keydown", onKey);
-  void reload();
+  void reload().then(() => {
+    lastSeenIndex.value = Math.max(...entries.value.map((e) => e.absolute_index), 0);
+    void reconcile();
+  });
 });
 watch(worldId, () => {
+  resetControl();
   void reload();
 });
 </script>
@@ -142,6 +176,21 @@ watch(worldId, () => {
 <template>
   <div class="world">
     <div class="mapcol" aria-label="World map">
+      <div class="simcontrols" role="group" aria-label="Simulation controls">
+        <button type="button" :disabled="controlState === 'resolving'" @click="nextPhase(onResolve)">
+          Next phase
+        </button>
+        <button type="button" @click="togglePlay">
+          {{ controlState === "idle" || controlState === "paused" || controlState === "failed" ? "Play" : "Pause" }}
+        </button>
+        <select v-model="pace" aria-label="Pacing">
+          <option value="slow">Slow</option>
+          <option value="normal">Normal</option>
+          <option value="fast">Fast</option>
+        </select>
+        <span class="simstate">{{ controlState }}</span>
+        <span v-if="controlNotice" class="simnotice">{{ controlNotice }}</span>
+      </div>
       <div v-if="!mapSrc" class="schematic">schematic ground · art pending</div>
       <div class="viewport" :style="{ transform: `scale(${zoom})` }">
         <img v-if="mapSrc" class="map" :src="mapSrc" alt="Ember Vale map" />
@@ -181,8 +230,6 @@ watch(worldId, () => {
         </button>
       </div>
     </div>
-    <aside class="chronicle" aria-label="Chronicle">
-      <h1>World Chronicle</h1>
       <div class="filters" role="group" aria-label="Filters">
         <button
           v-for="f in (['meaningful', 'all', 'following', 'major'] as const)"
@@ -228,6 +275,12 @@ watch(worldId, () => {
 </template>
 
 <style scoped>
+.simcontrols { position: absolute; top: 12px; left: 12px; z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--surface-panel); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 8px 12px; box-shadow: 0 4px 18px rgba(20, 16, 8, 0.25); font-size: 13px; }
+.simcontrols button { border: 1px solid var(--action-primary); background: #fff; color: var(--action-primary); border-radius: 8px; padding: 5px 12px; cursor: pointer; font: inherit; }
+.simcontrols button:disabled { opacity: 0.4; cursor: default; }
+.simcontrols select { font: inherit; border-radius: 8px; border: 1px solid var(--border-subtle); padding: 5px; }
+.simcontrols .simstate { color: var(--text-secondary); }
+.simcontrols .simnotice { color: var(--accent-gold); }
 .world { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 0; min-height: calc(100vh - 44px); }
 .mapcol { position: relative; overflow: hidden; background: #e8e2d4; min-height: 60vh; }
 .schematic { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); }

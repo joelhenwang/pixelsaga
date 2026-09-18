@@ -1006,3 +1006,14 @@ class EnsureStarterRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     world_id: UUID
+
+
+class SimulationStatus(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    absolute_index: int
+    open_run_id: UUID | None = None
+    open_run_state: str | None = None
+    latest_run_id: UUID | None = None
+    latest_run_state: str | None = None

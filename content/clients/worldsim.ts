@@ -578,6 +578,15 @@ export interface ChronicleResponse {
   world_id: string;
 }
 
+export interface SimulationStatus {
+  absolute_index: number;
+  latest_run_id?: string | null;
+  latest_run_state?: string | null;
+  open_run_id?: string | null;
+  open_run_state?: string | null;
+  world_id: string;
+}
+
 export interface PresentationCapabilities {
   capabilities?: string[] | null;
   character_id?: string | null;
@@ -679,10 +688,9 @@ export const ROUTES = {
   getScene: "GET /api/v1/stage1/scenes/{scene_id}",
   getNarration: "GET /api/v1/stage1/scenes/{scene_id}/narration",
   listModelRuns: "GET /api/v1/stage1/model-runs",
-  advance: "POST /api/v1/stage1/advance",
-  pause: "POST /api/v1/stage1/pause",
-  resume: "POST /api/v1/stage1/resume",
   beginPartyMember: "POST /api/v1/stage1/party/begin",
+  readSimulationStatus: "GET /api/v1/simulation/status",
+  resume: "POST /api/v1/stage1/resume",
   listParty: "GET /api/v1/stage1/party",
   createCharacter: "POST /api/v1/stage1/characters",
   linkPartyMember: "POST /api/v1/stage1/party/{member_id}/link",

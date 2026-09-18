@@ -158,6 +158,23 @@ class SqlAlchemyTaskRepository:
         await self._session.flush()
         return True
 
+    async def reset(self, task_id: UUID, owner: str) -> bool:
+        """Recycle a terminal slot for a new execution cycle."""
+        row = (
+            await self._session.execute(
+                select(TaskRunRow).where(TaskRunRow.id == task_id).with_for_update()
+            )
+        ).scalar_one_or_none()
+        if row is None:
+            raise missing("task", task_id)
+        if row.state not in self._TERMINAL:
+            return False
+        row.state = "pending"
+        row.owner = owner
+        row.attempt = 0
+        await self._session.flush()
+        return True
+
     async def find_by_key(self, world_id: UUID, key: str) -> TaskRun | None:
         row = (
             await self._session.execute(
