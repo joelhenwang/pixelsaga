@@ -230,6 +230,8 @@ watch(worldId, () => {
         </button>
       </div>
     </div>
+    <aside class="chronicle" aria-label="Chronicle">
+      <h1>World Chronicle</h1>
       <div class="filters" role="group" aria-label="Filters">
         <button
           v-for="f in (['meaningful', 'all', 'following', 'major'] as const)"
