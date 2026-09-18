@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock A01: Stories and original setup (fixture)</title>
+<style>
+:root{
+  --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
+  --text-primary:#253247; --text-secondary:#627084;
+  --action-primary:#216B63; --accent-gold:#A8792B; --status-danger:#BA5148;
+  --border-subtle:#DDD8CE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2,h3{font-family:Georgia,"Source Serif 4",serif;margin:0}
+.topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
+  background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
+.topbar .brand{font-family:Georgia,serif;font-size:17px}
+.topbar nav{display:flex;gap:2px}
+.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1.page{font-size:30px}
+.sub{color:var(--text-secondary);font-size:14px;margin:0 0 12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tabs button{font:inherit;font-size:14px;padding:8px 14px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--border-subtle);background:var(--surface-panel)}
+.tabs button[aria-pressed="true"]{background:var(--action-primary);border-color:var(--action-primary);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden}
+.card img{width:100%;height:130px;object-fit:cover;display:block}
+.card .body{padding:10px 14px}
+.card b{font-size:16px}.card .meta{font-size:13px;color:var(--text-secondary);margin:2px 0 8px}
+.card .row{display:flex;gap:8px;align-items:center}
+.btn{border:0;border-radius:8px;height:40px;padding:0 16px;font:inherit;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--action-primary);color:#fff}
+.btn.plain{border:1px solid var(--border-subtle);background:var(--surface-panel)}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:1px solid var(--border-subtle);
+  background:var(--surface-panel);cursor:pointer;font-size:16px;color:var(--action-primary)}
+.menu{position:relative}
+.menu ul{position:absolute;right:0;top:44px;list-style:none;margin:0;padding:4px;z-index:5;
+  background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:8px;min-width:170px}
+.menu ul button{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;
+  font-size:14px;padding:8px 10px;border-radius:6px;cursor:pointer}
+.menu ul button:hover{background:var(--surface-page)}
+.menu ul button.danger{color:var(--status-danger)}
+.hidden{display:none}
+/* Modal */
+.backdrop{position:fixed;inset:0;background:rgba(20,16,8,.5);display:flex;align-items:center;
+  justify-content:center;padding:20px}
+.modal{background:var(--surface-panel);border-radius:12px;max-width:640px;width:100%;
+  max-height:85vh;overflow:auto;padding:18px 22px}
+.modal .kicker{font-size:12px;letter-spacing:.08em;color:var(--accent-gold)}
+.modal h2{font-size:26px}
+.modal dl{display:grid;grid-template-columns:130px 1fr;gap:4px 12px;font-size:14px;margin:12px 0}
+.modal dt{color:var(--text-secondary);font-size:13px}
+@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
+.modal .foot{display:flex;gap:10px;margin-top:12px}
+.badge{display:inline-block;font-size:12px;border:1px solid var(--border-subtle);border-radius:6px;padding:2px 8px}
+.legacy{font-style:italic;color:var(--text-secondary)}
+:focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">PixelSaga</span>
+  <nav aria-label="Main">
+    <a href="home-a.html">Home</a><a href="new-story.html">New Story</a>
+    <a href="stories.html" aria-current="page">Stories</a><a href="library.html">Library</a><a href="settings.html">Settings</a>
+  </nav>
+</header>
+<main class="wrap">
+  <h1 class="page">Your stories</h1>
+  <p class="sub">Ongoing journeys and finished tales. Setup snapshots are read-only.</p>
+  <div class="tabs" role="group" aria-label="Status filter">
+    <button type="button" aria-pressed="true">In Progress (2)</button>
+    <button type="button" aria-pressed="false">Completed (1)</button>
+  </div>
+  <div class="cards">
+    <article class="card">
+      <img src="../../content/assets/revamp/hearth-background-v1.png" alt="Hearth art">
+      <div class="body"><b>The Sealed Gate</b>
+        <p class="meta">Ember Vale &middot; Watcher &middot; Day 3 &middot; played today</p>
+        <div class="row">
+          <button class="btn primary" type="button">Continue</button>
+          <button class="iconbtn" type="button" data-setup="sealed" aria-label="View original setup for The Sealed Gate">i</button>
+          <span class="menu"><button class="iconbtn" type="button" aria-label="Story actions" aria-haspopup="true">&vellip;</button>
+            <ul class="hidden"><li><button type="button">Rename</button></li>
+            <li><button type="button">Export setup</button></li>
+            <li><button type="button" class="danger">Archive story</button></li></ul></span>
+        </div>
+      </div>
+    </article>
+    <article class="card">
+      <img src="../../content/assets/revamp/wren-portrait-v1.png" alt="Wren portrait" style="object-position:top">
+      <div class="body"><b>The Lantern Road</b>
+        <p class="meta">Ember Vale &middot; Player as Wren &middot; Day 2 &middot; played 5 days ago</p>
+        <div class="row">
+          <button class="btn primary" type="button">Continue</button>
+          <button class="iconbtn" type="button" data-setup="legacy" aria-label="View original setup for The Lantern Road">i</button>
+          <span class="menu"><button class="iconbtn" type="button" aria-label="Story actions" aria-haspopup="true">&vellip;</button>
+            <ul class="hidden"><li><button type="button">Rename</button></li>
+            <li><button type="button" class="danger">Archive story</button></li></ul></span>
+        </div>
+      </div>
+    </article>
+  </div>
+</main>
+<div class="backdrop hidden" id="backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setupTitle" id="modal">
+    <div class="kicker">STORY INFORMATION &middot; SAVED AT CREATION</div>
+    <h2 id="setupTitle">The Sealed Gate</h2>
+    <p class="sub">Original story setup. Later Library or Settings changes do not alter it.</p>
+    <div id="setupBody">
+      <dl>
+        <dt>World</dt><dd>Ember Vale (preset rev 1), start Hearth</dd>
+        <dt>Cast</dt><dd>Wren (Hearth), Ash (Market)</dd>
+        <dt>Play mode</dt><dd>Watch &middot; Observer</dd>
+        <dt>Tone / pacing</dt><dd>Hopeful mystery &middot; measured</dd>
+        <dt>Language model</dt><dd>Default story model (demo) &middot; rev 3</dd>
+        <dt>Scene art</dt><dd>Curated &middot; anime-saga-v1</dd>
+        <dt>Created</dt><dd>14 September 2026</dd>
+      </dl>
+    </div>
+    <p class="legacy hidden" id="legacyBody">Original setup unavailable: this story predates setup snapshots. Current settings are not its original configuration.</p>
+    <div class="foot">
+      <button class="btn plain" type="button">Export setup</button>
+      <button class="btn plain" type="button">Use as new story</button>
+      <button class="btn primary" type="button" id="closeBtn">Close</button>
+    </div>
+  </div>
+</div>
+<script>
+const backdrop = document.getElementById('backdrop');
+const legacy = document.getElementById('legacyBody');
+const body = document.getElementById('setupBody');
+const title = document.getElementById('setupTitle');
+let opener = null;
+function openSetup(kind, btn) {
+  opener = btn;
+  const isLegacy = kind === 'legacy';
+  title.textContent = isLegacy ? 'The Lantern Road' : 'The Sealed Gate';
+  body.classList.toggle('hidden', isLegacy);
+  legacy.classList.toggle('hidden', !isLegacy);
+  backdrop.classList.remove('hidden');
+  document.getElementById('closeBtn').focus();
+}
+function closeSetup() {
+  backdrop.classList.add('hidden');
+  if (opener) opener.focus();
+}
+document.querySelectorAll('[data-setup]').forEach(b =>
+  b.addEventListener('click', () => openSetup(b.dataset.setup, b)));
+document.getElementById('closeBtn').addEventListener('click', closeSetup);
+backdrop.addEventListener('click', e => { if (e.target === backdrop) closeSetup(); });
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || backdrop.classList.contains('hidden')) return;
+  closeSetup();
+});
+/* Focus trap: keep Tab inside the dialog while open. */
+document.getElementById('modal').addEventListener('keydown', e => {
+  if (e.key !== 'Tab') return;
+  const f = [...document.querySelectorAll('#modal button')].filter(x => x.offsetParent);
+  const first = f[0], last = f[f.length - 1];
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+});
+document.querySelectorAll('.menu > button').forEach(b =>
+  b.addEventListener('click', () => {
+    const ul = b.parentElement.querySelector('ul');
+    const open = !ul.classList.contains('hidden');
+    document.querySelectorAll('.menu ul').forEach(x => x.classList.add('hidden'));
+    ul.classList.toggle('hidden', open);
+  }));
+</script>
+</body>
+</html>

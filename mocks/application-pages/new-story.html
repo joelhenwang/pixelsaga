@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock A01: New Story wizard (fixture)</title>
+<style>
+:root{
+  --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
+  --text-primary:#253247; --text-secondary:#627084;
+  --action-primary:#216B63; --accent-gold:#A8792B; --status-danger:#BA5148;
+  --border-subtle:#DDD8CE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2,h3{font-family:Georgia,"Source Serif 4",serif;margin:0}
+.topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
+  background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
+.topbar .brand{font-family:Georgia,serif;font-size:17px}
+.topbar nav{display:flex;gap:2px}
+.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1.page{font-size:30px}
+.sub{color:var(--text-secondary);font-size:14px;margin:0 0 12px}
+.steps{display:flex;gap:4px;list-style:none;margin:0 0 16px;padding:0;flex-wrap:wrap}
+.steps li{flex:1;min-width:110px}
+.steps button{width:100%;border:1px solid var(--border-subtle);background:var(--surface-panel);
+  border-radius:8px;padding:8px;font:inherit;font-size:13px;cursor:pointer;color:var(--text-secondary)}
+.steps li.done button{color:var(--action-primary);border-color:var(--action-primary)}
+.steps li.now button{background:var(--action-primary);border-color:var(--action-primary);color:#fff}
+.main{display:grid;grid-template-columns:3fr 1fr;gap:16px}
+.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px}
+.panel h2{font-size:19px;margin-bottom:8px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.card{border:1px solid var(--border-subtle);border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;text-align:left;font:inherit;padding:0}
+.card img{width:100%;height:150px;object-fit:cover;display:block}
+.card .body{padding:8px 10px}
+.card b{font-size:14px}.card span{display:block;font-size:12.5px;color:var(--text-secondary)}
+.card[aria-pressed="true"]{outline:2px solid var(--action-primary)}
+label.field{display:block;font-size:14px;margin:10px 0}
+label.field span{display:block;font-size:13px;color:var(--text-secondary)}
+input[type=text],select{font:inherit;font-size:14px;height:42px;border:1px solid var(--border-subtle);
+  border-radius:8px;padding:0 10px;width:100%;background:#fff;color:var(--text-primary)}
+.mode{display:flex;gap:12px;flex-wrap:wrap}
+.mode .card{min-width:200px;flex:1}
+.role3{display:flex;gap:8px;margin-top:10px}
+.role3 .card{flex:1}
+.summary{font-size:14px}
+.summary dt{color:var(--text-secondary);font-size:13px}
+.summary dd{margin:0 0 8px}
+.footer{display:flex;gap:10px;margin-top:16px;align-items:center}
+.btn{border:0;border-radius:8px;height:42px;padding:0 18px;font:inherit;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--action-primary);color:#fff}
+.btn.plain{border:1px solid var(--border-subtle);background:var(--surface-panel);color:var(--text-primary)}
+@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
+.warn{font-size:13.5px;color:var(--status-danger);min-height:20px;margin:6px 0 0}
+.roster{list-style:none;margin:0 0 8px;padding:0;font-size:14px}
+.roster li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.roster button{margin-left:auto;background:none;border:0;color:var(--status-danger);font-size:16px;cursor:pointer}
+.hidden{display:none}
+:focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
+@media (max-width:768px){.main{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">PixelSaga</span>
+  <nav aria-label="Main">
+    <a href="home-a.html">Home</a><a href="new-story.html" aria-current="page">New Story</a>
+    <a href="stories.html">Stories</a><a href="library.html">Library</a><a href="settings.html">Settings</a>
+  </nav>
+</header>
+<main class="wrap">
+  <h1 class="page">Create a new story</h1>
+  <p class="sub">Draft saves explicitly. Nothing is created until Review.</p>
+  <ol class="steps" id="steps">
+    <li data-s="0" class="done"><button type="button">1 &middot; World</button></li>
+    <li data-s="1" class="now"><button type="button">2 &middot; Characters</button></li>
+    <li data-s="2"><button type="button">3 &middot; Play Mode</button></li>
+    <li data-s="3"><button type="button">4 &middot; Story</button></li>
+    <li data-s="4"><button type="button">5 &middot; AI</button></li>
+    <li data-s="5"><button type="button">6 &middot; Review</button></li>
+  </ol>
+  <div class="main">
+    <div>
+      <section class="panel step" data-s="0">
+        <h2>World</h2>
+        <div class="cards">
+          <button class="card" type="button" aria-pressed="true">
+            <img src="../../content/assets/revamp/ember-vale-map-display-v1.webp" alt="Ember Vale map">
+            <span class="body"><b>Ember Vale</b><span>Hearth, Market &middot; rev 1</span></span>
+          </button>
+        </div>
+        <label class="field"><span>Story title</span><input type="text" value="The Sealed Gate"></label>
+      </section>
+      <section class="panel step hidden" data-s="1">
+        <h2>Characters</h2>
+        <p class="sub">Select the whole cast before choosing how to play.</p>
+        <div class="cards" id="castGrid">
+          <button class="card" type="button" aria-pressed="true" data-name="Wren">
+            <img src="../../content/assets/revamp/wren-portrait-v1.png" alt="Wren portrait">
+            <span class="body"><b>Wren</b><span>Traveler &middot; preset rev 1</span></span>
+          </button>
+          <button class="card" type="button" aria-pressed="true" data-name="Ash">
+            <img src="../../content/assets/revamp/ash-portrait-v1.png" alt="Ash portrait">
+            <span class="body"><b>Ash</b><span>Wanderer &middot; preset rev 1</span></span>
+          </button>
+          <button class="card" type="button" id="newChar">
+            <span class="body"><b>+ Create a new character</b><span>Returns to this step</span></span>
+          </button>
+        </div>
+      </section>
+      <section class="panel step hidden" data-s="2">
+        <h2>Play Mode</h2>
+        <div class="mode" id="modeRow">
+          <button class="card" type="button" aria-pressed="false" data-mode="player">
+            <span class="body"><b>Player</b><span>Direct one cast member</span></span>
+          </button>
+          <button class="card" type="button" aria-pressed="true" data-mode="watch">
+            <span class="body"><b>Watch</b><span>Observe, direct, or shape fate</span></span>
+          </button>
+        </div>
+        <div id="playerPick" class="hidden">
+          <label class="field"><span>Controlled character (from cast)</span>
+            <select id="playerSel"><option value="">Choose&hellip;</option><option>Wren</option><option>Ash</option></select>
+          </label>
+        </div>
+        <div id="watchPick">
+          <div class="role3" id="watchRow">
+            <button class="card" type="button" aria-pressed="true" data-watch="observer"><span class="body"><b>Observer</b><span>Watch only</span></span></button>
+            <button class="card" type="button" aria-pressed="false" data-watch="director"><span class="body"><b>Director</b><span>Guide events</span></span></button>
+            <button class="card" type="button" aria-pressed="false" data-watch="deity"><span class="body"><b>Deity</b><span>Override fate</span></span></button>
+          </div>
+        </div>
+      </section>
+      <section class="panel step hidden" data-s="3">
+        <h2>Story</h2>
+        <label class="field"><span>Tone</span><input type="text" value="Hopeful mystery"></label>
+        <label class="field"><span>Pacing</span>
+          <select><option>Measured</option><option>Brisk</option><option>Slow burn</option></select>
+        </label>
+      </section>
+      <section class="panel step hidden" data-s="4">
+        <h2>AI</h2>
+        <label class="field"><span>Text profile</span>
+          <select><option>Default story model (fake &middot; demo, scripted)</option></select>
+        </label>
+        <label class="field"><span>Scene art</span>
+          <select><option>Curated starter art</option><option>No images</option></select>
+        </label>
+        <p class="sub">Live generation is unavailable: no image adapter is configured. This is not a Ready state.</p>
+      </section>
+      <section class="panel step hidden" data-s="5">
+        <h2>Review</h2>
+        <dl class="summary">
+          <dt>World</dt><dd>Ember Vale (preset rev 1), start Hearth</dd>
+          <dt>Cast</dt><dd id="reviewCast">Wren, Ash</dd>
+          <dt>Mode</dt><dd id="reviewMode">Watch &middot; Observer</dd>
+          <dt>AI</dt><dd>Default story model (demo) &middot; curated art</dd>
+        </dl>
+      </section>
+      <p class="warn" id="warn"></p>
+      <div class="footer">
+        <button class="btn plain" type="button" id="backBtn">Back</button>
+        <button class="btn plain" type="button">Save draft</button>
+        <button class="btn primary" type="button" id="nextBtn">Continue</button>
+      </div>
+    </div>
+    <aside class="panel" aria-label="Draft summary">
+      <h2>Selected cast &middot; <span id="castCount">2</span></h2>
+      <ul class="roster" id="roster"><li>Wren<button type="button" aria-label="Remove Wren">&times;</button></li><li>Ash<button type="button" aria-label="Remove Ash">&times;</button></li></ul>
+      <h2>World</h2>
+      <p class="sub">Ember Vale &middot; <button class="link" type="button" style="background:none;border:0;color:var(--action-primary);cursor:pointer;font-size:14px">Change</button></p>
+    </aside>
+  </div>
+</main>
+<script>
+let step = 1, mode = 'watch', watch = 'observer', playerSel = '';
+const cast = new Set(['Wren', 'Ash']);
+const steps = [...document.querySelectorAll('#steps li')];
+const panels = [...document.querySelectorAll('.step')];
+const warn = document.getElementById('warn');
+const nextBtn = document.getElementById('nextBtn');
+function render() {
+  steps.forEach((li, i) => {
+    li.className = i < step ? 'done' : i === step ? 'now' : '';
+  });
+  panels.forEach(p => p.classList.toggle('hidden', +p.dataset.s !== step));
+  nextBtn.textContent = step === 5 ? 'Create story' : step === 1 ? 'Continue to Play Mode' : 'Continue';
+  document.getElementById('castCount').textContent = cast.size;
+  document.getElementById('reviewCast').textContent = [...cast].join(', ') || 'none';
+  document.getElementById('reviewMode').textContent =
+    mode === 'player' ? 'Player as ' + (playerSel || ' nobody (pick one)') : 'Watch \u00b7 ' + watch[0].toUpperCase() + watch.slice(1);
+  warn.textContent = '';
+}
+function valid() {
+  if (step === 1 && cast.size === 0) return 'Select at least one character.';
+  if (step === 2 && mode === 'player' && !cast.has(playerSel)) return 'Player mode needs a controlled cast member.';
+  return '';
+}
+document.getElementById('castGrid').addEventListener('click', e => {
+  const c = e.target.closest('.card[data-name]');
+  if (!c) return;
+  const n = c.dataset.name;
+  const on = c.getAttribute('aria-pressed') === 'true';
+  c.setAttribute('aria-pressed', String(!on));
+  !on ? cast.add(n) : cast.delete(n);
+  if (playerSel === n && on) playerSel = '';
+  document.getElementById('playerSel').value = playerSel;
+  render();
+});
+document.getElementById('modeRow').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  mode = c.dataset.mode;
+  document.querySelectorAll('#modeRow .card').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+  document.getElementById('playerPick').classList.toggle('hidden', mode !== 'player');
+  document.getElementById('watchPick').classList.toggle('hidden', mode !== 'watch');
+  render();
+});
+document.getElementById('watchRow').addEventListener('click', e => {
+  const c = e.target.closest('.card'); if (!c) return;
+  watch = c.dataset.watch;
+  document.querySelectorAll('#watchRow .card').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+  render();
+});
+document.getElementById('playerSel').addEventListener('change', e => { playerSel = e.target.value; render(); });
+document.getElementById('newChar').addEventListener('click', () => { warn.textContent = 'Inline editor returns here with the saved preset selected (fixture: no-op).'; });
+steps.forEach(li => li.querySelector('button').addEventListener('click', () => {
+  const t = +li.dataset.s;
+  if (t <= step) { step = t; render(); }
+  else warn.textContent = 'Finish the current step first; jumping ahead is blocked.';
+}));
+document.getElementById('backBtn').addEventListener('click', () => { if (step > 0) step--; render(); });
+nextBtn.addEventListener('click', () => {
+  const v = valid();
+  if (v) { warn.textContent = v; return; }
+  if (step === 5) warn.textContent = 'Fixture: creation POSTs one atomic request with a stable idempotency key.';
+  else step++;
+  render();
+});
+render();
+</script>
+</body>
+</html>

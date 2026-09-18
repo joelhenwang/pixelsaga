@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock A01-B: Home, compact list (fixture)</title>
+<style>
+:root{
+  --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
+  --text-primary:#253247; --text-secondary:#627084;
+  --action-primary:#216B63; --accent-gold:#A8792B; --status-danger:#BA5148;
+  --border-subtle:#DDD8CE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0}
+.topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
+  background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
+.topbar .brand{font-family:Georgia,serif;font-size:17px}
+.topbar nav{display:flex;gap:2px}
+.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
+.topbar .side{margin-left:auto;display:flex;gap:10px;align-items:center;font-size:13px;color:var(--text-secondary)}
+.topbar .avatar{width:30px;height:30px;border-radius:50%;background:var(--action-primary);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:13px}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1.page{font-size:30px;margin-bottom:4px}
+.sub{color:var(--text-secondary);font-size:14px;margin:0 0 14px}
+.grid{display:grid;grid-template-columns:1fr 2fr;gap:16px}
+.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px}
+.panel h2{font-size:19px;margin-bottom:8px}
+.big{font-size:17px;margin:4px 0}
+.meta{font-size:13px;color:var(--text-secondary);margin:0 0 10px}
+.btn{border:0;border-radius:8px;height:42px;padding:0 18px;font:inherit;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--action-primary);color:#fff}
+.btn.plain{border:1px solid var(--border-subtle);background:var(--surface-panel);color:var(--text-primary)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.story{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--border-subtle)}
+.story:first-of-type{border-top:0}
+.dot{flex:none;width:12px;height:12px;border-radius:50%;background:var(--action-primary)}
+@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
+.story b{display:block;font-size:14px}
+.story span{font-size:13px;color:var(--text-secondary)}
+.story .go{margin-left:auto}
+.link{background:none;border:0;color:var(--action-primary);font:inherit;font-size:14px;cursor:pointer;padding:8px}
+.counts{display:flex;gap:16px;font-size:13px;color:var(--text-secondary);margin-top:10px}
+:focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
+@media (max-width:768px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">PixelSaga</span>
+  <nav aria-label="Main">
+    <a href="home-b.html" aria-current="page">Home</a><a href="new-story.html">New Story</a>
+    <a href="stories.html">Stories</a><a href="library.html">Library</a><a href="settings.html">Settings</a>
+  </nav>
+  <span class="side"><a href="settings.html" style="color:inherit">Help</a><span class="avatar" title="Local profile">J</span></span>
+</header>
+<main class="wrap">
+  <h1 class="page">Good evening, storyteller</h1>
+  <p class="sub">Pick up where you left off, or begin something new.</p>
+  <div class="grid">
+    <section class="panel" aria-label="Continue">
+      <h2>Continue</h2>
+      <p class="big">The Sealed Gate</p>
+      <p class="meta">Ember Vale &middot; Watching &middot; Day 3, Morning</p>
+      <div class="row">
+        <button class="btn primary" type="button">Continue story</button>
+        <button class="btn plain" type="button">Start a new story</button>
+      </div>
+      <div class="counts"><span>3 stories in progress</span><span>2 world presets</span><span>2 character presets</span></div>
+    </section>
+    <section class="panel" aria-label="Recent stories">
+      <h2>Recent</h2>
+      <div class="story"><span class="dot"></span>
+        <div><b>The Sealed Gate</b><span>Ember Vale &middot; Watcher &middot; played today</span></div>
+        <button class="go link" type="button">Open</button>
+      </div>
+      <div class="story"><span class="dot paused"></span>
+        <div><b>Ashes Beneath the Snow</b><span>Ember Vale &middot; Watcher &middot; Day 8 &middot; paused</span></div>
+        <button class="go link" type="button">Open</button>
+      </div>
+      <div class="story"><span class="dot"></span>
+        <div><b>The Lantern Road</b><span>Ember Vale &middot; Player as Wren &middot; Day 2</span></div>
+        <button class="go link" type="button">Open</button>
+      </div>
+    </section>
+  </div>
+</main>
+</body>
+</html>

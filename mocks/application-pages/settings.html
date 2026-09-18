@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mock A01: Settings (fixture)</title>
+<style>
+:root{
+  --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
+  --text-primary:#253247; --text-secondary:#627084;
+  --action-primary:#216B63; --accent-gold:#A8792B; --status-danger:#BA5148;
+  --border-subtle:#DDD8CE;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:15px/1.5 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2,h3{font-family:Georgia,"Source Serif 4",serif;margin:0}
+.topbar{display:flex;gap:16px;align-items:center;padding:0 20px;min-height:60px;
+  background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
+.topbar .brand{font-family:Georgia,serif;font-size:17px}
+.topbar nav{display:flex;gap:2px}
+.topbar nav a{font-size:14px;color:var(--text-secondary);text-decoration:none;padding:6px 12px;border-radius:8px}
+.topbar nav a[aria-current="page"]{color:#fff;background:var(--action-primary)}
+.wrap{max-width:1200px;margin:0 auto;padding:20px}
+h1.page{font-size:30px}
+.sub{color:var(--text-secondary);font-size:14px;margin:0 0 12px}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:16px}
+.rail{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:8px}
+.rail button{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;font-size:14px;
+  padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--text-primary)}
+.rail button[aria-pressed="true"]{background:var(--action-primary);color:#fff}
+.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:14px 16px}
+.panel h2{font-size:19px;margin-bottom:4px}
+.group{border:1px solid var(--border-subtle);border-radius:8px;padding:12px;margin-top:12px}
+.group h3{font-size:16px;font-family:inherit;font-weight:bold}
+.group p{font-size:13.5px;color:var(--text-secondary);margin:2px 0 8px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+label.field{display:block;font-size:14px}
+label.field span{display:block;font-size:13px;color:var(--text-secondary)}
+input[type=text],select{font:inherit;font-size:14px;height:42px;border:1px solid var(--border-subtle);
+  border-radius:8px;padding:0 10px;width:100%;background:#fff;color:var(--text-primary)}
+input:disabled,select:disabled{background:var(--surface-page);color:var(--text-secondary)}
+.status{font-size:13px;font-weight:bold}
+.status.bad{color:var(--status-danger)}
+.status.dim{color:var(--text-secondary)}
+.foot{display:flex;gap:10px;margin-top:14px;align-items:center}
+@media (max-width:768px){.topbar{flex-wrap:wrap;padding:8px 12px}.topbar nav{order:3;overflow-x:auto;max-width:100%}}
+.btn.primary{background:var(--action-primary);color:#fff}
+.btn.plain{border:1px solid var(--border-subtle);background:var(--surface-panel)}
+.hidden{display:none}
+:focus-visible{outline:2px solid var(--action-primary);outline-offset:2px}
+@media (max-width:768px){.layout{grid-template-columns:1fr}.rail{display:flex;overflow-x:auto}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">PixelSaga</span>
+  <nav aria-label="Main">
+    <a href="home-a.html">Home</a><a href="new-story.html">New Story</a>
+    <a href="stories.html">Stories</a><a href="library.html">Library</a><a href="settings.html" aria-current="page">Settings</a>
+  </nav>
+</header>
+<main class="wrap">
+  <h1 class="page">Settings</h1>
+  <p class="sub">Defaults for new stories. Every control reaches a real consumer or is disabled with a reason.</p>
+  <div class="layout">
+    <nav class="rail" aria-label="Settings sections">
+      <button type="button" aria-pressed="true" data-sec="providers">AI Providers</button>
+      <button type="button" aria-pressed="false" data-sec="model">Language Model</button>
+      <button type="button" aria-pressed="false" data-sec="images">Image Generation</button>
+      <button type="button" aria-pressed="false" data-sec="gameplay">Gameplay Defaults</button>
+      <button type="button" aria-pressed="false" data-sec="storage">Storage &amp; Data</button>
+      <button type="button" aria-pressed="false" data-sec="access">Accessibility</button>
+      <button type="button" aria-pressed="false" data-sec="advanced">Advanced</button>
+    </nav>
+    <div>
+      <section class="panel sec" data-sec="providers">
+        <h2>AI Providers</h2>
+        <p class="sub">Text profiles and credentials. Keys are write-only and never displayed.</p>
+        <div class="group"><h3>Language provider</h3>
+          <p>Fake (demo, scripted) or a supported OpenRouter model. Other endpoints need an approved adapter.</p>
+          <div class="row">
+            <label class="field"><span>Provider</span>
+              <select><option>Fake (demo)</option><option>OpenRouter</option></select></label>
+            <label class="field"><span>API key</span><input type="text" placeholder="Write-only; empty means unchanged" autocomplete="off"></label>
+          </div>
+          <p><span class="status dim">Not tested</span> <button class="btn plain" type="button" style="height:36px">Test connection</button></p>
+        </div>
+        <div class="group"><h3>Default model</h3>
+          <div class="row">
+            <label class="field"><span>Model</span><select><option>Story Model (fake)</option></select></label>
+            <label class="field"><span>Response format</span><select><option>Structured</option></select></label>
+          </div>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="model">
+        <h2>Language Model</h2>
+        <p class="sub">Only parameters the active adapter supports. Unsupported fields are disabled with a reason.</p>
+        <div class="group"><h3>Generation parameters</h3>
+          <div class="row">
+            <label class="field"><span>Temperature (supported)</span><input type="text" value="0.8"></label>
+            <label class="field"><span>Top P (supported)</span><input type="text" value="0.95"></label>
+            <label class="field"><span>Top K (disabled: fake adapter ignores it)</span><input type="text" value="40" disabled></label>
+            <label class="field"><span>Max output tokens (cap 4096)</span><input type="text" value="2048"></label>
+          </div>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="images">
+        <h2>Image Generation</h2>
+        <p class="sub"><span class="status bad">Unavailable:</span> no live image adapter is configured. Curated starter art ships with Ember Vale.</p>
+        <div class="group"><h3>Scene art source</h3>
+          <div class="row">
+            <label class="field"><span>Source</span><select><option>Curated starter art</option><option>No images</option></select></label>
+          </div>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="gameplay">
+        <h2>Gameplay Defaults</h2>
+        <div class="group"><h3>New stories</h3>
+          <div class="row">
+            <label class="field"><span>Narrative pacing</span><select><option>Measured</option><option>Brisk</option><option>Slow burn</option></select></label>
+            <label class="field"><span>Autoplay dwell</span><select><option>Normal (1.5s)</option><option>Slow (3s)</option><option>Fast (0.5s)</option></select></label>
+          </div>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="storage">
+        <h2>Storage &amp; Data</h2>
+        <div class="group"><h3>Image cache</h3>
+          <p>Derived files only: 14 cached thumbnails. Clearing never deletes stories, presets, original art, or credentials, and never triggers regeneration.</p>
+          <p><button class="btn plain" type="button">Clear image cache (14 files)</button></p>
+        </div>
+        <div class="group"><h3>Export</h3>
+          <p>Setup/preset JSON exports carry redacted configuration only. Full saves travel with the database process.</p>
+          <p><button class="btn plain" type="button">Export preferences (JSON)</button></p>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="access">
+        <h2>Accessibility</h2>
+        <div class="group"><h3>Reading</h3>
+          <div class="row">
+            <label class="field"><span>Font scale</span><select><option>100%</option><option>112%</option><option>125%</option></select></label>
+            <label class="field"><span>Motion</span><select><option>Respect system</option><option>Reduce always</option></select></label>
+          </div>
+        </div>
+      </section>
+      <section class="panel sec hidden" data-sec="advanced">
+        <h2>Advanced</h2>
+        <div class="group"><h3>Diagnostics</h3>
+          <p>Config source: environment + operator profile rev 2. Request IDs appear in error details; no secrets leave the server.</p>
+          <p><button class="btn plain" type="button">Open operations view</button></p>
+        </div>
+      </section>
+      <div class="foot">
+        <button class="btn plain" type="button">Restore defaults</button>
+        <button class="btn primary" type="button">Save changes</button>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+document.querySelectorAll('.rail button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.rail button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  document.querySelectorAll('.sec').forEach(s => s.classList.toggle('hidden', s.dataset.sec !== b.dataset.sec));
+}));
+</script>
+</body>
+</html>
