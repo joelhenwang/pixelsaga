@@ -113,6 +113,9 @@ try {
       await mobile.goto(base, { waitUntil: "networkidle" });
       await mobile.getByRole("button", { name: "settings" }).click({ timeout: 12000 });
       await mobile.locator(".settings select").first().selectOption("player", { timeout: 12000 });
+      await mobile.getByRole("button", { name: /advance to/ }).click({ timeout: 12000 });
+      await mobile.locator(".strip button").last().waitFor({ timeout: 60000 });
+      await mobile.locator(".strip button").last().click({ timeout: 12000 });
       await mobile.locator(".composer input").waitFor({ timeout: 15000 });
       const box = await mobile.locator(".composer input").boundingBox();
       assert(box && box.width > 0, "composer not visible on mobile");
