@@ -5,7 +5,7 @@
 import { onUnmounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ApiError } from "../api";
-import { clock, connection, fail, notice } from "../store";
+import { clock, connection, fail, notice, worldStatus } from "../store";
 import { currentStory, enterStory, leaveStory } from "../composables/useStoryContext";
 
 const route = useRoute();
@@ -71,6 +71,7 @@ void enter(route.params.storyId as string);
       <span class="conn" :data-state="connection">{{ connection }}</span>
     </header>
     <p class="notice" v-if="blocked">{{ blocked }}</p>
+    <p class="notice" v-if="worldStatus !== 'active'">This story has ended. It stays inspectable; advance is disabled.</p>
     <p class="notice" v-if="notice">{{ notice }}</p>
     <RouterView v-if="!loading && !blocked" />
   </div>

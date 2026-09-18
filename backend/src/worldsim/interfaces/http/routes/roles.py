@@ -8,6 +8,7 @@ from fastapi import APIRouter, Request
 
 from worldsim.application.commands.deity import apply_override
 from worldsim.application.commands.director import accept_decision
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.domain.director import DirectorProposal, validate_proposal
 from worldsim.domain.enums import LifeStatus, PhaseRunState, UserRole
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -131,6 +132,7 @@ async def propose(body: api.DirectorProposalRequest, request: Request) -> api.Di
     if not decision.accepted:
         raise DomainError(ErrorCode.VALIDATION_FAILED, decision.reason)
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         world = await uow.worlds.get(body.world_id)
         await accept_decision(
             uow,
@@ -165,6 +167,7 @@ async def override(body: api.DeityOverrideRequest, request: Request) -> api.Deit
         ) from exc
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         run = await uow.phases.latest_run(body.world_id)
         if run is None:
             raise DomainError(ErrorCode.PRECONDITION_FAILED, "deity needs a phase context")

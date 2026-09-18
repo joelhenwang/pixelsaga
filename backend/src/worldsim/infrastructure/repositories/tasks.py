@@ -12,7 +12,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from worldsim.domain.enums import TaskRunState
+from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.tasks import Lease, TaskRun
+from worldsim.infrastructure.models.stories import StoryCatalogRow
 from worldsim.infrastructure.models.tasks import TaskRunRow
 from worldsim.infrastructure.repositories._common import missing
 
@@ -93,6 +95,7 @@ class SqlAlchemyTaskRepository:
         )
         if not eligible or row.state in self._TERMINAL:
             return None
+        await self._reject_archived(row.world_id)
         row.state = "running"
         row.owner = owner
         row.claimed_at = lease.claimed_at
@@ -101,6 +104,33 @@ class SqlAlchemyTaskRepository:
         row.max_attempts = lease.max_attempts
         await self._session.flush()
         return _to_domain(row)
+
+    async def _reject_archived(self, world_id: UUID) -> None:
+        catalog = (
+            await self._session.execute(
+                select(StoryCatalogRow.archived_at)
+                .where(StoryCatalogRow.world_id == world_id)
+                .with_for_update()
+            )
+        ).scalar_one_or_none()
+        if catalog:
+            raise DomainError(
+                ErrorCode.PRECONDITION_FAILED,
+                "story is archived; unarchive it before changing the world",
+            )
+
+    async def _archived_worlds(self, world_ids: set[UUID]) -> set[UUID]:
+        if not world_ids:
+            return set()
+        rows = (
+            await self._session.execute(
+                select(StoryCatalogRow.world_id).where(
+                    StoryCatalogRow.world_id.in_(world_ids),
+                    StoryCatalogRow.archived_at.is_not(None),
+                )
+            )
+        ).scalars()
+        return set(rows)
 
     async def heartbeat(self, task_id: UUID, owner: str, expires_at: datetime) -> bool:
         row = (
@@ -211,6 +241,8 @@ class SqlAlchemyTaskRepository:
             )
         ).scalars()
         claimed = list(rows)
+        archived = await self._archived_worlds({row.world_id for row in claimed})
+        claimed = [row for row in claimed if row.world_id not in archived]
         for row in claimed:
             row.state = "running"
             row.owner = owner

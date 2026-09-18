@@ -13,6 +13,7 @@ from worldsim.application.capabilities import (
     parse_role,
     require_capability,
 )
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.domain.assets import AssetKind, AssetRecord, ImageJob
 from worldsim.domain.enums import UserRole
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -73,6 +74,9 @@ async def request_job(body: api.JobRequest, request: Request) -> api.JobView:
     except ValueError as exc:
         raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown asset kind: {body.kind}") from exc
     state = request.app.state.app_state
+    if body.world_id is not None:
+        async with state.uow_factory()() as uow:
+            await require_unarchived(uow, body.world_id)
     gateway = FixtureImageGateway(state.uow_factory())
     job = await gateway.request(
         body.world_id, kind, body.subject_id, body.style_pack_version, body.idempotency_key
@@ -99,6 +103,8 @@ async def ensure_starter_assets(
     if not is_omniscient(parsed):
         require_capability(parsed, Capability.MACRO)
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
     assets = await ensure_starter(
         state.uow_factory(), body.world_id, state.seed_dir.parent.parent / "assets"
     )

@@ -7,7 +7,7 @@
 // may finish, but nothing from A may render into or schedule for B.
 import { reactive } from "vue";
 import { ApiError, api } from "../api";
-import { headers, refresh, switchRole } from "../store";
+import { headers, refresh, switchRole, worldStatus } from "../store";
 import { pause } from "./useSimulationControl";
 import type { Role } from "../api";
 
@@ -43,6 +43,7 @@ export async function enterStory(storyId: string): Promise<StoryBinding> {
   }
   pause();
   switchRole(role as Role, character);
+  worldStatus.value = detail.status;
   await refresh(detail.world_id);
   const binding: StoryBinding = {
     storyId,

@@ -21,6 +21,7 @@ from worldsim.application.execution import guarded, new_owner, phase_run_id, pha
 from worldsim.application.interventions import apply_batch, claim_for_boundary
 from worldsim.application.orchestration.stage1 import Stage1Orchestrator, Stage1PhaseReport
 from worldsim.application.queries.suggestions import suggestions_for
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.domain.commands import ActionIntent
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import derive_attempt_id
@@ -323,6 +324,8 @@ async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage
         player_intents[actor] = _ACTION_ADAPTER.validate_python(raw_action)
 
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
     owner = new_owner("http")
     orchestrator = _stage1(request)
 
@@ -369,6 +372,7 @@ async def pause(body: api.RunIdRequest, request: Request) -> dict[str, str]:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.phases.get_run(body.run_id)).world_id
+        await require_unarchived(uow, world_id)
     role, _viewer = await _perspective(request, world_id)
     require_capability(parse_role(role), Capability.ADVANCE)
     await _stage1(request).pause_phase(body.run_id)
@@ -400,6 +404,7 @@ async def resume(body: api.RunIdRequest, request: Request) -> dict[str, str]:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.phases.get_run(body.run_id)).world_id
+        await require_unarchived(uow, world_id)
     role, _viewer = await _perspective(request, world_id)
     require_capability(parse_role(role), Capability.ADVANCE)
     await _stage1(request).resume_phase(body.run_id)
@@ -413,6 +418,7 @@ async def begin_party_member(body: api.PartyBeginRequest, request: Request) -> a
     require_capability(parse_role(role), Capability.CREATE_CHARACTER)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         member = await begin_adventure(
             uow,
             dnd_tables(),
@@ -436,6 +442,7 @@ async def create_character_view(
     require_capability(parse_role(role), Capability.CREATE_CHARACTER)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         character = await create_character(
             uow,
             body.world_id,
@@ -462,6 +469,7 @@ async def link_party_member(
     require_capability(parse_role(role), Capability.CREATE_CHARACTER)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         member = await link_member(
             uow, body.world_id, member_id, body.character_id, body.expected_version
         )

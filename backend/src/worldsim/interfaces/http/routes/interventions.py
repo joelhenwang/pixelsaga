@@ -10,6 +10,7 @@ from worldsim.application import interventions as service
 from worldsim.application.capabilities import parse_role
 from worldsim.application.interventions import Scope
 from worldsim.application.ports.model_gateway import ModelGateway
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.domain.enums import UserRole
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.interventions import (
@@ -84,6 +85,8 @@ async def submit_intervention(
     if body.effective_at != "next_boundary":
         raise DomainError(ErrorCode.VALIDATION_FAILED, "effective_at must be next_boundary")
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
     intervention = await service.submit(
         state.uow_factory(),
         _gateway_for(request, parsed),

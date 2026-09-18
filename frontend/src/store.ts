@@ -15,6 +15,7 @@ export const characters = ref<{ id: string; name: string }[]>([]);
 export const worldId = ref<string>("");
 export const clock = ref<string>("no world");
 export const nextIndex = ref<number>(1);
+export const worldStatus = ref<string>("active");
 export const connection = ref<"online" | "offline">("online");
 
 // -- UI state ---------------------------------------------------------------
@@ -78,6 +79,7 @@ export function switchRole(next: Role, character: string | null): void {
   refreshAbort = null;
   clearAssetCache();
   role.value = next;
+  worldStatus.value = "active";
   characterId.value = character ?? "";
   characters.value = [];
   worldId.value = "";

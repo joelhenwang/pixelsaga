@@ -14,6 +14,7 @@ from worldsim.application.commands.activities import (
     resume_activity,
     start_activity,
 )
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.domain.activities import Activity
 from worldsim.domain.enums import ActivityKind, UserRole
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -83,6 +84,7 @@ async def start(body: api.ActivityStartRequest, request: Request) -> api.Activit
     state = request.app.state.app_state
     now = await _absolute_now(request, body.world_id)
     async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
         activity = await start_activity(
             uow,
             body.world_id,

@@ -5,7 +5,7 @@ import type { AssetView, BeatView, SceneDetail, SceneSummary, SuggestionView } f
 import { api } from "../api";
 import { assetUrl } from "../assets";
 import { portraitFor } from "../portrait";
-import { advance, busy, characters, characterId, clock, fail, headers, nextIndex, refresh, role, worldId } from "../store";
+import { advance, busy, characters, characterId, clock, fail, headers, nextIndex, refresh, role, worldId, worldStatus } from "../store";
 
 const scenes = ref<SceneSummary[]>([]);
 const currentId = ref<string>("");
@@ -300,7 +300,9 @@ watch(worldId, () => {
     <template v-else>
       <h1>no scene selected</h1>
       <p class="dim">Seed, advance a phase, then pick a scene. Arrows move between scenes, slash focuses the input.</p>
-      <button type="button" @click="advanceHere" :disabled="busy">advance to {{ nextIndex }}</button>
+      <button type="button" @click="advanceHere" :disabled="busy || worldStatus !== 'active'">
+        {{ worldStatus === "active" ? `advance to ${nextIndex}` : "story ended" }}
+      </button>
     </template>
   </main>
 </template>

@@ -475,6 +475,44 @@ export const api = {
   openStory(storyId: string, headers: Record<string, string>): Promise<StoryDetail> {
     return request<StoryDetail>(`/api/v1/stories/${storyId}/open`, { method: "POST" }, headers);
   },
+  renameStory(
+    storyId: string, title: string, expectedVersion: number, headers: Record<string, string>,
+  ): Promise<StoryDetail> {
+    return request<StoryDetail>(
+      `/api/v1/stories/${storyId}`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, expected_version: expectedVersion }),
+      },
+      headers,
+    );
+  },
+  archiveStory(storyId: string, expectedVersion: number, headers: Record<string, string>): Promise<StoryDetail> {
+    return request<StoryDetail>(
+      `/api/v1/stories/${storyId}/archive`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_version: expectedVersion }),
+      },
+      headers,
+    );
+  },
+  unarchiveStory(storyId: string, expectedVersion: number, headers: Record<string, string>): Promise<StoryDetail> {
+    return request<StoryDetail>(
+      `/api/v1/stories/${storyId}/unarchive`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_version: expectedVersion }),
+      },
+      headers,
+    );
+  },
+  exportSetup(storyId: string, headers: Record<string, string>): Promise<unknown> {
+    return request<unknown>(`/api/v1/stories/${storyId}/setup/export`, {}, headers);
+  },
   listPresets(
     headers: Record<string, string>,
     params: { kind?: string; include_archived?: boolean } = {},

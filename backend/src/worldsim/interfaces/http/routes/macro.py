@@ -26,6 +26,7 @@ from worldsim.application.macro.engine import MacroEngine
 from worldsim.application.macro.eras import compose_era
 from worldsim.application.macro.genealogy import apply_schedule_consequence, assign_focus
 from worldsim.application.macro.salience import find_break
+from worldsim.application.stories.guards import require_unarchived
 from worldsim.application.transactions.canonical import CanonicalTransaction
 from worldsim.domain.enums import FocusSlot, MacroResolution, ScheduleStatus
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -222,6 +223,8 @@ async def macro_advance(
         ) from exc
     engine = _engine_of(request)
     state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        await require_unarchived(uow, body.world_id)
     factory = state.uow_factory()
     pending = await active_conditions(factory, body.world_id)
     if pending:

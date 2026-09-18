@@ -18,6 +18,85 @@ const query = ref((route.query.q as string) || "");
 const setup = ref<StorySetupView | null>(null);
 const setupTitle = ref("");
 let openedInApp = false;
+const menuFor = ref<string | null>(null);
+const renaming = ref<string | null>(null);
+const renameText = ref("");
+async function versionOf(storyId: string): Promise<number> {
+  const detail = await api.readStory(storyId, headers.value);
+  return detail.metadata_version ?? 0;
+}
+
+async function doRename(story: StorySummary): Promise<void> {
+  try {
+    await api.renameStory(story.story_id, renameText.value, await versionOf(story.story_id), headers.value);
+    renaming.value = null;
+    await load(true);
+  } catch (error) {
+    fail("rename failed", error);
+  }
+}
+
+async function doArchive(story: StorySummary, archived: boolean): Promise<void> {
+  const action = archived ? "Unarchive" : "Archive";
+  if (!window.confirm(`${action} "${story.title}"?`)) return;
+  try {
+    if (archived) {
+      await api.unarchiveStory(story.story_id, await versionOf(story.story_id), headers.value);
+    } else {
+      await api.archiveStory(story.story_id, await versionOf(story.story_id), headers.value);
+    }
+    menuFor.value = null;
+    await load(true);
+  } catch (error) {
+    fail("archive failed", error);
+  }
+}
+
+async function doExport(story: StorySummary): Promise<void> {
+  try {
+    const data = await api.exportSetup(story.story_id, headers.value);
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `story-setup-${story.story_id.slice(0, 8)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    menuFor.value = null;
+  } catch (error) {
+    fail("export failed", error);
+  }
+}
+
+async function doReuse(story: StorySummary): Promise<void> {
+  try {
+    const view = await api.readSetup(story.story_id, headers.value);
+    const payload = (view.payload ?? {}) as Record<string, unknown>;
+    const cast = (payload.cast ?? []) as unknown as Record<string, string>[];
+    const mode = (payload.mode ?? {}) as Record<string, string>;
+    const tale = (payload.story ?? {}) as Record<string, string>;
+    const art = (payload.art ?? {}) as Record<string, string>;
+    const draft = await api.createStoryDraft(
+      {
+        payload: {
+          cast: cast.map((m) => ({
+            instance_key: m.instance_key,
+            name: m.name,
+            location_key: m.location_key ?? null,
+          })),
+          mode: { role: mode.role ?? "watcher" },
+          story: { title: tale.title ?? null, tone: tale.tone ?? null },
+          ai: { art_source: art.art_source ?? "curated" },
+        },
+        current_step: "review",
+      },
+      headers.value,
+    );
+    await router.push({ path: "/new-story", query: { draft: draft.id, step: "review" } });
+  } catch (error) {
+    fail("reuse failed", error);
+  }
+}
 
 async function load(reset: boolean): Promise<void> {
   loading.value = true;
@@ -127,7 +206,21 @@ onMounted(() => {
             type="button" class="icon" :aria-label="`View original setup for ${s.title}`"
             @click="openSetup(s)"
           >i</button>
+          <button
+            type="button" class="icon" :aria-label="`Actions for ${s.title}`"
+            @click="menuFor = menuFor === s.story_id ? null : s.story_id"
+          >&vellip;</button>
         </div>
+        <div v-if="renaming === s.story_id" class="row">
+          <input type="text" v-model="renameText" :aria-label="`New title for ${s.title}`" />
+          <button type="button" @click="doRename(s)">Save</button>
+        </div>
+        <ul v-if="menuFor === s.story_id" class="menu">
+          <li><button type="button" @click="renaming = s.story_id; renameText = s.title; menuFor = null">Rename</button></li>
+          <li><button type="button" @click="doExport(s)">Export setup</button></li>
+          <li><button type="button" @click="doReuse(s)">Use as new story</button></li>
+          <li><button type="button" @click="doArchive(s, s.archived ?? false)">{{ s.archived ? "Unarchive" : "Archive story" }}</button></li>
+        </ul>
       </article>
     </div>
     <button v-if="nextCursor" type="button" @click="load(false)">More stories</button>
