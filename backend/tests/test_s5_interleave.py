@@ -53,12 +53,16 @@ def _watcher() -> dict[str, str]:
 
 
 def _advance(
-    client: ApiClient, world: UUID, index: int, player_intents: dict[str, Any] | None = None
+    client: ApiClient,
+    world: UUID,
+    index: int,
+    player_intents: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> httpx.Response:
     body: dict[str, Any] = {"world_id": str(world), "absolute_index": index}
     if player_intents:
         body["player_intents"] = player_intents
-    return client.post("/api/v1/stage1/advance", json=body, headers=_watcher())
+    return client.post("/api/v1/stage1/advance", json=body, headers=headers or _watcher())
 
 
 async def _seed_two() -> dict[str, UUID]:
@@ -177,8 +181,13 @@ async def _inner(client: ApiClient, gateway: FakeGateway) -> None:
             "topic": "welcome",
         }
     }
-    resumed = _advance(client, wid, 20, talk)
-    assert resumed.status_code == 200, resumed.text
+    resumed = _advance(
+        client,
+        wid,
+        20,
+        talk,
+        {"X-Worldsim-Role": "player", "X-Worldsim-Character": str(wren)},
+    )
     for index in range(21, 31):
         report = _advance(client, wid, index)
         assert report.status_code == 200, (index, report.text)
