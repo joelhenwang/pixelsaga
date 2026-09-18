@@ -97,7 +97,8 @@ class DraftStory(BaseModel):
 class DraftAi(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    profile_revision: str | None = Field(default=None, max_length=128)
+    profile_id: str | None = Field(default=None, max_length=128)
+    profile_revision: int | None = Field(default=None, ge=1)
     model: str | None = Field(default=None, max_length=128)
     style_pack_revision: str | None = Field(default=None, max_length=128)
     art_source: str | None = Field(default=None, max_length=32)

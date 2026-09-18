@@ -7,6 +7,7 @@ import GenerationsView from "./views/GenerationsView.vue";
 import HelpView from "./views/HelpView.vue";
 import HomeView from "./views/HomeView.vue";
 import LibraryView from "./views/LibraryView.vue";
+import NewStoryView from "./views/NewStoryView.vue";
 import MapView from "./views/MapView.vue";
 import OpsView from "./views/OpsView.vue";
 import PartyView from "./views/PartyView.vue";
@@ -30,6 +31,7 @@ export const router = createRouter({
       children: [
         { path: "", name: "home", component: HomeView },
         { path: "stories", name: "stories", component: StoriesView },
+        { path: "new-story", name: "new-story", component: NewStoryView },
         { path: "library", name: "library", component: LibraryView },
         { path: "library/:category", redirect: (to) => `/library?category=${to.params.category}` },
         { path: "settings", name: "settings", component: SettingsView },

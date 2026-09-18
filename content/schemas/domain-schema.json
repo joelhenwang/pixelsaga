@@ -8890,11 +8890,24 @@
               "default": null,
               "title": "Model"
             },
-            "profile_revision": {
+            "profile_id": {
               "anyOf": [
                 {
                   "maxLength": 128,
                   "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Profile Id"
+            },
+            "profile_revision": {
+              "anyOf": [
+                {
+                  "minimum": 1,
+                  "type": "integer"
                 },
                 {
                   "type": "null"

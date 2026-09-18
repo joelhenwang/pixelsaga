@@ -10,7 +10,7 @@ class LocalStorage:
     """Content refs are relative paths under one root; traversal refused."""
 
     def __init__(self, root: Path) -> None:
-        self._root = root
+        self._root = root.resolve()
 
     def _resolve(self, content_ref: str) -> Path:
         candidate = (self._root / content_ref).resolve()

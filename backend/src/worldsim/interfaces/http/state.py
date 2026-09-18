@@ -35,9 +35,9 @@ from worldsim.infrastructure.repositories.unit_of_work import (
 from worldsim.infrastructure.settings import Settings
 from worldsim.infrastructure.tracing.langsmith import select_exporter
 
-SEED_DIR = Path("content/seeds/stage0")
-
-DND_DATA_DIR = Path("content/dnd")
+_REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent.parent
+SEED_DIR = _REPO_ROOT / "content" / "seeds" / "stage0"
+DND_DATA_DIR = _REPO_ROOT / "content" / "dnd"
 
 
 _dnd_tables: DataTables | None = None
