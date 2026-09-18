@@ -43,6 +43,11 @@ from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.roles import RoleGrant
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.schedules import ScheduledEffect
+from worldsim.domain.settings import (
+    ApplicationPreferences,
+    ProviderConnection,
+    ProviderProfileRevision,
+)
 from worldsim.domain.stories import (
     StoryCatalogEntry,
     StoryCreationReceipt,
@@ -138,6 +143,9 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     StoryCreationReceipt,
     StoryDraft,
     StoryInitialSetup,
+    ProviderConnection,
+    ProviderProfileRevision,
+    ApplicationPreferences,
     tracing.ManifestSource,
     tracing.ContextManifest,
     tracing.ModelCall,

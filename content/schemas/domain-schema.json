@@ -767,6 +767,95 @@
       "title": "AmbiguityPacket",
       "type": "object"
     },
+    "ApplicationPreferences": {
+      "$defs": {
+        "AccessibilityPrefs": {
+          "additionalProperties": false,
+          "properties": {
+            "font_scale": {
+              "default": 100,
+              "maximum": 200,
+              "minimum": 75,
+              "title": "Font Scale",
+              "type": "integer"
+            },
+            "motion": {
+              "default": "system",
+              "maxLength": 16,
+              "title": "Motion",
+              "type": "string"
+            }
+          },
+          "title": "AccessibilityPrefs",
+          "type": "object"
+        },
+        "GameplayDefaults": {
+          "additionalProperties": false,
+          "properties": {
+            "autoplay_dwell": {
+              "default": "normal",
+              "maxLength": 16,
+              "title": "Autoplay Dwell",
+              "type": "string"
+            },
+            "pacing": {
+              "default": "measured",
+              "maxLength": 32,
+              "title": "Pacing",
+              "type": "string"
+            }
+          },
+          "title": "GameplayDefaults",
+          "type": "object"
+        },
+        "LocalProfile": {
+          "additionalProperties": false,
+          "properties": {
+            "avatar": {
+              "default": "J",
+              "maxLength": 8,
+              "title": "Avatar",
+              "type": "string"
+            },
+            "display_name": {
+              "default": "Storyteller",
+              "maxLength": 64,
+              "title": "Display Name",
+              "type": "string"
+            }
+          },
+          "title": "LocalProfile",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "accessibility": {
+          "$ref": "#/$defs/AccessibilityPrefs"
+        },
+        "gameplay": {
+          "$ref": "#/$defs/GameplayDefaults"
+        },
+        "operator": {
+          "default": "local",
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Operator",
+          "type": "string"
+        },
+        "profile": {
+          "$ref": "#/$defs/LocalProfile"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "title": "ApplicationPreferences",
+      "type": "object"
+    },
     "Attempt": {
       "$defs": {
         "AttemptStatus": {
@@ -5845,6 +5934,173 @@
         "content_hash"
       ],
       "title": "PresetRevision",
+      "type": "object"
+    },
+    "ProviderConnection": {
+      "$defs": {
+        "AdapterKind": {
+          "enum": [
+            "fake",
+            "openrouter"
+          ],
+          "title": "AdapterKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "adapter": {
+          "$ref": "#/$defs/AdapterKind"
+        },
+        "allow_local_endpoint": {
+          "default": false,
+          "title": "Allow Local Endpoint",
+          "type": "boolean"
+        },
+        "config_version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Config Version",
+          "type": "integer"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "credential_env": {
+          "anyOf": [
+            {
+              "maxLength": 128,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Credential Env"
+        },
+        "endpoint": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Endpoint",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "adapter",
+        "name",
+        "endpoint"
+      ],
+      "title": "ProviderConnection",
+      "type": "object"
+    },
+    "ProviderProfileRevision": {
+      "additionalProperties": false,
+      "properties": {
+        "capabilities": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Capabilities",
+          "type": "array"
+        },
+        "connection_id": {
+          "format": "uuid",
+          "title": "Connection Id",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "max_tokens": {
+          "default": 512,
+          "maximum": 4096,
+          "minimum": 1,
+          "title": "Max Tokens",
+          "type": "integer"
+        },
+        "model_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Model Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "maximum": 2.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temperature"
+        },
+        "top_k": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top K"
+        },
+        "top_p": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Top P"
+        }
+      },
+      "required": [
+        "id",
+        "connection_id",
+        "revision",
+        "model_id"
+      ],
+      "title": "ProviderProfileRevision",
       "type": "object"
     },
     "Reaction": {

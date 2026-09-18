@@ -67,6 +67,9 @@ class CompletionRequest(BaseModel):
     system: str | None = Field(default=None, min_length=1, max_length=16000)
     max_tokens: int = Field(default=512, ge=1, le=4096)
     json_mode: bool = False
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    top_p: float | None = Field(default=None, ge=0.0, le=1.0)
+    top_k: int | None = Field(default=None, ge=1, le=100)
 
 
 class CompletionResult(BaseModel):

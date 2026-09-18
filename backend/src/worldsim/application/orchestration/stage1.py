@@ -81,6 +81,7 @@ from worldsim.application.graphs.summary import (
 )
 from worldsim.application.orchestration.service import derive_run_id, derive_snapshot_id
 from worldsim.application.ports.model_gateway import ModelGateway
+from worldsim.application.settings.resolution import SamplingParams, resolve_sampling
 from worldsim.application.tasks.service import TaskService
 from worldsim.application.tracing.gateway import TracedGateway
 from worldsim.application.tracing.service import ManifestSpec, TraceService
@@ -329,6 +330,11 @@ class Stage1Orchestrator:
     def _fire(self, point: str) -> None:
         if self._hook is not None:
             self._hook(point)
+
+    async def _sampling(self, world_id: UUID) -> SamplingParams:
+        """Pinned sampling captured once per phase run; env defaults unpinned."""
+        async with self._factory() as uow:
+            return await resolve_sampling(uow, world_id)
 
     async def advance_phase(
         self,
@@ -844,11 +850,15 @@ class Stage1Orchestrator:
                 "source_ids": sorted(set(source_ids)),
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_summary_graph(
             SummaryGraphDeps(
                 gateway=traced,
                 profile=self._profiles["summary"],  # type: ignore[arg-type]
                 system_template=load_summary_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         try:
@@ -1012,11 +1022,15 @@ class Stage1Orchestrator:
                 "source_ids": sorted(set(source_ids)),
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_summary_graph(
             SummaryGraphDeps(
                 gateway=traced,
                 profile=self._profiles["summary"],  # type: ignore[arg-type]
                 system_template=load_digest_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         try:
@@ -1158,11 +1172,15 @@ class Stage1Orchestrator:
                 "world_id": str(world_id),
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_director_graph(
             DirectorGraphDeps(
                 gateway=traced,
                 profile=self._profiles["director"],  # type: ignore[arg-type]
                 system_template=load_director_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         try:
@@ -1286,11 +1304,15 @@ class Stage1Orchestrator:
                 "location_ids": place_ids,
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_character_graph(
             CharacterGraphDeps(
                 gateway=traced,
                 profile=self._profiles["character"],  # type: ignore[arg-type]
                 system_template=load_character_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         result = await invoke(graph, invocation)
@@ -1755,11 +1777,15 @@ class Stage1Orchestrator:
                 "attempt_actor_id": str(attempt.actor_character_id),
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_reaction_graph(
             ReactionGraphDeps(
                 gateway=traced,
                 profile=self._profiles["reaction"],  # type: ignore[arg-type]
                 system_template=load_reaction_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         result = await invoke(graph, invocation)
@@ -1813,11 +1839,15 @@ class Stage1Orchestrator:
                 "expected_versions": live_versions,
             },
         )
+        sampling = await self._sampling(world_id)
         graph = build_resolve_graph(
             ResolverGraphDeps(
                 gateway=traced,
                 profile=self._profiles["resolver"],  # type: ignore[arg-type]
                 system_template=load_resolver_prompt(),
+                temperature=sampling.temperature,
+                top_p=sampling.top_p,
+                top_k=sampling.top_k,
             )
         )
         result = await invoke(graph, invocation)
@@ -2002,11 +2032,15 @@ class Stage1Orchestrator:
                 await uow.commit()
             return "fallback"
         try:
+            sampling = await self._sampling(world_id)
             graph = build_narration_graph(
                 NarratorGraphDeps(
                     gateway=traced,
                     profile=self._profiles["narrator"],  # type: ignore[arg-type]
                     system_template=load_narrator_prompt(),
+                    temperature=sampling.temperature,
+                    top_p=sampling.top_p,
+                    top_k=sampling.top_k,
                 )
             )
             result = await invoke(graph, invocation)

@@ -536,6 +536,44 @@
         "title": "BeliefView",
         "type": "object"
       },
+      "CacheClearRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope"
+        ],
+        "title": "CacheClearRequest",
+        "type": "object"
+      },
+      "CacheScopeView": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "files": {
+            "title": "Files",
+            "type": "integer"
+          },
+          "scope": {
+            "title": "Scope",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scope",
+          "files",
+          "description"
+        ],
+        "title": "CacheScopeView",
+        "type": "object"
+      },
       "CastEntry": {
         "additionalProperties": false,
         "properties": {
@@ -3347,6 +3385,91 @@
         "title": "PhaseName",
         "type": "string"
       },
+      "PreferencesPatchRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "accessibility": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accessibility"
+          },
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "gameplay": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gameplay"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile"
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "title": "PreferencesPatchRequest",
+        "type": "object"
+      },
+      "PreferencesView": {
+        "additionalProperties": false,
+        "properties": {
+          "accessibility": {
+            "additionalProperties": true,
+            "title": "Accessibility",
+            "type": "object"
+          },
+          "gameplay": {
+            "additionalProperties": true,
+            "title": "Gameplay",
+            "type": "object"
+          },
+          "operator": {
+            "title": "Operator",
+            "type": "string"
+          },
+          "profile": {
+            "additionalProperties": true,
+            "title": "Profile",
+            "type": "object"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "operator",
+          "version"
+        ],
+        "title": "PreferencesView",
+        "type": "object"
+      },
       "PresentationCapabilities": {
         "additionalProperties": false,
         "properties": {
@@ -3664,6 +3787,411 @@
           "version"
         ],
         "title": "PresetSummary",
+        "type": "object"
+      },
+      "ProviderCapabilitiesView": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter": {
+            "title": "Adapter",
+            "type": "string"
+          },
+          "connection_id": {
+            "format": "uuid",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "models": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "probe": {
+            "additionalProperties": true,
+            "title": "Probe",
+            "type": "object"
+          },
+          "supported_parameters": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported Parameters",
+            "type": "array"
+          }
+        },
+        "required": [
+          "connection_id",
+          "adapter"
+        ],
+        "title": "ProviderCapabilitiesView",
+        "type": "object"
+      },
+      "ProviderConnectionCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter": {
+            "title": "Adapter",
+            "type": "string"
+          },
+          "allow_local_endpoint": {
+            "default": false,
+            "title": "Allow Local Endpoint",
+            "type": "boolean"
+          },
+          "credential_env": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Env"
+          },
+          "endpoint": {
+            "maxLength": 512,
+            "minLength": 1,
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "adapter",
+          "name",
+          "endpoint"
+        ],
+        "title": "ProviderConnectionCreate",
+        "type": "object"
+      },
+      "ProviderConnectionPatch": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_local_endpoint": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allow Local Endpoint"
+          },
+          "credential_env": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Env"
+          },
+          "endpoint": {
+            "anyOf": [
+              {
+                "maxLength": 512,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Endpoint"
+          },
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "title": "ProviderConnectionPatch",
+        "type": "object"
+      },
+      "ProviderConnectionView": {
+        "additionalProperties": false,
+        "properties": {
+          "adapter": {
+            "title": "Adapter",
+            "type": "string"
+          },
+          "allow_local_endpoint": {
+            "default": false,
+            "title": "Allow Local Endpoint",
+            "type": "boolean"
+          },
+          "config_version": {
+            "title": "Config Version",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "credential_env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Env"
+          },
+          "endpoint": {
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "has_credential": {
+            "default": false,
+            "title": "Has Credential",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "adapter",
+          "name",
+          "endpoint",
+          "config_version",
+          "created_at"
+        ],
+        "title": "ProviderConnectionView",
+        "type": "object"
+      },
+      "ProviderProfileCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "max_tokens": {
+            "default": 512,
+            "maximum": 4096.0,
+            "minimum": 1.0,
+            "title": "Max Tokens",
+            "type": "integer"
+          },
+          "model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Model Id",
+            "type": "string"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "maximum": 2.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "top_k": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top K"
+          },
+          "top_p": {
+            "anyOf": [
+              {
+                "maximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top P"
+          }
+        },
+        "required": [
+          "model_id"
+        ],
+        "title": "ProviderProfileCreate",
+        "type": "object"
+      },
+      "ProviderProfileView": {
+        "additionalProperties": false,
+        "properties": {
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "connection_id": {
+            "format": "uuid",
+            "title": "Connection Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "max_tokens": {
+            "title": "Max Tokens",
+            "type": "integer"
+          },
+          "model_id": {
+            "title": "Model Id",
+            "type": "string"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "top_k": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top K"
+          },
+          "top_p": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top P"
+          }
+        },
+        "required": [
+          "id",
+          "connection_id",
+          "revision",
+          "model_id",
+          "max_tokens",
+          "created_at"
+        ],
+        "title": "ProviderProfileView",
+        "type": "object"
+      },
+      "ProviderTestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "live": {
+            "default": false,
+            "title": "Live",
+            "type": "boolean"
+          }
+        },
+        "title": "ProviderTestRequest",
+        "type": "object"
+      },
+      "ProviderTestView": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "reachable": {
+            "default": false,
+            "title": "Reachable",
+            "type": "boolean"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          },
+          "tested_at": {
+            "default": "",
+            "title": "Tested At",
+            "type": "string"
+          },
+          "tested_config_revision": {
+            "default": 0,
+            "title": "Tested Config Revision",
+            "type": "integer"
+          },
+          "text_ready": {
+            "default": "unknown",
+            "title": "Text Ready",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "ProviderTestView",
         "type": "object"
       },
       "ReactionView": {
@@ -6955,6 +7483,487 @@
         "summary": "Get Task",
         "tags": [
           "operations"
+        ]
+      }
+    },
+    "/api/v1/settings/cache": {
+      "get": {
+        "operationId": "list_caches_api_v1_settings_cache_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CacheScopeView"
+                  },
+                  "title": "Response List Caches Api V1 Settings Cache Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Caches",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/cache/clear": {
+      "post": {
+        "operationId": "clear_cache_api_v1_settings_cache_clear_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheClearRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Clear Cache Api V1 Settings Cache Clear Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Clear Cache",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/preferences": {
+      "get": {
+        "operationId": "read_preferences_api_v1_settings_preferences_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Read Preferences",
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "save_preferences_api_v1_settings_preferences_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesPatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreferencesView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Preferences",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/providers": {
+      "get": {
+        "operationId": "list_providers_api_v1_settings_providers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderConnectionView"
+                  },
+                  "title": "Response List Providers Api V1 Settings Providers Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Providers",
+        "tags": [
+          "settings"
+        ]
+      },
+      "post": {
+        "operationId": "create_provider_api_v1_settings_providers_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderConnectionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Provider",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/providers/{connection_id}": {
+      "get": {
+        "operationId": "read_provider_api_v1_settings_providers__connection_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderConnectionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Provider",
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "operationId": "save_provider_api_v1_settings_providers__connection_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderConnectionPatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderConnectionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Provider",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/providers/{connection_id}/capabilities": {
+      "get": {
+        "operationId": "read_capabilities_api_v1_settings_providers__connection_id__capabilities_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderCapabilitiesView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Capabilities",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/providers/{connection_id}/profiles": {
+      "get": {
+        "operationId": "list_profiles_api_v1_settings_providers__connection_id__profiles_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderProfileView"
+                  },
+                  "title": "Response List Profiles Api V1 Settings Providers  Connection Id  Profiles Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Profiles",
+        "tags": [
+          "settings"
+        ]
+      },
+      "post": {
+        "operationId": "add_profile_api_v1_settings_providers__connection_id__profiles_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderProfileCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderProfileView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add Profile",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/providers/{connection_id}/test": {
+      "post": {
+        "description": "Explicit bounded probe: reachability only, unless live text is requested.",
+        "operationId": "test_provider_api_v1_settings_providers__connection_id__test_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "connection_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Connection Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProviderTestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderTestView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Test Provider",
+        "tags": [
+          "settings"
         ]
       }
     },

@@ -45,6 +45,7 @@ from worldsim.infrastructure.repositories.relationships import (
 from worldsim.infrastructure.repositories.roles import SqlAlchemyRoleRepository
 from worldsim.infrastructure.repositories.scenes import SqlAlchemySceneRepository
 from worldsim.infrastructure.repositories.schedules import SqlAlchemyScheduleRepository
+from worldsim.infrastructure.repositories.settings import SqlAlchemySettingsRepository
 from worldsim.infrastructure.repositories.stories import SqlAlchemyStoryRepository
 from worldsim.infrastructure.repositories.summaries import SqlAlchemySummaryRepository
 from worldsim.infrastructure.repositories.tasks import SqlAlchemyTaskRepository
@@ -90,6 +91,7 @@ class SqlAlchemyUnitOfWork:
         self._activities: SqlAlchemyActivityRepository | None = None
         self._routes: SqlAlchemyRouteRepository | None = None
         self._schedules: SqlAlchemyScheduleRepository | None = None
+        self._settings: SqlAlchemySettingsRepository | None = None
         self._macro: SqlAlchemyMacroRepository | None = None
         self._lineage: SqlAlchemyLineageRepository | None = None
 
@@ -210,6 +212,12 @@ class SqlAlchemyUnitOfWork:
         if self._schedules is None:
             self._schedules = SqlAlchemyScheduleRepository(self._require_session())
         return self._schedules
+
+    @property
+    def settings(self) -> SqlAlchemySettingsRepository:
+        if self._settings is None:
+            self._settings = SqlAlchemySettingsRepository(self._require_session())
+        return self._settings
 
     @property
     def macro(self) -> SqlAlchemyMacroRepository:

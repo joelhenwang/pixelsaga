@@ -75,6 +75,9 @@ class CharacterGraphDeps:
     profile: ModelProfile
     system_template: str
     max_tokens: int = 512
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
     repair_budget: int = 1
 
 
@@ -202,6 +205,9 @@ def build_character_graph(deps: CharacterGraphDeps) -> Any:
                     prompt=user,
                     system=system,
                     max_tokens=deps.max_tokens,
+                    temperature=deps.temperature,
+                    top_p=deps.top_p,
+                    top_k=deps.top_k,
                     json_mode=True,
                 )
             )
@@ -244,6 +250,9 @@ def build_character_graph(deps: CharacterGraphDeps) -> Any:
                             ),
                             system=system,
                             max_tokens=deps.max_tokens,
+                            temperature=deps.temperature,
+                            top_p=deps.top_p,
+                            top_k=deps.top_k,
                             json_mode=True,
                         )
                     )

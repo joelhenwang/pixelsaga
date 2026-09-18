@@ -42,6 +42,9 @@ from worldsim.interfaces.http.routes import (
     stories,
     world,
 )
+from worldsim.interfaces.http.routes import (
+    settings as settings_routes,
+)
 from worldsim.interfaces.http.state import (
     MIGRATIONS_DIR,
     SEED_DIR,
@@ -99,6 +102,7 @@ def create_app(
     app.include_router(knowledge.router, prefix="/api/v1")
     app.include_router(progress.router, prefix="/api/v1")
     app.include_router(roles.router, prefix="/api/v1")
+    app.include_router(settings_routes.router, prefix="/api/v1")
     app.include_router(stage2.router, prefix="/api/v1")
     app.include_router(macro.router, prefix="/api/v1")
     app.include_router(assets.router, prefix="/api/v1")

@@ -67,6 +67,9 @@ class DirectorGraphDeps:
     profile: ModelProfile
     system_template: str
     max_tokens: int = 512
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
     repair_budget: int = 1
 
 
@@ -127,7 +130,13 @@ def build_director_graph(deps: DirectorGraphDeps) -> Any:
         try:
             result = await deps.gateway.complete(
                 CompletionRequest(
-                    prompt=user, system=system, max_tokens=deps.max_tokens, json_mode=True
+                    prompt=user,
+                    system=system,
+                    max_tokens=deps.max_tokens,
+                    json_mode=True,
+                    temperature=deps.temperature,
+                    top_p=deps.top_p,
+                    top_k=deps.top_k,
                 )
             )
         except (
@@ -161,6 +170,9 @@ def build_director_graph(deps: DirectorGraphDeps) -> Any:
                             ),
                             system=system,
                             max_tokens=deps.max_tokens,
+                            temperature=deps.temperature,
+                            top_p=deps.top_p,
+                            top_k=deps.top_k,
                             json_mode=True,
                         )
                     )

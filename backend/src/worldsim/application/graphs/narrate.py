@@ -67,6 +67,9 @@ class NarratorGraphDeps:
     profile: ModelProfile
     system_template: str
     max_tokens: int = 512
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
     repair_budget: int = 1
 
 
@@ -244,7 +247,14 @@ def build_narration_graph(deps: NarratorGraphDeps) -> Any:
         repairs = 0
         try:
             result = await deps.gateway.complete(
-                CompletionRequest(prompt=user, system=system, max_tokens=deps.max_tokens)
+                CompletionRequest(
+                    prompt=user,
+                    system=system,
+                    max_tokens=deps.max_tokens,
+                    temperature=deps.temperature,
+                    top_p=deps.top_p,
+                    top_k=deps.top_k,
+                )
             )
         except (
             ModelTimeoutError,
@@ -322,6 +332,9 @@ async def _repair_call(deps: NarratorGraphDeps, system: str, user: str, denial: 
                 ),
                 system=system,
                 max_tokens=deps.max_tokens,
+                temperature=deps.temperature,
+                top_p=deps.top_p,
+                top_k=deps.top_k,
             )
         )
     except (

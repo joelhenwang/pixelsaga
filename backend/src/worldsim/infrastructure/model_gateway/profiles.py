@@ -31,7 +31,7 @@ CHARACTER_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-character-decision",
     max_context_tokens=4096,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 
 REACTION_FAKE_PROFILE = ModelProfile(
@@ -40,7 +40,7 @@ REACTION_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-reaction",
     max_context_tokens=4096,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 
 RESOLVER_FAKE_PROFILE = ModelProfile(
@@ -49,7 +49,7 @@ RESOLVER_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-resolver",
     max_context_tokens=8192,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 
 NARRATOR_FAKE_PROFILE = ModelProfile(
@@ -58,7 +58,7 @@ NARRATOR_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-narrator",
     max_context_tokens=8192,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 
 SUMMARY_FAKE_PROFILE = ModelProfile(
@@ -67,7 +67,7 @@ SUMMARY_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-summary",
     max_context_tokens=4096,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 DIRECTOR_FAKE_PROFILE = ModelProfile(
     name="director",
@@ -75,7 +75,7 @@ DIRECTOR_FAKE_PROFILE = ModelProfile(
     adapter="fake",
     model_id="fake-director",
     max_context_tokens=4096,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 OPENROUTER_CHAT_PROFILE = ModelProfile(
     name="openrouter",
@@ -83,7 +83,7 @@ OPENROUTER_CHAT_PROFILE = ModelProfile(
     adapter="openrouter",
     model_id="openrouter/auto",
     max_context_tokens=128000,
-    capabilities=["chat", "json_mode"],
+    capabilities=["chat", "json_mode", "temperature", "top_p", "top_k"],
 )
 
 OPENROUTER_EMBED_PROFILE = ModelProfile(

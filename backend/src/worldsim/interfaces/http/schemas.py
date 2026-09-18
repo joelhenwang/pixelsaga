@@ -1273,3 +1273,122 @@ class PresetRevisionRequest(BaseModel):
 
     payload: dict[str, Any]
     expected_version: int = Field(ge=0)
+
+
+class PreferencesView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    operator: str
+    gameplay: dict[str, Any] = Field(default_factory=dict)
+    accessibility: dict[str, Any] = Field(default_factory=dict)
+    profile: dict[str, Any] = Field(default_factory=dict)
+    version: int
+
+
+class PreferencesPatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    gameplay: dict[str, Any] | None = None
+    accessibility: dict[str, Any] | None = None
+    profile: dict[str, Any] | None = None
+    expected_version: int = Field(ge=0)
+
+
+class ProviderConnectionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    adapter: str
+    name: str
+    endpoint: str
+    credential_env: str | None = None
+    has_credential: bool = False
+    allow_local_endpoint: bool = False
+    config_version: int
+    created_at: datetime
+
+
+class ProviderConnectionCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    adapter: str
+    name: str = Field(min_length=1, max_length=128)
+    endpoint: str = Field(min_length=1, max_length=512)
+    credential_env: str | None = Field(default=None, max_length=128)
+    allow_local_endpoint: bool = False
+
+
+class ProviderConnectionPatch(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    name: str | None = Field(default=None, min_length=1, max_length=128)
+    endpoint: str | None = Field(default=None, min_length=1, max_length=512)
+    credential_env: str | None = Field(default=None, max_length=128)
+    allow_local_endpoint: bool | None = None
+    expected_version: int = Field(ge=0)
+
+
+class ProviderProfileView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    connection_id: UUID
+    revision: int
+    model_id: str
+    temperature: float | None = None
+    top_p: float | None = None
+    top_k: int | None = None
+    max_tokens: int
+    capabilities: list[str] = Field(default_factory=list)
+    created_at: datetime
+
+
+class ProviderProfileCreate(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    model_id: str = Field(min_length=1, max_length=128)
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    top_p: float | None = Field(default=None, ge=0.0, le=1.0)
+    top_k: int | None = Field(default=None, ge=1, le=100)
+    max_tokens: int = Field(default=512, ge=1, le=4096)
+
+
+class ProviderCapabilitiesView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    connection_id: UUID
+    adapter: str
+    supported_parameters: list[str] = Field(default_factory=list)
+    models: list[str] = Field(default_factory=list)
+    probe: dict[str, Any] = Field(default_factory=dict)
+
+
+class ProviderTestRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    live: bool = False
+
+
+class ProviderTestView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    state: str
+    reachable: bool = False
+    text_ready: str = "unknown"
+    detail: str = ""
+    tested_at: str = ""
+    tested_config_revision: int = 0
+
+
+class CacheScopeView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    scope: str
+    files: int
+    description: str
+
+
+class CacheClearRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    scope: str

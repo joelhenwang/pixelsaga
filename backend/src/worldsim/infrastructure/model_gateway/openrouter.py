@@ -78,6 +78,12 @@ class OpenRouterGateway:
         }
         if request.json_mode:
             body["response_format"] = {"type": "json_object"}
+        if request.temperature is not None:
+            body["temperature"] = request.temperature
+        if request.top_p is not None:
+            body["top_p"] = request.top_p
+        if request.top_k is not None:
+            body["top_k"] = request.top_k
         return body
 
     async def complete(self, request: CompletionRequest) -> CompletionResult:
