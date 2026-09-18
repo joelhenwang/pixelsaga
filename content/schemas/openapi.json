@@ -5027,6 +5027,75 @@
         "title": "StoryArchiveRequest",
         "type": "object"
       },
+      "StoryCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "draft_id": {
+            "format": "uuid",
+            "title": "Draft Id",
+            "type": "string"
+          },
+          "expected_draft_version": {
+            "minimum": 1.0,
+            "title": "Expected Draft Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "draft_id",
+          "expected_draft_version"
+        ],
+        "title": "StoryCreateRequest",
+        "type": "object"
+      },
+      "StoryCreateResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "art_registered": {
+            "default": 0,
+            "title": "Art Registered",
+            "type": "integer"
+          },
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
+          },
+          "replayed": {
+            "default": false,
+            "title": "Replayed",
+            "type": "boolean"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "story_id": {
+            "format": "uuid",
+            "title": "Story Id",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "story_id",
+          "world_id",
+          "role"
+        ],
+        "title": "StoryCreateResponse",
+        "type": "object"
+      },
       "StoryDetail": {
         "additionalProperties": false,
         "properties": {
@@ -9881,6 +9950,64 @@
           }
         },
         "summary": "List Stories",
+        "tags": [
+          "stories"
+        ]
+      },
+      "post": {
+        "description": "Resolve one draft into a live story: atomic, idempotent, no generation.",
+        "operationId": "create_new_story_api_v1_stories_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoryCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StoryCreateResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create New Story",
         "tags": [
           "stories"
         ]

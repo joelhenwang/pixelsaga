@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Header, Request
 
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import new_story_draft_id
@@ -19,13 +19,13 @@ from worldsim.domain.stories import (
     StoryCatalogEntry,
     StoryDraft,
 )
+from worldsim.application.stories.validation import validate_draft as validate_draft_payload
 from worldsim.domain.time import absolute_index, utcnow
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role
 
 router = APIRouter(tags=["stories"])
 
-_VALID_ROLES = ("player", "watcher", "director", "deity")
 _VALID_STEPS = ("world", "characters", "mode", "story", "ai", "review")
 
 
@@ -333,7 +333,7 @@ async def validate_draft(draft_id: UUID, request: Request) -> api.DraftValidatio
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         draft = await uow.stories.get_draft(draft_id)
-        issues = _validate(draft.payload)
+        issues = validate_draft_payload(draft.payload)
         resolved: dict[str, Any] = {}
         if draft.payload.world.preset_id is not None:
             try:
@@ -354,18 +354,36 @@ async def validate_draft(draft_id: UUID, request: Request) -> api.DraftValidatio
     return api.DraftValidationView(valid=not issues, issues=issues, resolved=resolved)
 
 
-def _validate(payload: DraftPayload) -> list[str]:
-    issues: list[str] = []
-    keys = [member.instance_key for member in payload.cast]
-    if len(set(keys)) != len(keys):
-        issues.append("cast instance keys must be unique")
-    if not payload.cast:
-        issues.append("select at least one character")
-    if payload.mode.role not in _VALID_ROLES:
-        issues.append(f"unknown role: {payload.mode.role}")
-    if payload.mode.role == "player":
-        if not payload.mode.controlled_cast_key:
-            issues.append("player mode needs a controlled cast member")
-        elif payload.mode.controlled_cast_key not in keys:
-            issues.append("controlled character is not in the cast")
-    return issues
+@router.post("/stories", response_model=api.StoryCreateResponse)
+async def create_new_story(
+    body: api.StoryCreateRequest,
+    request: Request,
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> api.StoryCreateResponse:
+    """Resolve one draft into a live story: atomic, idempotent, no generation."""
+    from worldsim.application.stories.create import create_story, register_curated_art
+
+    key = idempotency_key or ""
+
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        draft = await uow.stories.get_draft(body.draft_id)
+    result = await create_story(
+        state.uow_factory(), draft, body.expected_draft_version, "local", key
+    )
+    try:
+        art = await register_curated_art(
+            state.uow_factory(),
+            state.seed_dir.parent.parent / "assets",
+            result.world_id,
+        )
+    except Exception:
+        art = 0
+    return api.StoryCreateResponse(
+        story_id=result.story_id,
+        world_id=result.world_id,
+        role=result.role,
+        character_id=result.character_id,
+        replayed=result.replayed,
+        art_registered=art,
+    )

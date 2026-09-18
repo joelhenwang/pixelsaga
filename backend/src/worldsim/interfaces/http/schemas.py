@@ -1392,3 +1392,21 @@ class CacheClearRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     scope: str
+
+
+class StoryCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    draft_id: UUID
+    expected_draft_version: int = Field(ge=1)
+
+
+class StoryCreateResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    story_id: UUID
+    world_id: UUID
+    role: str
+    character_id: UUID | None = None
+    replayed: bool = False
+    art_registered: int = 0
