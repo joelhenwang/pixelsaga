@@ -25,16 +25,16 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;
   max-width:1440px;margin:0 auto;padding:14px}
 .panel{background:var(--surface-panel);border:1px solid var(--border-subtle);
-  border-radius:12px;padding:14px}
-/* Hero: tall art with overlaid title, translucent scrim behind text only */
 .hero{position:relative;border-radius:8px;overflow:hidden;background:#e8e2d4}
-.hero img{display:block;width:100%;height:420px;object-fit:cover}
-.hero .scrim{position:absolute;inset:auto 0 0 0;padding:40px 16px 12px;
-  background:linear-gradient(transparent, rgba(20,16,8,.62));color:#fff}
-.hero .scrim h1{margin:0;font-size:24px;color:#fff;opacity:1}
-.hero .scrim p{margin:2px 0 0;font-size:12.5px;color:#fff;opacity:1}
-.narration{font-size:15px;line-height:1.6;margin:12px 0}
-.narration .quote{color:var(--text-primary)}
+.hero img{display:block;width:100%;height:480px;object-fit:cover}
+.title-card{position:absolute;top:14px;left:14px;background:rgba(20,16,8,.55);
+  border-radius:8px;padding:10px 16px;color:#fff}
+.title-card h1{margin:0;font-size:22px;color:#fff}
+.title-card p{margin:2px 0 0;font-size:12px;color:#fff}
+.story-card{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(20,16,8,.55);
+  border-radius:8px;padding:10px 16px;color:#fff;font-size:14.5px;line-height:1.55}
+.story-card p{margin:4px 0;color:#fff}
+.story-card .quote{font-style:italic}
 .choices{display:flex;flex-direction:column;gap:8px;margin:10px 0}
 .choice{display:flex;gap:10px;align-items:center;text-align:left;background:#fff;
   border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;cursor:pointer;font:inherit;width:100%}
@@ -51,7 +51,9 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif}
 .composer input{width:100%;height:40px;border:1px solid var(--border-subtle);
   border-radius:8px;padding:0 44px 0 12px;font:inherit;background:#fff}
 .composer button{position:absolute;right:4px;top:4px;width:32px;height:32px;border:0;border-radius:6px;
-  background:var(--action-primary);color:#fff;font-size:16px;cursor:pointer;line-height:1}
+  background:var(--action-primary);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.choice .icon i{width:12px;height:12px;border-radius:50%;background:#fff;display:block}
+.composer button img{width:18px;height:18px;display:block}
 .notice{border:1px solid var(--accent-gold);border-radius:8px;padding:6px 10px;margin:10px 0;font-size:13px}
 .error{border-color:var(--status-danger);color:var(--status-danger)}
 .hidden{display:none}
@@ -88,24 +90,27 @@ h1,h2{font-family:Georgia,"Source Serif 4",serif}
   <main class="panel" id="main">
     <div class="hero" id="heroBlock">
       <img id="sceneArt" src="../../docs/pixelsaga-revamp/assets/images/hearth-background-v1.png" alt="Hearth traveler hall with a lit fireplace">
-      <div class="scrim">
+      <div class="title-card">
         <h1>The Hearth Fire</h1>
         <p>Hearth · Day 1, dawn</p>
+      </div>
+      <div class="story-card">
+        <p>Rain drums the shutters while Wren feeds the last log to the Hearth fire. A traveler shakes water from a Market cloak and asks after the toll road.</p>
+        <p class="quote">“You are keeping the fire for all of us, aren’t you?”</p>
       </div>
     </div>
     <div id="stateEmpty" class="notice hidden">No scene yet. Seed a world, then advance one phase.</div>
     <div id="stateLoading" class="notice hidden">Loading scene…</div>
     <div id="stateError" class="notice error hidden">Scene failed to load (fixture error state). Draft preserved below.</div>
     <div id="sceneBody">
-      <p class="narration">Rain drums the shutters while Wren feeds the last log to the Hearth fire. A traveler shakes water from a Market cloak and asks after the toll road.<br><span class="quote">“You are keeping the fire for all of us, aren’t you?”</span></p>
       <div class="choices">
-        <button class="choice"><span class="icon">◌</span><span><b>Offer the traveler shelter</b><span>A dry corner by the fire, no questions asked.</span></span><span class="chev">›</span></button>
-        <button class="choice magic"><span class="icon">✦</span><span><b>Read the traveler's manner</b><span>Sense whether this one means trouble.</span></span><span class="chip">Insight · DC 12</span></button>
-        <button class="choice"><span class="icon">◌</span><span><b>Ask about the Market tolls</b><span>Learn what changed on the bridge road.</span></span><span class="chev">›</span></button>
+        <button class="choice"><span class="icon"><i></i></span><span><b>Offer the traveler shelter</b><span>A dry corner by the fire, no questions asked.</span></span><span class="chev">›</span></button>
+        <button class="choice magic"><span class="icon"><i></i></span><span><b>Read the traveler's manner</b><span>Sense whether this one means trouble.</span></span><span class="chip">Insight · DC 12</span></button>
+        <button class="choice"><span class="icon"><i></i></span><span><b>Ask about the Market tolls</b><span>Learn what changed on the bridge road.</span></span><span class="chev">›</span></button>
       </div>
       <div class="composer">
         <input id="draft" aria-label="Custom action" placeholder="Try something else…">
-        <button id="send" type="button" aria-label="Send action">→</button>
+        <button id="send" type="button" aria-label="Send action"><img src="../../docs/pixelsaga-revamp/assets/images/send-message-icon.svg" alt=""></button>
       </div>
       <div id="queued" class="notice hidden">Queued: <span id="queuedText"></span>. Queued is not executed.</div>
     </div>
