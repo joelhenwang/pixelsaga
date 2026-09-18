@@ -724,6 +724,242 @@ export interface ConditionsResponse {
   world_id: string;
 }
 
+export interface StorySummary {
+  absolute_index: number;
+  archived?: boolean | null;
+  day: number;
+  last_played_at?: string | null;
+  mode: string;
+  phase: string;
+  status: string;
+  story_id: string;
+  title: string;
+  world_id: string;
+  world_name: string;
+}
+
+export interface StoryDetail {
+  absolute_index: number;
+  archived_at?: string | null;
+  day: number;
+  last_played_at?: string | null;
+  metadata_version: number;
+  mode: string;
+  phase: string;
+  status: string;
+  story_id: string;
+  title: string;
+  world_id: string;
+  world_name: string;
+}
+
+export interface StoryListResponse {
+  items?: StorySummary[] | null;
+  next_cursor?: string | null;
+}
+
+export interface StorySetupView {
+  content_hash: string;
+  created_at: string;
+  payload?: Record<string, unknown> | null;
+  provenance: string;
+  schema_version: number;
+  story_id: string;
+  world_id: string;
+}
+
+export interface StoryPatchRequest {
+  cover_asset_id?: string | null;
+  expected_version: number;
+  title?: string | null;
+}
+
+export interface StoryArchiveRequest {
+  expected_version: number;
+}
+
+export interface StoryDraftPayload {
+  ai?: Record<string, unknown> | null;
+  cast?: Record<string, unknown>[] | null;
+  mode?: Record<string, unknown> | null;
+  story?: Record<string, unknown> | null;
+  world?: Record<string, unknown> | null;
+}
+
+export interface StoryDraftCreateRequest {
+  current_step?: string | null;
+  payload?: StoryDraftPayload | null;
+}
+
+export interface StoryDraftPatchRequest {
+  current_step: string;
+  expected_version: number;
+  payload: StoryDraftPayload;
+}
+
+export interface StoryDraftView {
+  created_at: string;
+  created_world_id?: string | null;
+  current_step: string;
+  id: string;
+  payload: StoryDraftPayload;
+  updated_at: string;
+  version: number;
+}
+
+export interface DraftValidationView {
+  issues?: string[] | null;
+  resolved?: Record<string, unknown> | null;
+  valid: boolean;
+}
+
+export interface StoryCreateRequest {
+  draft_id: string;
+  expected_draft_version: number;
+}
+
+export interface StoryCreateResponse {
+  art_registered?: number | null;
+  character_id?: string | null;
+  replayed?: boolean | null;
+  role: string;
+  story_id: string;
+  world_id: string;
+}
+
+export interface PresetSummary {
+  archived: boolean;
+  builtin: boolean;
+  current_revision: number;
+  id: string;
+  kind: string;
+  name: string;
+  readonly: boolean;
+  version: number;
+}
+
+export interface PresetDetail {
+  archived_at?: string | null;
+  builtin: boolean;
+  current_revision: number;
+  id: string;
+  kind: string;
+  name: string;
+  readonly: boolean;
+  revision?: Record<string, unknown> | null;
+  version: number;
+}
+
+export interface PresetCreateRequest {
+  kind: string;
+  name: string;
+  payload: Record<string, unknown>;
+}
+
+export interface PresetArchiveRequest {
+  expected_version: number;
+}
+
+export interface PresetRevisionRequest {
+  expected_version: number;
+  payload: Record<string, unknown>;
+}
+
+export interface PreferencesView {
+  accessibility?: Record<string, unknown> | null;
+  gameplay?: Record<string, unknown> | null;
+  operator: string;
+  profile?: Record<string, unknown> | null;
+  version: number;
+}
+
+export interface PreferencesPatchRequest {
+  accessibility?: Record<string, unknown> | null;
+  expected_version: number;
+  gameplay?: Record<string, unknown> | null;
+  profile?: Record<string, unknown> | null;
+}
+
+export interface ProviderConnectionView {
+  adapter: string;
+  allow_local_endpoint?: boolean | null;
+  config_version: number;
+  created_at: string;
+  credential_env?: string | null;
+  endpoint: string;
+  has_credential?: boolean | null;
+  id: string;
+  name: string;
+}
+
+export interface ProviderConnectionCreate {
+  adapter: string;
+  allow_local_endpoint?: boolean | null;
+  credential_env?: string | null;
+  endpoint: string;
+  name: string;
+}
+
+export interface ProviderConnectionPatch {
+  allow_local_endpoint?: boolean | null;
+  credential_env?: string | null;
+  endpoint?: string | null;
+  expected_version: number;
+  name?: string | null;
+}
+
+export interface ProviderProfileView {
+  capabilities?: string[] | null;
+  connection_id: string;
+  created_at: string;
+  id: string;
+  max_tokens: number;
+  model_id: string;
+  revision: number;
+  temperature?: unknown | null;
+  top_k?: number | null;
+  top_p?: unknown | null;
+}
+
+export interface ProviderProfileCreate {
+  max_tokens?: number | null;
+  model_id: string;
+  temperature?: unknown | null;
+  top_k?: number | null;
+  top_p?: unknown | null;
+}
+
+export interface ProviderCapabilitiesView {
+  adapter: string;
+  connection_id: string;
+  models?: string[] | null;
+  probe?: Record<string, unknown> | null;
+  supported_parameters?: string[] | null;
+}
+
+export interface ProviderTestRequest {
+  live?: boolean | null;
+}
+
+export interface ProviderTestView {
+  detail?: string | null;
+  reachable?: boolean | null;
+  state: string;
+  tested_at?: string | null;
+  tested_config_revision?: number | null;
+  text_ready?: string | null;
+}
+
+export interface CacheScopeView {
+  description: string;
+  files: number;
+  scope: string;
+}
+
+export interface CacheClearRequest {
+  scope: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -786,4 +1022,40 @@ export const ROUTES = {
   evaluateEndings: "POST /api/v1/macro/endings/evaluate",
   assignFocus: "POST /api/v1/macro/focus/assign",
   cancelSchedule: "POST /api/v1/macro/schedules/{schedule_id}/cancel",
+  listStories: "GET /api/v1/stories",
+  createStory: "POST /api/v1/stories",
+  readStory: "GET /api/v1/stories/{story_id}",
+  renameStory: "PATCH /api/v1/stories/{story_id}",
+  readStorySetup: "GET /api/v1/stories/{story_id}/setup",
+  exportStorySetup: "GET /api/v1/stories/{story_id}/setup/export",
+  openStory: "POST /api/v1/stories/{story_id}/open",
+  archiveStory: "POST /api/v1/stories/{story_id}/archive",
+  unarchiveStory: "POST /api/v1/stories/{story_id}/unarchive",
+  listDrafts: "GET /api/v1/story-drafts",
+  createDraft: "POST /api/v1/story-drafts",
+  readDraft: "GET /api/v1/story-drafts/{draft_id}",
+  saveDraft: "PATCH /api/v1/story-drafts/{draft_id}",
+  deleteDraft: "DELETE /api/v1/story-drafts/{draft_id}",
+  validateDraft: "POST /api/v1/story-drafts/{draft_id}/validate",
+  listPresets: "GET /api/v1/library/presets",
+  createPreset: "POST /api/v1/library/presets",
+  readPreset: "GET /api/v1/library/presets/{preset_id}",
+  addPresetRevision: "POST /api/v1/library/presets/{preset_id}/revisions",
+  duplicatePreset: "POST /api/v1/library/presets/{preset_id}/duplicate",
+  archivePreset: "POST /api/v1/library/presets/{preset_id}/archive",
+  unarchivePreset: "POST /api/v1/library/presets/{preset_id}/unarchive",
+  exportPreset: "GET /api/v1/library/presets/{preset_id}/export",
+  listLibraryAssets: "GET /api/v1/library/assets",
+  readPreferences: "GET /api/v1/settings/preferences",
+  savePreferences: "PATCH /api/v1/settings/preferences",
+  listProviders: "GET /api/v1/settings/providers",
+  createProvider: "POST /api/v1/settings/providers",
+  readProvider: "GET /api/v1/settings/providers/{connection_id}",
+  saveProvider: "PATCH /api/v1/settings/providers/{connection_id}",
+  listProfiles: "GET /api/v1/settings/providers/{connection_id}/profiles",
+  addProfile: "POST /api/v1/settings/providers/{connection_id}/profiles",
+  readCapabilities: "GET /api/v1/settings/providers/{connection_id}/capabilities",
+  testProvider: "POST /api/v1/settings/providers/{connection_id}/test",
+  listCaches: "GET /api/v1/settings/cache",
+  clearCache: "POST /api/v1/settings/cache/clear",
 } as const;

@@ -123,3 +123,239 @@
     animation: none !important;
   }
 }
+
+/* Application pages (A07): shared shell and compact working surfaces. */
+.topbar .side {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+}
+.topbar .avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--action-primary);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.topbar .story-name {
+  font-family: Georgia, "Source Serif 4", serif;
+  font-size: 15px;
+}
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 28px;
+}
+.page.narrow {
+  max-width: 720px;
+}
+.page h1 {
+  font-family: Georgia, "Source Serif 4", serif;
+  font-size: 30px;
+  margin: 0 0 4px;
+}
+.sub {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+.panel {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  padding: 14px 16px;
+}
+.panel h2 {
+  font-family: Georgia, "Source Serif 4", serif;
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.home-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+.hero {
+  background: var(--surface-panel);
+  border: 1px solid var(--accent-gold);
+  border-radius: var(--radius-panel);
+  padding: 20px;
+}
+.hero h1 {
+  font-family: Georgia, "Source Serif 4", serif;
+  font-size: 32px;
+  margin: 0;
+}
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.openrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.link {
+  background: none;
+  border: 0;
+  color: var(--action-primary);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 8px;
+}
+.minis {
+  list-style: none;
+  margin: 4px 0;
+  padding: 0;
+  font-size: 14px;
+}
+.minis li {
+  padding: 2px 0;
+}
+.toolbar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.card {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  padding: 10px 14px;
+}
+.card .row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.preset {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface-panel);
+  padding: 8px 10px;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.preset[aria-pressed="true"] {
+  outline: 2px solid var(--action-primary);
+}
+.preset b {
+  display: block;
+  font-size: 14px;
+}
+.preset span {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+}
+.layout {
+  display: grid;
+  grid-template-columns: 230px 1fr;
+  gap: 16px;
+}
+.rail {
+  background: var(--surface-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  padding: 8px;
+  align-self: start;
+}
+.rail button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.rail button[aria-pressed="true"] {
+  background: var(--action-primary);
+  color: #fff;
+}
+.group {
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 8, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--surface-panel);
+  border-radius: var(--radius-panel);
+  max-width: 640px;
+  width: 100%;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 18px 22px;
+}
+.modal .kicker {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent-gold);
+}
+.modal h2 {
+  font-family: Georgia, "Source Serif 4", serif;
+  font-size: 26px;
+  margin: 0;
+}
+.setup {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 4px 12px;
+  font-size: 14px;
+}
+.legacy {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+.dirty {
+  font-size: 13px;
+  color: var(--accent-gold);
+}
+.icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-panel);
+  cursor: pointer;
+  color: var(--action-primary);
+  font-size: 16px;
+}
+@media (max-width: 900px) {
+  .home-grid,
+  .split,
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

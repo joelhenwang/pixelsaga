@@ -28,6 +28,27 @@ import type {
   RoleGrantView,
   SceneDetail,
   SimulationStatus,
+  StorySummary,
+  StoryDetail,
+  StoryListResponse,
+  StorySetupView,
+  StoryCreateResponse,
+  StoryDraftView,
+  DraftValidationView,
+  PresetSummary,
+  PresetDetail,
+  PresetCreateRequest,
+  PresetRevisionRequest,
+  PreferencesView,
+  PreferencesPatchRequest,
+  ProviderConnectionView,
+  ProviderConnectionCreate,
+  ProviderConnectionPatch,
+  ProviderProfileView,
+  ProviderProfileCreate,
+  ProviderCapabilitiesView,
+  ProviderTestView,
+  CacheScopeView,
   SuggestionView,
   SceneSummary,
   ScheduleCancelResponse,
@@ -432,5 +453,189 @@ export const api = {
   },
   cancelSchedule(scheduleId: string, headers: Record<string, string>): Promise<ScheduleCancelResponse> {
     return request<ScheduleCancelResponse>(`/api/v1/macro/schedules/${scheduleId}/cancel`, { method: "POST" }, headers);
+  },
+  listStories(
+    headers: Record<string, string>,
+    params: { status?: string; q?: string; sort?: string; cursor?: string; limit?: number } = {},
+    options: RequestOptions = {},
+  ): Promise<StoryListResponse> {
+    const query = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined) query.set(key, String(value));
+    }
+    const suffix = query.size ? `?${query}` : "";
+    return request<StoryListResponse>(`/api/v1/stories${suffix}`, {}, headers, options);
+  },
+  readStory(storyId: string, headers: Record<string, string>): Promise<StoryDetail> {
+    return request<StoryDetail>(`/api/v1/stories/${storyId}`, {}, headers);
+  },
+  readSetup(storyId: string, headers: Record<string, string>): Promise<StorySetupView> {
+    return request<StorySetupView>(`/api/v1/stories/${storyId}/setup`, {}, headers);
+  },
+  openStory(storyId: string, headers: Record<string, string>): Promise<StoryDetail> {
+    return request<StoryDetail>(`/api/v1/stories/${storyId}/open`, { method: "POST" }, headers);
+  },
+  listPresets(
+    headers: Record<string, string>,
+    params: { kind?: string; include_archived?: boolean } = {},
+  ): Promise<PresetSummary[]> {
+    const query = new URLSearchParams();
+    if (params.kind) query.set("kind", params.kind);
+    if (params.include_archived) query.set("include_archived", "true");
+    const suffix = query.size ? `?${query}` : "";
+    return request<PresetSummary[]>(`/api/v1/library/presets${suffix}`, {}, headers);
+  },
+  readPreset(presetId: string, headers: Record<string, string>, revision?: number): Promise<PresetDetail> {
+    const suffix = revision ? `?revision=${revision}` : "";
+    return request<PresetDetail>(`/api/v1/library/presets/${presetId}${suffix}`, {}, headers);
+  },
+  createPreset(body: PresetCreateRequest, headers: Record<string, string>): Promise<PresetDetail> {
+    return request<PresetDetail>(
+      "/api/v1/library/presets",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  addPresetRevision(
+    presetId: string, body: PresetRevisionRequest, headers: Record<string, string>,
+  ): Promise<PresetDetail> {
+    return request<PresetDetail>(
+      `/api/v1/library/presets/${presetId}/revisions`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  duplicatePreset(presetId: string, headers: Record<string, string>): Promise<PresetDetail> {
+    return request<PresetDetail>(`/api/v1/library/presets/${presetId}/duplicate`, { method: "POST" }, headers);
+  },
+  archivePreset(presetId: string, expectedVersion: number, headers: Record<string, string>): Promise<PresetDetail> {
+    return request<PresetDetail>(
+      `/api/v1/library/presets/${presetId}/archive`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_version: expectedVersion }),
+      },
+      headers,
+    );
+  },
+  unarchivePreset(presetId: string, expectedVersion: number, headers: Record<string, string>): Promise<PresetDetail> {
+    return request<PresetDetail>(
+      `/api/v1/library/presets/${presetId}/unarchive`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_version: expectedVersion }),
+      },
+      headers,
+    );
+  },
+  readPreferences(headers: Record<string, string>): Promise<PreferencesView> {
+    return request<PreferencesView>("/api/v1/settings/preferences", {}, headers);
+  },
+  savePreferences(body: PreferencesPatchRequest, headers: Record<string, string>): Promise<PreferencesView> {
+    return request<PreferencesView>(
+      "/api/v1/settings/preferences",
+      { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  listProviders(headers: Record<string, string>): Promise<ProviderConnectionView[]> {
+    return request<ProviderConnectionView[]>("/api/v1/settings/providers", {}, headers);
+  },
+  createProvider(body: ProviderConnectionCreate, headers: Record<string, string>): Promise<ProviderConnectionView> {
+    return request<ProviderConnectionView>(
+      "/api/v1/settings/providers",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  saveProvider(
+    connectionId: string, body: ProviderConnectionPatch, headers: Record<string, string>,
+  ): Promise<ProviderConnectionView> {
+    return request<ProviderConnectionView>(
+      `/api/v1/settings/providers/${connectionId}`,
+      { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  listProfiles(connectionId: string, headers: Record<string, string>): Promise<ProviderProfileView[]> {
+    return request<ProviderProfileView[]>(`/api/v1/settings/providers/${connectionId}/profiles`, {}, headers);
+  },
+  addProfile(
+    connectionId: string,
+    body: { model_id: string; temperature?: number | null; top_p?: number | null; top_k?: number | null; max_tokens?: number },
+    headers: Record<string, string>,
+  ): Promise<ProviderProfileView> {
+    return request<ProviderProfileView>(
+      `/api/v1/settings/providers/${connectionId}/profiles`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  readCapabilities(connectionId: string, headers: Record<string, string>): Promise<ProviderCapabilitiesView> {
+    return request<ProviderCapabilitiesView>(
+      `/api/v1/settings/providers/${connectionId}/capabilities`, {}, headers,
+    );
+  },
+  testProvider(
+    connectionId: string, live: boolean, headers: Record<string, string>,
+  ): Promise<ProviderTestView> {
+    return request<ProviderTestView>(
+      `/api/v1/settings/providers/${connectionId}/test`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ live }) },
+      headers,
+    );
+  },
+  listCaches(headers: Record<string, string>): Promise<CacheScopeView[]> {
+    return request<CacheScopeView[]>("/api/v1/settings/cache", {}, headers);
+  },
+  clearCache(scope: string, headers: Record<string, string>): Promise<{ scope: string; removed: number }> {
+    return request<{ scope: string; removed: number }>(
+      "/api/v1/settings/cache/clear",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scope }) },
+      headers,
+    );
+  },
+  createStoryDraft(
+    body: { payload?: object; current_step?: string }, headers: Record<string, string>,
+  ): Promise<StoryDraftView> {
+    return request<StoryDraftView>(
+      "/api/v1/story-drafts",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  readStoryDraft(draftId: string, headers: Record<string, string>): Promise<StoryDraftView> {
+    return request<StoryDraftView>(`/api/v1/story-drafts/${draftId}`, {}, headers);
+  },
+  saveStoryDraft(
+    draftId: string,
+    body: { payload: object; current_step: string; expected_version: number },
+    headers: Record<string, string>,
+  ): Promise<StoryDraftView> {
+    return request<StoryDraftView>(
+      `/api/v1/story-drafts/${draftId}`,
+      { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  validateStoryDraft(draftId: string, headers: Record<string, string>): Promise<DraftValidationView> {
+    return request<DraftValidationView>(`/api/v1/story-drafts/${draftId}/validate`, { method: "POST" }, headers);
+  },
+  createStory(
+    body: { draft_id: string; expected_draft_version: number },
+    idempotencyKey: string,
+    headers: Record<string, string>,
+  ): Promise<StoryCreateResponse> {
+    return request<StoryCreateResponse>(
+      "/api/v1/stories",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
+        body: JSON.stringify(body),
+      },
+      headers,
+    );
   },
 };

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { CharacterSummary, PartyMemberView } from "@gen";
 import { api } from "../api";
 import { assetUrl } from "../assets";
@@ -8,6 +8,7 @@ import { portraitFor } from "../portrait";
 import { fail, headers, refresh, role, switchRole, worldId } from "../store";
 
 const router = useRouter();
+const route = useRoute();
 const roster = ref<PartyMemberView[]>([]);
 const faces = ref<Record<string, string>>({});
 const characters = ref<CharacterSummary[]>([]);
@@ -129,7 +130,7 @@ async function createAdventurer(): Promise<void> {
     );
     switchRole("player", member.character_id ?? character.id);
     await refresh();
-    void router.push("/scene");
+    void router.push(`/stories/${route.params.storyId}/adventure`);
   } catch (error) {
     fail("creation failed", error);
   }

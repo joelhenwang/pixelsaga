@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { api } from "../api";
 import { assetUrl, clearAssetCache } from "../assets";
 import { portraitFor } from "../portrait";
@@ -20,6 +20,7 @@ import {
 } from "../composables/useSimulationControl";
 
 const router = useRouter();
+const route = useRoute();
 type Filter = "meaningful" | "all" | "following" | "major";
 const MAJOR_TYPES = new Set(["world_ended", "deity_override", "schedule_fired", "macro_aggregate"]);
 
@@ -119,7 +120,8 @@ function follow(characterId: string): void {
 
 function openScene(sceneId: string | null): void {
   if (sceneId) {
-    void router.push({ path: "/scene", query: { scene: sceneId } });
+    const storyId = route.params.storyId as string;
+    void router.push({ path: `/stories/${storyId}/adventure`, query: { scene: sceneId } });
   }
 }
 
