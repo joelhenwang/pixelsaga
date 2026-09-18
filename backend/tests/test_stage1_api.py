@@ -160,12 +160,16 @@ def _player(character: UUID) -> dict[str, str]:
 
 
 def _advance(
-    client: ApiClient, world: UUID, index: int, player_intents: dict[str, Any] | None = None
+    client: ApiClient,
+    world: UUID,
+    index: int,
+    player_intents: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
 ) -> httpx.Response:
     body: dict[str, Any] = {"world_id": str(world), "absolute_index": index}
     if player_intents:
         body["player_intents"] = player_intents
-    return client.post("/api/v1/stage1/advance", json=body, headers=_watcher())
+    return client.post("/api/v1/stage1/advance", json=body, headers=headers or _watcher())
 
 
 def test_watcher_and_player_views_differ(
@@ -218,7 +222,7 @@ def test_player_intent_detail_scoped(api: tuple[ApiClient, FakeGateway, dict[str
             "topic": "dawn patrol",
         }
     }
-    report = _advance(client, ids["world"], 1, player)
+    report = _advance(client, ids["world"], 1, player, _player(ids["ash"]))
     assert report.status_code == 200, report.text
     scene_id = report.json()["scenes"][0]["scene_id"]
 

@@ -85,3 +85,16 @@ class SqlAlchemyPartyRepository:
         row.version = expected_version + 1
         await self._session.flush()
         return self._to_domain(row)
+
+    async def save_link(
+        self, member_id: PartyMemberId, character_id: UUID, expected_version: int
+    ) -> PartyMember:
+        row = await self._session.get(PartyMemberRow, member_id)
+        if row is None:
+            raise missing("party member", member_id)
+        if row.version != expected_version:
+            raise version_conflict("party member", member_id, expected_version, row.version)
+        row.character_id = character_id
+        row.version = expected_version + 1
+        await self._session.flush()
+        return self._to_domain(row)

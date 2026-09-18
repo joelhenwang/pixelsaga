@@ -90,6 +90,15 @@ WANTED = (
     "EndingsEvaluateRequest",
     "FocusAssignRequest",
     "ScheduleCancelResponse",
+    "CharacterCreateRequest",
+    "PartyLinkRequest",
+    "ChronicleEntry",
+    "ChronicleResponse",
+    "PresentationCapabilities",
+    "MapAnchorView",
+    "MapManifestView",
+    "CastEntry",
+    "PresentationResponse",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -105,6 +114,8 @@ ROUTES = (
     ("post", "/api/v1/stage1/resume", "resume"),
     ("post", "/api/v1/stage1/party/begin", "beginPartyMember"),
     ("get", "/api/v1/stage1/party", "listParty"),
+    ("post", "/api/v1/stage1/characters", "createCharacter"),
+    ("post", "/api/v1/stage1/party/{member_id}/link", "linkPartyMember"),
     ("post", "/api/v1/stage2/activities", "startActivity"),
     ("post", "/api/v1/stage2/activities/{activity_id}/interrupt", "interruptActivity"),
     ("post", "/api/v1/stage2/activities/{activity_id}/resume", "resumeActivity"),
@@ -130,6 +141,8 @@ ROUTES = (
     ("get", "/api/v1/stage2/director/hooks", "listDirectorHooks"),
     ("get", "/api/v1/stage2/operations/status", "readOperationsStatus"),
     ("get", "/api/v1/world/events", "listEvents"),
+    ("get", "/api/v1/world/presentation", "readPresentation"),
+    ("get", "/api/v1/world/chronicle", "readChronicle"),
     ("get", "/api/v1/macro/runs", "listMacroRuns"),
     ("get", "/api/v1/macro/lineage", "readLineage"),
     ("get", "/api/v1/macro/focus", "listFocus"),

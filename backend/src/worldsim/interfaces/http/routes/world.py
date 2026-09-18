@@ -2,12 +2,23 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Header, Request
+from uuid import UUID
 
+from fastapi import APIRouter, Header, Query, Request
+
+from worldsim.application.capabilities import parse_role
 from worldsim.application.commands.seed_world import SeedService
+from worldsim.application.queries.presentation import (
+    chronicle as chronicle_query,
+)
+from worldsim.application.queries.presentation import (
+    presentation as presentation_query,
+)
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.time import absolute_index
 from worldsim.domain.world import World
+from worldsim.interfaces.http import schemas as api
+from worldsim.interfaces.http.routes.roles import effective_role
 from worldsim.interfaces.http.schemas import (
     AdvanceRequest,
     AdvanceResponse,
@@ -131,3 +142,26 @@ async def advance_phase(
         idempotent_replay=report.duplicate,
         result=AdvanceResult(event_id=report.event_id, sequence=report.sequence),
     )
+
+
+@router.get("/world/presentation", response_model=api.PresentationResponse)
+async def get_presentation(world_id: UUID, request: Request) -> api.PresentationResponse:
+    """One coherent snapshot for the new Adventure and World surfaces."""
+    role, viewer = await effective_role(request, world_id)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        return await presentation_query(uow, world_id, parse_role(role), viewer)
+
+
+@router.get("/world/chronicle", response_model=api.ChronicleResponse)
+async def get_chronicle(
+    world_id: UUID,
+    request: Request,
+    after: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+) -> api.ChronicleResponse:
+    """Visible events with structured identity and an advancing cursor."""
+    role, viewer = await effective_role(request, world_id)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        return await chronicle_query(uow, world_id, parse_role(role), viewer, after, limit)

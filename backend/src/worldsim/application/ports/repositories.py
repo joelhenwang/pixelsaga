@@ -87,6 +87,9 @@ class PartyRepository(Protocol):
     async def save_sheet(
         self, member_id: UUID, sheet: Sheet, expected_version: int
     ) -> PartyMember: ...
+    async def save_link(
+        self, member_id: UUID, character_id: UUID, expected_version: int
+    ) -> PartyMember: ...
 
 
 class MonsterRepository(Protocol):

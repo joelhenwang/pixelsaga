@@ -12,6 +12,12 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
 
+from worldsim.application.capabilities import (
+    Capability,
+    is_omniscient,
+    parse_role,
+    require_capability,
+)
 from worldsim.application.macro.endings import evaluate_endings
 from worldsim.application.macro.engine import MacroEngine
 from worldsim.application.macro.eras import compose_era
@@ -35,7 +41,7 @@ def _engine_of(request: Request) -> MacroEngine:
 @router.get("/macro/runs", response_model=api.MacroRunsResponse)
 async def macro_runs(world_id: UUID, request: Request) -> api.MacroRunsResponse:
     role, _ = await effective_role(request, world_id)
-    require_role(role, "watcher", "player")
+    require_role(role, "watcher", "player", "director", "deity")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         runs = await uow.macro.list_runs(world_id)
@@ -75,7 +81,7 @@ async def macro_runs(world_id: UUID, request: Request) -> api.MacroRunsResponse:
 @router.get("/macro/lineage", response_model=api.LineageResponse)
 async def lineage(world_id: UUID, request: Request) -> api.LineageResponse:
     role, _ = await effective_role(request, world_id)
-    require_role(role, "watcher", "player")
+    require_role(role, "watcher", "player", "director", "deity")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         records = await uow.lineage.list_records(world_id)
@@ -115,7 +121,7 @@ async def lineage(world_id: UUID, request: Request) -> api.LineageResponse:
 @router.get("/macro/focus", response_model=api.FocusResponse)
 async def focus(world_id: UUID, request: Request) -> api.FocusResponse:
     role, _ = await effective_role(request, world_id)
-    require_role(role, "watcher", "player")
+    require_role(role, "watcher", "player", "director", "deity")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         characters = await uow.characters.list_for_world(world_id)
@@ -149,13 +155,13 @@ async def eras(
     owner_id: UUID | None = None,
 ) -> api.ErasResponse:
     role, viewer = await effective_role(request, world_id)
-    require_role(role, "watcher", "player")
-    if role != "watcher" and owner_id is not None and viewer != owner_id:
+    require_role(role, "watcher", "player", "director", "deity")
+    if not is_omniscient(parse_role(role)) and owner_id is not None and viewer != owner_id:
         raise DomainError(ErrorCode.FORBIDDEN, "era digests are holder-private")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         digests = await uow.macro.list_eras_for_span(world_id, start_absolute, end_absolute)
-    if role != "watcher":
+    if not is_omniscient(parse_role(role)):
         digests = [era for era in digests if viewer is not None and era.owner_id == viewer]
     if owner_id is not None:
         digests = [era for era in digests if era.owner_id == owner_id]
@@ -179,7 +185,7 @@ async def eras(
 @router.get("/macro/endings", response_model=api.EndingsResponse)
 async def endings(world_id: UUID, request: Request) -> api.EndingsResponse:
     role, _ = await effective_role(request, world_id)
-    require_role(role, "watcher", "player")
+    require_role(role, "watcher", "player", "director", "deity")
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         rows = await uow.macro.list_endings(world_id)
@@ -204,7 +210,7 @@ async def macro_advance(
     body: api.MacroAdvanceRequest, request: Request
 ) -> api.MacroAdvanceResponse:
     role, _ = await effective_role(request, body.world_id)
-    require_role(role, "watcher")
+    require_capability(parse_role(role), Capability.MACRO)
     try:
         resolution = MacroResolution(body.resolution)
     except ValueError as exc:
@@ -238,8 +244,8 @@ async def macro_advance(
 @router.post("/macro/eras/compose", response_model=api.EraView)
 async def compose_era_view(body: api.EraComposeRequest, request: Request) -> api.EraView:
     role, viewer = await effective_role(request, body.world_id)
-    require_role(role, "watcher", "player")
-    if role != "watcher" and viewer != body.owner_id:
+    require_role(role, "watcher", "player", "director", "deity")
+    if not is_omniscient(parse_role(role)) and viewer != body.owner_id:
         raise DomainError(ErrorCode.FORBIDDEN, "era digests are holder-private")
     state = request.app.state.app_state
     try:
@@ -268,7 +274,7 @@ async def evaluate_endings_view(
     body: api.EndingsEvaluateRequest, request: Request
 ) -> api.EndingsResponse:
     role, _ = await effective_role(request, body.world_id)
-    require_role(role, "watcher")
+    require_capability(parse_role(role), Capability.MACRO)
     state = request.app.state.app_state
     rows = await evaluate_endings(state.uow_factory(), body.world_id, body.at_absolute)
     return api.EndingsResponse(
@@ -292,7 +298,7 @@ async def assign_focus_view(
     body: api.FocusAssignRequest, request: Request
 ) -> api.FocusAssignmentView:
     role, _ = await effective_role(request, body.world_id)
-    require_role(role, "watcher")
+    require_capability(parse_role(role), Capability.MACRO)
     try:
         slot = FocusSlot(body.slot)
     except ValueError as exc:
@@ -329,7 +335,7 @@ async def cancel_schedule(schedule_id: UUID, request: Request) -> api.ScheduleCa
     async with state.uow_factory()() as uow:
         schedule = await uow.schedules.get(schedule_id)
         role, _ = await effective_role(request, schedule.world_id)
-        require_role(role, "watcher")
+        require_capability(parse_role(role), Capability.MACRO)
         if schedule.status != ScheduleStatus.PENDING:
             return api.ScheduleCancelResponse(schedule_id=schedule.id, status=schedule.status.value)
         saved = await uow.schedules.save(

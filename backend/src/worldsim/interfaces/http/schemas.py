@@ -331,6 +331,7 @@ class PartyBeginRequest(BaseModel):
     character_class: str = Field(default="fighter", max_length=64)
     level: int = Field(default=1, ge=1, le=20)
     stats: dict[str, int] | None = None
+    character_id: UUID | None = None
 
 
 class PartyMemberView(BaseModel):
@@ -344,6 +345,7 @@ class PartyMemberView(BaseModel):
     hp_current: int | None = None
     hp_max: int | None = None
     conditions: list[str] = Field(default_factory=list)
+    character_id: UUID | None = None
     version: int
 
 
@@ -420,6 +422,10 @@ class ActivityView(BaseModel):
     start_absolute: int
     duration_phases: int
     progress_phases: int
+    from_location_id: UUID | None = None
+    to_location_id: UUID | None = None
+    route_id: UUID | None = None
+    effective_progress_phases: int | None = None
     version: int
 
 
@@ -591,6 +597,8 @@ class TimelineResponse(BaseModel):
     world_id: UUID
     entries: list[TimelineEntry] = Field(default_factory=list)
     total: int
+    next_after: int
+    has_more: bool
 
 
 class MapRoute(BaseModel):
@@ -609,6 +617,7 @@ class MapPlace(BaseModel):
     discovered: bool
     routes: list[MapRoute] = Field(default_factory=list)
     occupants: list[str] = Field(default_factory=list)
+    occupant_ids: list[UUID] = Field(default_factory=list)
 
 
 class MapResponse(BaseModel):
@@ -850,3 +859,102 @@ class ScheduleCancelResponse(BaseModel):
 
     schedule_id: UUID
     status: str
+
+
+class CharacterCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    name: str = Field(min_length=1, max_length=128)
+    location_id: UUID
+    appearance: str = Field(default="", max_length=2000)
+    personality: str = Field(default="", max_length=2000)
+    background: str = Field(default="", max_length=2000)
+
+
+class PartyLinkRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    character_id: UUID
+    expected_version: int = Field(ge=0)
+
+
+class ChronicleEntry(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    sequence: int
+    event_id: UUID
+    event_type: str
+    title: str
+    text: str | None = None
+    participant_ids: list[UUID] = Field(default_factory=list)
+    location_id: UUID | None = None
+    scene_id: UUID | None = None
+    absolute_index: int
+    revision: int = 0
+
+
+class ChronicleResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    entries: list[ChronicleEntry] = Field(default_factory=list)
+    next_after: int
+    has_more: bool
+    watermark: int
+
+
+class PresentationCapabilities(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    role: str
+    character_id: UUID | None = None
+    capabilities: list[str] = Field(default_factory=list)
+
+
+class MapAnchorView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    location_id: UUID
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+
+
+class MapManifestView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: str
+    version: int
+    schematic: bool
+    asset_id: UUID | None = None
+    anchors: list[MapAnchorView] = Field(default_factory=list)
+
+
+class CastEntry(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    character_id: UUID
+    name: str
+    life_status: str
+    location_id: UUID
+    portrait_asset_id: UUID | None = None
+
+
+class PresentationResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    day: int
+    phase: str
+    absolute_index: int
+    latest_run_id: UUID | None = None
+    open_run_id: UUID | None = None
+    run_state: str | None = None
+    revision: int
+    capabilities: PresentationCapabilities
+    manifest: MapManifestView
+    cast: list[CastEntry] = Field(default_factory=list)
+    activities: list[ActivityView] = Field(default_factory=list)
+    recent_event_id: UUID | None = None
+    threads: list[str] = Field(default_factory=list)

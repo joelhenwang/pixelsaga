@@ -99,6 +99,29 @@
             "title": "Duration Phases",
             "type": "integer"
           },
+          "effective_progress_phases": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Progress Phases"
+          },
+          "from_location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "From Location Id"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -112,6 +135,18 @@
             "title": "Progress Phases",
             "type": "integer"
           },
+          "route_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route Id"
+          },
           "start_absolute": {
             "title": "Start Absolute",
             "type": "integer"
@@ -119,6 +154,18 @@
           "status": {
             "title": "Status",
             "type": "string"
+          },
+          "to_location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "To Location Id"
           },
           "version": {
             "title": "Version",
@@ -405,6 +452,95 @@
         "title": "BeliefView",
         "type": "object"
       },
+      "CastEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "life_status": {
+            "title": "Life Status",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "portrait_asset_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Portrait Asset Id"
+          }
+        },
+        "required": [
+          "character_id",
+          "name",
+          "life_status",
+          "location_id"
+        ],
+        "title": "CastEntry",
+        "type": "object"
+      },
+      "CharacterCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "appearance": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Appearance",
+            "type": "string"
+          },
+          "background": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Background",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "personality": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Personality",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "name",
+          "location_id"
+        ],
+        "title": "CharacterCreateRequest",
+        "type": "object"
+      },
       "CharacterDetail": {
         "additionalProperties": false,
         "description": "Stage 1 character view; card excerpt only for self or watcher.",
@@ -491,6 +627,126 @@
           "location_id"
         ],
         "title": "CharacterSummary",
+        "type": "object"
+      },
+      "ChronicleEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "event_type": {
+            "title": "Event Type",
+            "type": "string"
+          },
+          "location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location Id"
+          },
+          "participant_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Participant Ids",
+            "type": "array"
+          },
+          "revision": {
+            "default": 0,
+            "title": "Revision",
+            "type": "integer"
+          },
+          "scene_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scene Id"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sequence",
+          "event_id",
+          "event_type",
+          "title",
+          "absolute_index"
+        ],
+        "title": "ChronicleEntry",
+        "type": "object"
+      },
+      "ChronicleResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "entries": {
+            "items": {
+              "$ref": "#/components/schemas/ChronicleEntry"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "next_after": {
+            "title": "Next After",
+            "type": "integer"
+          },
+          "watermark": {
+            "title": "Watermark",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "next_after",
+          "has_more",
+          "watermark"
+        ],
+        "title": "ChronicleResponse",
         "type": "object"
       },
       "ClaimListResponse": {
@@ -1962,6 +2218,78 @@
         "title": "MacroRunsResponse",
         "type": "object"
       },
+      "MapAnchorView": {
+        "additionalProperties": false,
+        "properties": {
+          "location_id": {
+            "format": "uuid",
+            "title": "Location Id",
+            "type": "string"
+          },
+          "x": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "X",
+            "type": "number"
+          },
+          "y": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Y",
+            "type": "number"
+          }
+        },
+        "required": [
+          "location_id",
+          "x",
+          "y"
+        ],
+        "title": "MapAnchorView",
+        "type": "object"
+      },
+      "MapManifestView": {
+        "additionalProperties": false,
+        "properties": {
+          "anchors": {
+            "items": {
+              "$ref": "#/components/schemas/MapAnchorView"
+            },
+            "title": "Anchors",
+            "type": "array"
+          },
+          "asset_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Asset Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "schematic": {
+            "title": "Schematic",
+            "type": "boolean"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "schematic"
+        ],
+        "title": "MapManifestView",
+        "type": "object"
+      },
       "MapPlace": {
         "additionalProperties": false,
         "properties": {
@@ -1977,6 +2305,14 @@
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "occupant_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Occupant Ids",
+            "type": "array"
           },
           "occupants": {
             "items": {
@@ -2203,6 +2539,18 @@
             "title": "Character Class",
             "type": "string"
           },
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
+          },
           "level": {
             "default": 1,
             "maximum": 20.0,
@@ -2249,12 +2597,51 @@
         "title": "PartyBeginRequest",
         "type": "object"
       },
+      "PartyLinkRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "character_id": {
+            "format": "uuid",
+            "title": "Character Id",
+            "type": "string"
+          },
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "character_id",
+          "expected_version"
+        ],
+        "title": "PartyLinkRequest",
+        "type": "object"
+      },
       "PartyMemberView": {
         "additionalProperties": false,
         "properties": {
           "character_class": {
             "title": "Character Class",
             "type": "string"
+          },
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
           },
           "conditions": {
             "items": {
@@ -2356,6 +2743,150 @@
         ],
         "title": "PhaseName",
         "type": "string"
+      },
+      "PresentationCapabilities": {
+        "additionalProperties": false,
+        "properties": {
+          "capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Character Id"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role"
+        ],
+        "title": "PresentationCapabilities",
+        "type": "object"
+      },
+      "PresentationResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "absolute_index": {
+            "title": "Absolute Index",
+            "type": "integer"
+          },
+          "activities": {
+            "items": {
+              "$ref": "#/components/schemas/ActivityView"
+            },
+            "title": "Activities",
+            "type": "array"
+          },
+          "capabilities": {
+            "$ref": "#/components/schemas/PresentationCapabilities"
+          },
+          "cast": {
+            "items": {
+              "$ref": "#/components/schemas/CastEntry"
+            },
+            "title": "Cast",
+            "type": "array"
+          },
+          "day": {
+            "title": "Day",
+            "type": "integer"
+          },
+          "latest_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Run Id"
+          },
+          "manifest": {
+            "$ref": "#/components/schemas/MapManifestView"
+          },
+          "open_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Open Run Id"
+          },
+          "phase": {
+            "title": "Phase",
+            "type": "string"
+          },
+          "recent_event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recent Event Id"
+          },
+          "revision": {
+            "title": "Revision",
+            "type": "integer"
+          },
+          "run_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run State"
+          },
+          "threads": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Threads",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "day",
+          "phase",
+          "absolute_index",
+          "revision",
+          "capabilities",
+          "manifest"
+        ],
+        "title": "PresentationResponse",
+        "type": "object"
       },
       "ReactionView": {
         "additionalProperties": false,
@@ -3240,6 +3771,14 @@
             "title": "Entries",
             "type": "array"
           },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          },
+          "next_after": {
+            "title": "Next After",
+            "type": "integer"
+          },
           "total": {
             "title": "Total",
             "type": "integer"
@@ -3252,7 +3791,9 @@
         },
         "required": [
           "world_id",
-          "total"
+          "total",
+          "next_after",
+          "has_more"
         ],
         "title": "TimelineResponse",
         "type": "object"
@@ -4027,6 +4568,46 @@
         "tags": [
           "stage1"
         ]
+      },
+      "post": {
+        "description": "Create a simulation character with its identity card.",
+        "operationId": "create_character_view_api_v1_stage1_characters_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CharacterCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CharacterSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Character View",
+        "tags": [
+          "stage1"
+        ]
       }
     },
     "/api/v1/stage1/characters/{character_id}": {
@@ -4200,6 +4781,60 @@
           }
         },
         "summary": "Begin Party Member",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/party/{member_id}/link": {
+      "post": {
+        "description": "Bind an existing roster row to a real character, version-checked.",
+        "operationId": "link_party_member_api_v1_stage1_party__member_id__link_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "member_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Member Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartyLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartyMemberView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Link Party Member",
         "tags": [
           "stage1"
         ]
@@ -5513,7 +6148,7 @@
     },
     "/api/v1/stage2/timeline": {
       "get": {
-        "description": "Committed events with narration snippets, newest last.",
+        "description": "Committed events with narration snippets, newest last.\n\n`next_after` is the last scanned source sequence, not the last\ndisplayed entry: a page with zero visible entries still advances.",
         "operationId": "timeline_api_v1_stage2_timeline_get",
         "parameters": [
           {
@@ -5594,6 +6229,73 @@
           }
         },
         "summary": "Get World",
+        "tags": [
+          "world"
+        ]
+      }
+    },
+    "/api/v1/world/chronicle": {
+      "get": {
+        "description": "Visible events with structured identity and an advancing cursor.",
+        "operationId": "get_chronicle_api_v1_world_chronicle_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "after",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "After",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChronicleResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Chronicle",
         "tags": [
           "world"
         ]
@@ -5748,6 +6450,50 @@
           }
         },
         "summary": "Get Current Phase",
+        "tags": [
+          "world"
+        ]
+      }
+    },
+    "/api/v1/world/presentation": {
+      "get": {
+        "description": "One coherent snapshot for the new Adventure and World surfaces.",
+        "operationId": "get_presentation_api_v1_world_presentation_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresentationResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Presentation",
         "tags": [
           "world"
         ]

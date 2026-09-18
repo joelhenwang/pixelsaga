@@ -12,6 +12,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Query, Request
 
+from worldsim.application.capabilities import is_omniscient, parse_role
 from worldsim.domain.enums import Visibility
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.interfaces.http import schemas as api
@@ -32,14 +33,19 @@ async def timeline(
     after: int = Query(default=0, ge=0),
     limit: int = Query(default=20, ge=1, le=100),
 ) -> api.TimelineResponse:
-    """Committed events with narration snippets, newest last."""
+    """Committed events with narration snippets, newest last.
+
+    `next_after` is the last scanned source sequence, not the last
+    displayed entry: a page with zero visible entries still advances.
+    """
     role, viewer = await _role_of(request, world_id)
+    omniscient = is_omniscient(parse_role(role))
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         events = await uow.events.list_range(world_id, after, limit)
         entries: list[api.TimelineEntry] = []
         for event in events:
-            if role != "watcher" and (
+            if not omniscient and (
                 event.visibility != Visibility.PUBLIC
                 and (viewer is None or viewer not in event.participant_ids)
             ):
@@ -55,13 +61,22 @@ async def timeline(
                 )
             )
         total = await uow.events.count_events(world_id)
-    return api.TimelineResponse(world_id=world_id, entries=entries, total=total)
+        high = await uow.events.max_sequence(world_id)
+    scanned = events[-1].sequence if events else after
+    return api.TimelineResponse(
+        world_id=world_id,
+        entries=entries,
+        total=total,
+        next_after=scanned,
+        has_more=high > scanned,
+    )
 
 
 @router.get("/stage2/map", response_model=api.MapResponse)
 async def world_map(world_id: UUID, request: Request) -> api.MapResponse:
     """Places, routes, and occupants; players see discovered ground only."""
     role, viewer = await _role_of(request, world_id)
+    omniscient = is_omniscient(parse_role(role))
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         locations = await uow.locations.list_for_world(world_id)
@@ -69,7 +84,7 @@ async def world_map(world_id: UUID, request: Request) -> api.MapResponse:
     places: list[api.MapPlace] = []
     for location in locations:
         if (
-            role != "watcher"
+            not omniscient
             and not location.discovered
             and (
                 viewer is None
@@ -77,6 +92,7 @@ async def world_map(world_id: UUID, request: Request) -> api.MapResponse:
             )
         ):
             continue
+        present = [c for c in characters if c.location_id == location.id]
         places.append(
             api.MapPlace(
                 id=location.id,
@@ -90,11 +106,8 @@ async def world_map(world_id: UUID, request: Request) -> api.MapResponse:
                     )
                     for route in location.routes
                 ],
-                occupants=[
-                    character.name
-                    for character in characters
-                    if character.location_id == location.id
-                ],
+                occupants=[character.name for character in present],
+                occupant_ids=[character.id for character in present],
             )
         )
     return api.MapResponse(world_id=world_id, places=places)

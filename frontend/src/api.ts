@@ -3,6 +3,7 @@ import type {
   BeatView,
   CharacterDetail,
   CharacterSummary,
+  ChronicleResponse,
   DiaryResponse,
   EndingsResponse,
   EraView,
@@ -20,6 +21,8 @@ import type {
   PartyRosterResponse,
   PlayerHeaders,
   RelationshipListResponse,
+  PresentationResponse,
+  RoleGrantView,
   SceneDetail,
   SceneSummary,
   ScheduleCancelResponse,
@@ -306,6 +309,46 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ world_id: worldId, slot, to_character_id: to, reason, effective_absolute: at }),
       },
+      headers,
+    );
+  },
+  createCharacter(
+    body: { world_id: string; name: string; location_id: string; appearance?: string; personality?: string; background?: string },
+    headers: Record<string, string>,
+  ): Promise<CharacterSummary> {
+    return request<CharacterSummary>(
+      "/api/v1/stage1/characters",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  linkPartyMember(
+    memberId: string,
+    body: { world_id: string; character_id: string; expected_version: number },
+    headers: Record<string, string>,
+  ): Promise<PartyMemberView> {
+    return request<PartyMemberView>(
+      `/api/v1/stage1/party/${memberId}/link`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  presentation(worldId: string, headers: Record<string, string>): Promise<PresentationResponse> {
+    return request<PresentationResponse>(`/api/v1/world/presentation?world_id=${worldId}`, {}, headers);
+  },
+  chronicle(worldId: string, after: number, limit: number, headers: Record<string, string>): Promise<ChronicleResponse> {
+    return request<ChronicleResponse>(`/api/v1/world/chronicle?world_id=${worldId}&after=${after}&limit=${limit}`, {}, headers);
+  },
+  roleGrant(worldId: string, headers: Record<string, string>): Promise<RoleGrantView | null> {
+    return request(`/api/v1/stage2/roles?world_id=${worldId}`, {}, headers);
+  },
+  selectRole(
+    body: { world_id: string; role: string; character_id?: string | null },
+    headers: Record<string, string>,
+  ): Promise<RoleGrantView> {
+    return request<RoleGrantView>(
+      "/api/v1/stage2/roles/select",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
       headers,
     );
   },

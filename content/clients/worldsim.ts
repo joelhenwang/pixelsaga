@@ -117,6 +117,7 @@ export interface Stage1AdvanceResponse {
 
 export interface PartyBeginRequest {
   character_class?: string | null;
+  character_id?: string | null;
   level?: number | null;
   name: string;
   race?: string | null;
@@ -126,6 +127,7 @@ export interface PartyBeginRequest {
 
 export interface PartyMemberView {
   character_class: string;
+  character_id?: string | null;
   conditions?: string[] | null;
   hp_current?: number | null;
   hp_max?: number | null;
@@ -153,11 +155,15 @@ export interface ActivityStartRequest {
 export interface ActivityView {
   character_id: string;
   duration_phases: number;
+  effective_progress_phases?: number | null;
+  from_location_id?: string | null;
   id: string;
   kind: string;
   progress_phases: number;
+  route_id?: string | null;
   start_absolute: number;
   status: string;
+  to_location_id?: string | null;
   version: number;
   world_id: string;
 }
@@ -333,6 +339,8 @@ export interface TimelineEntry {
 
 export interface TimelineResponse {
   entries?: TimelineEntry[] | null;
+  has_more: boolean;
+  next_after: number;
   total: number;
   world_id: string;
 }
@@ -346,6 +354,7 @@ export interface MapPlace {
   discovered: boolean;
   id: string;
   name: string;
+  occupant_ids?: string[] | null;
   occupants?: string[] | null;
   region: string;
   routes?: MapRoute[] | null;
@@ -533,6 +542,87 @@ export interface ScheduleCancelResponse {
   status: string;
 }
 
+export interface CharacterCreateRequest {
+  appearance?: string | null;
+  background?: string | null;
+  location_id: string;
+  name: string;
+  personality?: string | null;
+  world_id: string;
+}
+
+export interface PartyLinkRequest {
+  character_id: string;
+  expected_version: number;
+  world_id: string;
+}
+
+export interface ChronicleEntry {
+  absolute_index: number;
+  event_id: string;
+  event_type: string;
+  location_id?: string | null;
+  participant_ids?: string[] | null;
+  revision?: number | null;
+  scene_id?: string | null;
+  sequence: number;
+  text?: string | null;
+  title: string;
+}
+
+export interface ChronicleResponse {
+  entries?: ChronicleEntry[] | null;
+  has_more: boolean;
+  next_after: number;
+  watermark: number;
+  world_id: string;
+}
+
+export interface PresentationCapabilities {
+  capabilities?: string[] | null;
+  character_id?: string | null;
+  role: string;
+}
+
+export interface MapAnchorView {
+  location_id: string;
+  x: unknown;
+  y: unknown;
+}
+
+export interface MapManifestView {
+  anchors?: MapAnchorView[] | null;
+  asset_id?: string | null;
+  id: string;
+  schematic: boolean;
+  version: number;
+}
+
+export interface CastEntry {
+  character_id: string;
+  life_status: string;
+  location_id: string;
+  name: string;
+  portrait_asset_id?: string | null;
+}
+
+export interface PresentationResponse {
+  absolute_index: number;
+  activities?: ActivityView[] | null;
+  capabilities: PresentationCapabilities;
+  cast?: CastEntry[] | null;
+  day: number;
+  latest_run_id?: string | null;
+  manifest: MapManifestView;
+  open_run_id?: string | null;
+  phase: string;
+  recent_event_id?: string | null;
+  revision: number;
+  run_state?: string | null;
+  threads?: string[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -554,6 +644,8 @@ export const ROUTES = {
   resume: "POST /api/v1/stage1/resume",
   beginPartyMember: "POST /api/v1/stage1/party/begin",
   listParty: "GET /api/v1/stage1/party",
+  createCharacter: "POST /api/v1/stage1/characters",
+  linkPartyMember: "POST /api/v1/stage1/party/{member_id}/link",
   startActivity: "POST /api/v1/stage2/activities",
   interruptActivity: "POST /api/v1/stage2/activities/{activity_id}/interrupt",
   resumeActivity: "POST /api/v1/stage2/activities/{activity_id}/resume",
@@ -579,6 +671,8 @@ export const ROUTES = {
   listDirectorHooks: "GET /api/v1/stage2/director/hooks",
   readOperationsStatus: "GET /api/v1/stage2/operations/status",
   listEvents: "GET /api/v1/world/events",
+  readPresentation: "GET /api/v1/world/presentation",
+  readChronicle: "GET /api/v1/world/chronicle",
   listMacroRuns: "GET /api/v1/macro/runs",
   readLineage: "GET /api/v1/macro/lineage",
   listFocus: "GET /api/v1/macro/focus",

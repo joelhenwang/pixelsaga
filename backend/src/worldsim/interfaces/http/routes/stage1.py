@@ -14,7 +14,8 @@ from uuid import UUID
 from fastapi import APIRouter, Request
 from pydantic import TypeAdapter
 
-from worldsim.application.commands.party import begin_adventure
+from worldsim.application.capabilities import Capability, parse_role, require_capability
+from worldsim.application.commands.party import begin_adventure, create_character, link_member
 from worldsim.application.orchestration.stage1 import Stage1Orchestrator
 from worldsim.domain.commands import ActionIntent
 from worldsim.domain.errors import DomainError, ErrorCode
@@ -42,6 +43,7 @@ def _party_view(member: PartyMember) -> api.PartyMemberView:
         hp_current=hit_points.current if hit_points else None,
         hp_max=hit_points.max if hit_points else None,
         conditions=list(member.sheet.conditions),
+        character_id=member.character_id,
         version=member.version,
     )
 
@@ -50,7 +52,7 @@ async def _perspective(request: Request, world_id: UUID | None = None) -> tuple[
     """Header perspective for reads; grant-aware gates for mutating routes."""
     if world_id is None:
         role = request.headers.get("x-worldsim-role", "watcher").lower()
-        if role not in ("watcher", "player"):
+        if role not in ("watcher", "player", "director", "deity"):
             raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown role: {role}")
         raw_character = request.headers.get("x-worldsim-character")
         if role == "player":
@@ -278,7 +280,19 @@ async def list_model_runs(request: Request, phase_run_id: UUID) -> list[api.Mode
 
 @router.post("/stage1/advance", response_model=api.Stage1AdvanceResponse)
 async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage1AdvanceResponse:
-    _role, viewer = await _perspective(request, body.world_id)
+    role, viewer = await _perspective(request, body.world_id)
+    require_capability(parse_role(role), Capability.ADVANCE)
+    if role == "watcher" and body.player_intents:
+        raise DomainError(
+            ErrorCode.FORBIDDEN,
+            "watch mode advances the world but files no attempts; "
+            "switch to Player or queue a direction",
+        )
+    if role in ("director", "deity") and body.player_intents:
+        raise DomainError(
+            ErrorCode.FORBIDDEN,
+            "directed attempts go through the intervention queue, not advance",
+        )
     player_intents: dict[UUID, ActionIntent] = {}
     for raw_actor, raw_action in body.player_intents.items():
         try:
@@ -333,7 +347,8 @@ async def resume(body: api.RunIdRequest, request: Request) -> dict[str, str]:
 @router.post("/stage1/party/begin", response_model=api.PartyMemberView)
 async def begin_party_member(body: api.PartyBeginRequest, request: Request) -> api.PartyMemberView:
     """Seat the player's adventurer (explicit stats or the auto build)."""
-    _role, _viewer = await _perspective(request, body.world_id)
+    role, _viewer = await _perspective(request, body.world_id)
+    require_capability(parse_role(role), Capability.CREATE_CHARACTER)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         member = await begin_adventure(
@@ -345,6 +360,48 @@ async def begin_party_member(body: api.PartyBeginRequest, request: Request) -> a
             body.character_class,
             body.level,
             body.stats,
+            character_id=body.character_id,
+        )
+    return _party_view(member)
+
+
+@router.post("/stage1/characters", response_model=api.CharacterSummary)
+async def create_character_view(
+    body: api.CharacterCreateRequest, request: Request
+) -> api.CharacterSummary:
+    """Create a simulation character with its identity card."""
+    role, _viewer = await _perspective(request, body.world_id)
+    require_capability(parse_role(role), Capability.CREATE_CHARACTER)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        character = await create_character(
+            uow,
+            body.world_id,
+            body.name,
+            body.location_id,
+            appearance=body.appearance,
+            personality=body.personality,
+            background=body.background,
+        )
+    return api.CharacterSummary(
+        id=character.id,
+        name=character.name,
+        life_status=character.life_status.value,
+        location_id=character.location_id,
+    )
+
+
+@router.post("/stage1/party/{member_id}/link", response_model=api.PartyMemberView)
+async def link_party_member(
+    member_id: UUID, body: api.PartyLinkRequest, request: Request
+) -> api.PartyMemberView:
+    """Bind an existing roster row to a real character, version-checked."""
+    role, _viewer = await _perspective(request, body.world_id)
+    require_capability(parse_role(role), Capability.CREATE_CHARACTER)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        member = await link_member(
+            uow, body.world_id, member_id, body.character_id, body.expected_version
         )
     return _party_view(member)
 
