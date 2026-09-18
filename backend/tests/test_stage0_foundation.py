@@ -132,7 +132,11 @@ def test_stage0_foundation_v1(migrated_db: None, monkeypatch: pytest.MonkeyPatch
                 gateway_factory=lambda: gateway,
             )
             transport = httpx.ASGITransport(app=app)
-            async with httpx.AsyncClient(transport=transport, base_url="http://stage0") as client:
+            async with httpx.AsyncClient(
+                transport=transport,
+                base_url="http://stage0",
+                headers={"Authorization": f"Bearer {SENTINELS[0]}"},
+            ) as client:
                 seeded = (await client.post("/api/v1/world/seed")).json()
                 assert seeded["duplicate"] is False
                 world_id = UUID(seeded["world_id"])

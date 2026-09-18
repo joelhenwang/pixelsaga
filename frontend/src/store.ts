@@ -15,9 +15,20 @@ export const nextIndex = ref<number>(1);
 export const connection = ref<"online" | "offline">("online");
 export const notice = ref<string>("");
 export const busy = ref<boolean>(false);
+export const apiKey = ref<string>(localStorage.getItem("worldsim.key") ?? "");
+
+export function setApiKey(key: string): void {
+  apiKey.value = key;
+  if (key) {
+    localStorage.setItem("worldsim.key", key);
+  } else {
+    localStorage.removeItem("worldsim.key");
+  }
+}
 
 export const headers = computed<Record<string, string>>(() => ({
   ...headersFor(role.value, characterId.value || null),
+  ...(apiKey.value ? { Authorization: `Bearer ${apiKey.value}` } : {}),
 }));
 
 export function fail(message: string, error: unknown): void {

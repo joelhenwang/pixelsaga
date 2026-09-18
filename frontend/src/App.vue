@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { characterId, characters, clock, connection, fail, notice, refresh, role } from "./store";
-import { headers } from "./store";
+import { apiKey, characterId, characters, clock, connection, fail, headers, notice, refresh, role, setApiKey } from "./store";
 
 const route = useRoute();
 
@@ -62,6 +61,10 @@ onMounted(() => {
         <select v-model="characterId" @change="refresh">
           <option v-for="c in characters" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
+      </label>
+      <label>key
+        <input type="password" :value="apiKey" placeholder="bearer key, optional" autocomplete="off"
+          @change="setApiKey(($event.target as HTMLInputElement).value.trim()); refresh()" />
       </label>
       <button type="button" @click="seed">seed</button>
       <button type="button" @click="refresh">refresh</button>
