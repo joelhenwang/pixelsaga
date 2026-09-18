@@ -4192,6 +4192,64 @@
         "title": "Stage1SceneOutcome",
         "type": "object"
       },
+      "SuggestionView": {
+        "additionalProperties": false,
+        "properties": {
+          "destination_location_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Destination Location Id"
+          },
+          "family": {
+            "title": "Family",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "needs_topic": {
+            "default": false,
+            "title": "Needs Topic",
+            "type": "boolean"
+          },
+          "subtitle": {
+            "default": "",
+            "title": "Subtitle",
+            "type": "string"
+          },
+          "target_character_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Character Id"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "family",
+          "title"
+        ],
+        "title": "SuggestionView",
+        "type": "object"
+      },
       "TaskResponse": {
         "additionalProperties": false,
         "properties": {
@@ -4447,6 +4505,69 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/assets": {
+      "get": {
+        "operationId": "list_assets_api_v1_assets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssetView"
+                  },
+                  "title": "Response List Assets Api V1 Assets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Assets",
+        "tags": [
+          "assets"
+        ]
+      }
+    },
     "/api/v1/assets/ensure-starter": {
       "post": {
         "description": "Register the curated starter set for one world, idempotently.",
@@ -4721,7 +4842,7 @@
         ]
       },
       "post": {
-        "description": "Interpret and queue a direction; same client key replays the same item.",
+        "description": "Interpret and queue a direction; same key replays the same item.",
         "operationId": "submit_intervention_api_v1_interventions_post",
         "requestBody": {
           "content": {
@@ -6090,6 +6211,54 @@
           }
         },
         "summary": "Get Narration",
+        "tags": [
+          "stage1"
+        ]
+      }
+    },
+    "/api/v1/stage1/suggestions": {
+      "get": {
+        "description": "Validated contextual actions for one character; players read only themselves.",
+        "operationId": "character_suggestions_api_v1_stage1_suggestions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "character_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Character Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SuggestionView"
+                  },
+                  "title": "Response Character Suggestions Api V1 Stage1 Suggestions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Character Suggestions",
         "tags": [
           "stage1"
         ]

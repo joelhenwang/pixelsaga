@@ -28,6 +28,7 @@ from worldsim.domain.ids import (
 class InterventionMode(StrEnum):
     INFLUENCE = "influence"
     FORCE = "force"
+    ATTEMPT = "attempt"
 
 
 class InterventionStatus(StrEnum):

@@ -73,8 +73,8 @@ async def _detail(request: Request, intervention_id: UUID) -> api.InterventionVi
 async def submit_intervention(
     body: api.InterventionRequest, request: Request
 ) -> api.InterventionView:
-    """Interpret and queue a direction; same client key replays the same item."""
-    role, _ = await effective_role(request, body.world_id)
+    """Interpret and queue a direction; same key replays the same item."""
+    role, viewer = await effective_role(request, body.world_id)
     parsed = parse_role(role)
     try:
         mode = InterventionMode(body.mode)
@@ -96,6 +96,7 @@ async def submit_intervention(
             location_ids=list(body.scope.location_ids),
         ),
         body.client_request_id,
+        viewer=viewer,
     )
     return await _detail(request, intervention.id)
 
@@ -131,7 +132,7 @@ async def edit_intervention(
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         current = await uow.interventions.get_intervention(intervention_id)
-    role, _ = await effective_role(request, current.world_id)
+    role, viewer = await effective_role(request, current.world_id)
     parsed = parse_role(role)
     updated = await service.edit_text(
         state.uow_factory(),
@@ -144,6 +145,7 @@ async def edit_intervention(
             character_ids=list(body.scope.character_ids),
             location_ids=list(body.scope.location_ids),
         ),
+        viewer=viewer,
     )
     return await _detail(request, updated.id)
 

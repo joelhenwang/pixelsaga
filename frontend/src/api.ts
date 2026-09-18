@@ -1,4 +1,5 @@
 import type {
+  AssetView,
   ActivityListResponse,
   BeatView,
   CharacterDetail,
@@ -26,6 +27,7 @@ import type {
   RoleGrantView,
   SceneDetail,
   SimulationStatus,
+  SuggestionView,
   SceneSummary,
   ScheduleCancelResponse,
   Stage1AdvanceResponse,
@@ -374,6 +376,13 @@ export const api = {
       },
       headers,
     );
+  },
+  suggestions(characterId: string, headers: Record<string, string>): Promise<SuggestionView[]> {
+    return request<SuggestionView[]>(`/api/v1/stage1/suggestions?character_id=${characterId}`, {}, headers);
+  },
+  listAssets(worldId: string, kind: string | null, headers: Record<string, string>): Promise<AssetView[]> {
+    const query = kind ? `?world_id=${worldId}&kind=${kind}` : `?world_id=${worldId}`;
+    return request<AssetView[]>(`/api/v1/assets${query}`, {}, headers);
   },
   presentation(worldId: string, headers: Record<string, string>): Promise<PresentationResponse> {
     return request<PresentationResponse>(`/api/v1/world/presentation?world_id=${worldId}`, {}, headers);

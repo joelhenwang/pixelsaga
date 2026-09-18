@@ -88,6 +88,7 @@ async def interpret(
     mode: InterventionMode,
     text: str,
     scope: Scope,
+    viewer: UUID | None = None,
 ) -> InterpretOutcome:
     """Resolve scope, ask the model for a typed plan, validate it."""
     characters = await uow.characters.list_for_world(world_id)
@@ -142,7 +143,7 @@ async def interpret(
             InterventionStatus.NEEDS_CLARIFICATION,
             note="I could not map that to a concrete plan; name characters explicitly or pick IDs.",
         )
-    problem = _validate_plan(interpretation, role, by_id, loc_by_id)
+    problem = _validate_plan(interpretation, role, by_id, loc_by_id, viewer)
     if problem is not None:
         status, note = problem
         return InterpretOutcome(status, note=note)
@@ -163,6 +164,7 @@ def _validate_plan(
     role: UserRole,
     by_id: dict[UUID, Any],
     loc_by_id: dict[UUID, Any],
+    viewer: UUID | None = None,
 ) -> tuple[InterventionStatus, str] | None:
     """Reject unexecutable plans; None means the plan may queue."""
     if len(interpretation.steps) > MAX_STEPS:
@@ -176,6 +178,10 @@ def _validate_plan(
                 InterventionStatus.FAILED,
                 "Direct mode proposes hooks and arcs; forcing needs God mode",
             )
+        if role == UserRole.PLAYER and (
+            step.kind != StepKind.DIRECT_ATTEMPT or step.character_id != viewer
+        ):
+            return InterventionStatus.FAILED, "players attempt only their own actions"
         problem = _validate_step(step, by_id, loc_by_id)
         if problem is not None:
             return problem
@@ -237,19 +243,27 @@ async def submit(
     scope: Scope,
     client_request_id: str,
     watermark: int = 0,
+    viewer: UUID | None = None,
 ) -> Intervention:
     """Interpret and persist a queue item; same key replays the same item."""
     if (role == UserRole.DIRECTOR and mode != InterventionMode.INFLUENCE) or (
         role == UserRole.DEITY and mode != InterventionMode.FORCE
     ):
         raise DomainError(ErrorCode.FORBIDDEN, "mode does not match the operating role")
-    if role not in (UserRole.DIRECTOR, UserRole.DEITY):
+    if role == UserRole.PLAYER and (
+        mode != InterventionMode.ATTEMPT
+        or viewer is None
+        or scope.character_ids != [viewer]
+        or scope.location_ids
+    ):
+        raise DomainError(ErrorCode.FORBIDDEN, "players attempt only their own actions")
+    if role not in (UserRole.DIRECTOR, UserRole.DEITY, UserRole.PLAYER):
         raise DomainError(ErrorCode.FORBIDDEN, "interventions need Direct or God mode")
     async with factory() as uow:
         existing = await uow.interventions.find_by_client_key(world_id, client_request_id)
         if existing is not None:
             return existing
-        outcome = await interpret(uow, gateway, world_id, role, mode, text, scope)
+        outcome = await interpret(uow, gateway, world_id, role, mode, text, scope, viewer)
         if (
             outcome.status == InterventionStatus.QUEUED
             and (not outcome.interpretation or not outcome.interpretation.steps)
@@ -556,6 +570,7 @@ async def edit_text(
     expected_version: int,
     text: str,
     scope: Scope,
+    viewer: UUID | None = None,
 ) -> Intervention:
     """Reinterpret before claim; history restarts from the new text."""
     async with factory() as uow:
@@ -575,6 +590,7 @@ async def edit_text(
             intervention.mode,
             text,
             scope,
+            viewer,
         )
         if (
             outcome.status == InterventionStatus.QUEUED

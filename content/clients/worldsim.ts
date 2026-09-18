@@ -691,14 +691,18 @@ export interface InterventionView {
   world_id: string;
 }
 
-export interface InterventionEditRequest {
-  expected_version: number;
-  scope?: InterventionScope | null;
-  text: string;
-}
-
 export interface InterventionCancelRequest {
   expected_version: number;
+}
+
+export interface SuggestionView {
+  destination_location_id?: string | null;
+  family: string;
+  id: string;
+  needs_topic?: boolean | null;
+  subtitle?: string | null;
+  target_character_id?: string | null;
+  title: string;
 }
 
 export type WatcherHeaders = {

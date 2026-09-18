@@ -19,6 +19,7 @@ from worldsim.application.commands.party import begin_adventure, create_characte
 from worldsim.application.execution import guarded, new_owner, phase_run_id, phase_scope
 from worldsim.application.interventions import apply_batch, claim_for_boundary
 from worldsim.application.orchestration.stage1 import Stage1Orchestrator, Stage1PhaseReport
+from worldsim.application.queries.suggestions import suggestions_for
 from worldsim.domain.commands import ActionIntent
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import derive_attempt_id
@@ -197,6 +198,17 @@ async def get_character(character_id: UUID, request: Request) -> api.CharacterDe
         card=card,
         state=detail_state,
     )
+
+
+@router.get("/stage1/suggestions", response_model=list[api.SuggestionView])
+async def character_suggestions(character_id: UUID, request: Request) -> list[api.SuggestionView]:
+    """Validated contextual actions for one character; players read only themselves."""
+    _role, viewer = await _perspective(request)
+    if viewer is not None and viewer != character_id:
+        raise DomainError(ErrorCode.FORBIDDEN, "players read only their own suggestions")
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        return await suggestions_for(uow, character_id)
 
 
 @router.get("/stage1/scenes", response_model=list[api.SceneSummary])

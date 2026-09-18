@@ -1078,3 +1078,15 @@ class InterventionCancelRequest(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     expected_version: int = Field(ge=0)
+
+
+class SuggestionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: str
+    family: str
+    title: str
+    subtitle: str = ""
+    target_character_id: UUID | None = None
+    destination_location_id: UUID | None = None
+    needs_topic: bool = False

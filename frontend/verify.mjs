@@ -60,9 +60,14 @@ try {
     assert(beats > 0, "expected at least one beat");
   });
 
+  await check("switch to player", async () => {
+    await page.locator(".settings select").first().selectOption("player", { timeout: 12000 });
+    await page.locator("#draft").waitFor({ timeout: 15000 });
+  });
+
   await check("action submit queues without doubles", async () => {
-    await page.locator("#topic").fill("dawn patrol", { timeout: 12000 });
-    await page.locator("#go").click({ timeout: 12000 });
+    await page.locator("#draft").fill("dawn patrol", { timeout: 12000 });
+    await page.getByRole("button", { name: "Send action" }).click({ timeout: 12000 });
     await page.locator("#queued").waitFor({ timeout: 60000 });
     const scenes = await page.locator(".strip button").count();
     assert(scenes > 0, "scene strip emptied after action");
@@ -75,19 +80,21 @@ try {
       return;
     }
     await page.locator(".strip button").first().click({ timeout: 12000 });
-    const first = await page.locator(".stage h1").innerText();
+    const first = await page.locator(".journal h1").innerText();
     await page.keyboard.press("ArrowRight");
     await page.waitForFunction(
-      (before) => document.querySelector(".stage h1")?.textContent !== before,
+      (before) => document.querySelector(".journal h1")?.textContent !== before,
       first,
       { timeout: 15000 },
     );
   });
 
   await check("action button re-enables after submit", async () => {
-    await page.waitForFunction(() => !document.querySelector("#go")?.disabled, null, {
-      timeout: 90000,
-    });
+    await page.waitForFunction(
+      () => !document.querySelector('button[aria-label="Send action"]')?.disabled,
+      null,
+      { timeout: 90000 },
+    );
   });
 
   await check("theme selects dark", async () => {
@@ -105,9 +112,9 @@ try {
     const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
     try {
       await mobile.goto(base, { waitUntil: "networkidle" });
-      await mobile.locator("#go").waitFor({ timeout: 15000 });
-      const box = await mobile.locator("#go").boundingBox();
-      assert(box && box.width > 0, "action button not visible on mobile");
+      await mobile.locator(".composer input").waitFor({ timeout: 15000 });
+      const box = await mobile.locator(".composer input").boundingBox();
+      assert(box && box.width > 0, "composer not visible on mobile");
     } finally {
       await mobile.close();
     }

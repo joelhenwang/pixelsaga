@@ -105,6 +105,25 @@ async def ensure_starter_assets(
     return [_asset_view(asset) for asset in assets]
 
 
+@router.get("/assets", response_model=list[api.AssetView])
+async def list_assets(
+    world_id: UUID, request: Request, kind: str | None = None
+) -> list[api.AssetView]:
+    role, viewer = await effective_role(request, world_id)
+    parsed = parse_role(role)
+    kinds = [kind] if kind else ["map", "background", "portrait"]
+    state = request.app.state.app_state
+    views: list[api.AssetView] = []
+    async with state.uow_factory()() as uow:
+        for one in kinds:
+            for asset in await uow.assets.list_ready_for_world(world_id, one):
+                if is_omniscient(parsed) or asset.kind in (AssetKind.MAP, AssetKind.BACKGROUND):
+                    views.append(_asset_view(asset))
+                elif asset.subject_id is not None and asset.subject_id == viewer:
+                    views.append(_asset_view(asset))
+    return views
+
+
 @router.get("/assets/{asset_id}")
 async def read_asset_bytes(asset_id: UUID, request: Request, world_id: UUID) -> Response:
     """Serve stored bytes. Players read world art and their own portrait only."""
