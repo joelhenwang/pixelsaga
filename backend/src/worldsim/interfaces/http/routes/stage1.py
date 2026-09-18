@@ -9,7 +9,6 @@ orchestrator's idempotent keys: repeats return stored reports.
 
 from __future__ import annotations
 
-from functools import partial
 from uuid import UUID
 
 from fastapi import APIRouter, Request
@@ -18,7 +17,8 @@ from pydantic import TypeAdapter
 from worldsim.application.capabilities import Capability, parse_role, require_capability
 from worldsim.application.commands.party import begin_adventure, create_character, link_member
 from worldsim.application.execution import guarded, new_owner, phase_run_id, phase_scope
-from worldsim.application.orchestration.stage1 import Stage1Orchestrator
+from worldsim.application.interventions import apply_batch, claim_for_boundary
+from worldsim.application.orchestration.stage1 import Stage1Orchestrator, Stage1PhaseReport
 from worldsim.domain.commands import ActionIntent
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import derive_attempt_id
@@ -308,13 +308,25 @@ async def advance(body: api.Stage1AdvanceRequest, request: Request) -> api.Stage
 
     state = request.app.state.app_state
     owner = new_owner("http")
+    orchestrator = _stage1(request)
+
+    async def _run() -> Stage1PhaseReport:
+        batch = await claim_for_boundary(factory, body.world_id, owner)
+        directed = await apply_batch(
+            factory, body.world_id, body.absolute_index, batch, set(player_intents)
+        )
+        merged = dict(player_intents)
+        merged.update(directed)
+        return await orchestrator.advance_phase(body.world_id, body.absolute_index, merged)
+
+    factory = state.uow_factory()
     report = await guarded(
-        state.uow_factory(),
+        factory,
         body.world_id,
         phase_scope(body.absolute_index),
         owner,
         phase_run_id(body.world_id, body.absolute_index),
-        partial(_stage1(request).advance_phase, body.world_id, body.absolute_index, player_intents),
+        _run,
     )
     return api.Stage1AdvanceResponse(
         run_id=report.run_id,

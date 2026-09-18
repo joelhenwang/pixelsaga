@@ -20,6 +20,7 @@ from worldsim.infrastructure.repositories.commands import SqlAlchemyCommandRepos
 from worldsim.infrastructure.repositories.costs import SqlAlchemyCostRepository
 from worldsim.infrastructure.repositories.digests import SqlAlchemyDigestRepository
 from worldsim.infrastructure.repositories.events import SqlAlchemyEventRepository
+from worldsim.infrastructure.repositories.interventions import SqlAlchemyInterventionRepository
 from worldsim.infrastructure.repositories.knowledge import SqlAlchemyKnowledgeRepository
 from worldsim.infrastructure.repositories.lineage import SqlAlchemyLineageRepository
 from worldsim.infrastructure.repositories.locations import SqlAlchemyLocationRepository
@@ -75,6 +76,7 @@ class SqlAlchemyUnitOfWork:
         self._party: SqlAlchemyPartyRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
         self._assets: SqlAlchemyAssetRepository | None = None
+        self._interventions: SqlAlchemyInterventionRepository | None = None
         self._narrative: SqlAlchemyNarrativeRepository | None = None
         self._digests: SqlAlchemyDigestRepository | None = None
         self._summaries: SqlAlchemySummaryRepository | None = None
@@ -259,6 +261,12 @@ class SqlAlchemyUnitOfWork:
         return self._party
 
     @property
+    def interventions(self) -> SqlAlchemyInterventionRepository:
+        if self._interventions is None:
+            self._interventions = SqlAlchemyInterventionRepository(self._require_session())
+        return self._interventions
+
+    @property
     def assets(self) -> SqlAlchemyAssetRepository:
         if self._assets is None:
             self._assets = SqlAlchemyAssetRepository(self._require_session())
@@ -291,6 +299,7 @@ class SqlAlchemyUnitOfWork:
             self._tasks = None
             self._party = None
             self._assets = None
+            self._interventions = None
             self._narrative = None
             self._summaries = None
             self._roles = None

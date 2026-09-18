@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { api } from "../api";
 import { assetUrl } from "../assets";
 import { portraitFor } from "../portrait";
+import type { InterventionView } from "@gen";
+import { fail, headers, role, worldId } from "../store";
 import { checkNew, entries, hasMore, loadOlder, loadProjection, presentation } from "../composables/useProjection";
-import { fail, headers, worldId } from "../store";
 import {
   controlNotice,
   controlState,
@@ -134,13 +136,63 @@ function onKey(event: KeyboardEvent): void {
   }
 }
 
+const draft = ref<string>("");
+const queueItems = ref<InterventionView[]>([]);
+const queueMode = computed(() => (role.value === "deity" ? "force" : "influence"));
+const canDirect = computed(() => role.value === "director" || role.value === "deity");
+
+async function reloadQueue(): Promise<void> {
+  if (!worldId.value || !canDirect.value) {
+    queueItems.value = [];
+    return;
+  }
+  try {
+    queueItems.value = await api.listInterventions(worldId.value, headers.value);
+  } catch (error) {
+    fail("queue load failed", error);
+  }
+}
+
 async function reload(): Promise<void> {
   faceSrc.value = {};
   mapSrc.value = "";
   await loadProjection(fail);
   await resolveFaces();
+  await reloadQueue();
 }
 
+async function submitCommand(): Promise<void> {
+  const text = draft.value.trim();
+  if (!text || !worldId.value) {
+    return;
+  }
+  try {
+    const scopeIds = [followedId.value, selectedId.value].filter((id) => id);
+    await api.submitIntervention(
+      {
+        world_id: worldId.value,
+        client_request_id: crypto.randomUUID(),
+        text,
+        mode: queueMode.value,
+        scope: { kind: scopeIds.length > 0 ? "characters" : "world", character_ids: scopeIds, location_ids: [] },
+        effective_at: "next_boundary",
+      },
+      headers.value,
+    );
+    await reloadQueue();
+  } catch (error) {
+    fail("queue failed", error);
+  }
+}
+
+async function cancelCommand(id: string, version: number): Promise<void> {
+  try {
+    await api.cancelIntervention(id, version, headers.value);
+    await reloadQueue();
+  } catch (error) {
+    fail("cancel failed", error);
+  }
+}
 const lastSeenIndex = ref<number>(0);
 
 async function onResolve(): Promise<PhaseOutcome> {
@@ -223,6 +275,26 @@ watch(worldId, () => {
         <button type="button" @click="follow(selected.character_id)">follow</button>
         <button type="button" @click="selectedId = ''">close</button>
       </div>
+      <div v-if="canDirect" class="composer">
+        <div class="row">
+          <input
+            v-model="draft"
+            aria-label="Intervention command"
+            placeholder="Direct, e.g. Ash should go to Hearth"
+            @keydown.enter="submitCommand"
+          />
+          <button type="button" @click="submitCommand">Queue event</button>
+        </div>
+        <p class="meta">{{ queueMode }} · applies at the next phase boundary · queued is not executed</p>
+        <div v-for="q in queueItems" :key="q.id" class="queued">
+          <span><b>{{ q.status }}</b> · {{ q.text }}</span>
+          <button
+            v-if="q.status === 'queued' || q.status === 'needs_clarification'"
+            type="button"
+            @click="cancelCommand(q.id, q.version)"
+          >Cancel</button>
+        </div>
+      </div>
       <div class="accesslist">
         <span>characters:</span>
         <button v-for="c in presentation?.cast ?? []" :key="c.character_id" type="button" @click="select(c.character_id)">
@@ -279,8 +351,15 @@ watch(worldId, () => {
 <style scoped>
 .simcontrols { position: absolute; top: 12px; left: 12px; z-index: 5; display: flex; gap: 8px; align-items: center; background: var(--surface-panel); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 8px 12px; box-shadow: 0 4px 18px rgba(20, 16, 8, 0.25); font-size: 13px; }
 .simcontrols button { border: 1px solid var(--action-primary); background: #fff; color: var(--action-primary); border-radius: 8px; padding: 5px 12px; cursor: pointer; font: inherit; }
-.simcontrols button:disabled { opacity: 0.4; cursor: default; }
-.simcontrols select { font: inherit; border-radius: 8px; border: 1px solid var(--border-subtle); padding: 5px; }
+.accesslist { position: absolute; right: 12px; top: 56px; display: flex; flex-direction: column; gap: 4px; align-items: end; font-size: 12px; color: var(--text-secondary); }
+.accesslist button { border: 1px solid var(--border-subtle); background: var(--surface-panel); border-radius: 12px; padding: 1px 10px; cursor: pointer; font-size: 12px; }
+.composer { position: absolute; left: 12px; bottom: 12px; width: min(560px, 60%); background: var(--surface-panel); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 8px 12px; z-index: 4; }
+.composer .row { display: flex; gap: 8px; }
+.composer input { flex: 1; font: inherit; font-size: 13px; border: 1px solid var(--border-subtle); border-radius: 8px; padding: 7px; }
+.composer button { background: var(--action-primary); color: #fff; border: 0; border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+.composer .meta { font-size: 11.5px; color: var(--text-secondary); margin: 6px 0 0; }
+.composer .queued { display: flex; gap: 8px; justify-content: space-between; align-items: center; font-size: 12.5px; border-top: 1px solid var(--border-subtle); margin-top: 6px; padding-top: 6px; }
+.composer .queued button { background: none; border: 1px solid var(--border-subtle); color: var(--text-primary); padding: 2px 10px; }
 .simcontrols .simstate { color: var(--text-secondary); }
 .simcontrols .simnotice { color: var(--accent-gold); }
 .world { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 0; min-height: calc(100vh - 44px); }

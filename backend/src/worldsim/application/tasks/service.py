@@ -9,6 +9,7 @@ from typing import Protocol
 from uuid import UUID, uuid4
 
 from sqlalchemy.exc import IntegrityError
+
 from worldsim.application.tasks.backoff import backoff_s
 from worldsim.application.unit_of_work import UnitOfWork
 from worldsim.domain.errors import DomainError, ErrorCode

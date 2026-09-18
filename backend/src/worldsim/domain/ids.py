@@ -288,3 +288,15 @@ def new_asset_id() -> AssetId:
 
 def new_job_id() -> ImageJobId:
     return uuid4()
+
+
+InterventionId = UUID
+InterventionStepId = UUID
+
+
+def new_intervention_id() -> InterventionId:
+    return uuid4()
+
+
+def new_intervention_step_id() -> InterventionStepId:
+    return uuid4()

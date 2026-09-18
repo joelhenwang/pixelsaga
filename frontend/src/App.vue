@@ -51,7 +51,6 @@ onMounted(() => {
   void refresh();
 });
 </script>
-
 <template>
   <div class="shell">
     <header class="topbar">
@@ -75,6 +74,8 @@ onMounted(() => {
         <select :value="role" @change="onRoleChange">
           <option value="watcher">watcher</option>
           <option value="player">player</option>
+          <option value="director">director</option>
+          <option value="deity">deity</option>
         </select>
       </label>
       <label v-if="role === 'player'">character

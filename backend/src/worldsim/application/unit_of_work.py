@@ -13,6 +13,7 @@ from worldsim.application.ports.repositories import (
     CostRepository,
     DigestRepository,
     EventRepository,
+    InterventionRepository,
     InventoryRepository,
     KnowledgeRepository,
     LineageRepository,
@@ -47,6 +48,8 @@ class UnitOfWork(Protocol):
     def characters(self) -> CharacterRepository: ...
     @property
     def party(self) -> PartyRepository: ...
+    @property
+    def interventions(self) -> InterventionRepository: ...
     @property
     def assets(self) -> AssetRepository: ...
     @property

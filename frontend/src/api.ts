@@ -16,6 +16,7 @@ import type {
   MacroRunsResponse,
   MapResponse,
   OperationsStatus,
+  InterventionView,
   PartyBeginRequest,
   PartyMemberView,
   PartyRosterResponse,
@@ -32,7 +33,7 @@ import type {
   WatcherHeaders,
 } from "@gen";
 
-export type Role = "watcher" | "player";
+export type Role = "watcher" | "player" | "director" | "deity";
 
 export type ErrorKind =
   | "transport"
@@ -82,9 +83,12 @@ export function kindFor(status: number, code: string): ErrorKind {
   return "unknown";
 }
 
-export function headersFor(role: Role, characterId: string | null): WatcherHeaders | PlayerHeaders {
+export function headersFor(role: Role, characterId: string | null): Record<string, string> {
   if (role === "player" && characterId) {
     return { "X-Worldsim-Role": "player", "X-Worldsim-Character": characterId };
+  }
+  if (role === "director" || role === "deity") {
+    return { "X-Worldsim-Role": role };
   }
   return { "X-Worldsim-Role": "watcher" };
 }
@@ -336,6 +340,40 @@ export const api = {
   },
   simulationStatus(worldId: string, headers: Record<string, string>): Promise<SimulationStatus> {
     return request<SimulationStatus>(`/api/v1/simulation/status?world_id=${worldId}`, {}, headers);
+  },
+  submitIntervention(
+    body: {
+      world_id: string;
+      client_request_id: string;
+      text: string;
+      mode: string;
+      scope: { kind: string; character_ids: string[]; location_ids: string[] };
+      effective_at: string;
+    },
+    headers: Record<string, string>,
+  ): Promise<InterventionView> {
+    return request<InterventionView>(
+      "/api/v1/interventions",
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) },
+      headers,
+    );
+  },
+  listInterventions(worldId: string, headers: Record<string, string>): Promise<InterventionView[]> {
+    return request<InterventionView[]>(`/api/v1/interventions?world_id=${worldId}`, {}, headers);
+  },
+  readIntervention(id: string, headers: Record<string, string>): Promise<InterventionView> {
+    return request<InterventionView>(`/api/v1/interventions/${id}`, {}, headers);
+  },
+  cancelIntervention(id: string, expectedVersion: number, headers: Record<string, string>): Promise<InterventionView> {
+    return request<InterventionView>(
+      `/api/v1/interventions/${id}/cancel`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expected_version: expectedVersion }),
+      },
+      headers,
+    );
   },
   presentation(worldId: string, headers: Record<string, string>): Promise<PresentationResponse> {
     return request<PresentationResponse>(`/api/v1/world/presentation?world_id=${worldId}`, {}, headers);

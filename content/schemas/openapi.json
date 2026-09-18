@@ -1859,6 +1859,259 @@
         "title": "IntentView",
         "type": "object"
       },
+      "InterventionCancelRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "title": "InterventionCancelRequest",
+        "type": "object"
+      },
+      "InterventionEditRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/InterventionScope"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "expected_version"
+        ],
+        "title": "InterventionEditRequest",
+        "type": "object"
+      },
+      "InterventionRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "client_request_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Client Request Id",
+            "type": "string"
+          },
+          "effective_at": {
+            "default": "next_boundary",
+            "maxLength": 32,
+            "title": "Effective At",
+            "type": "string"
+          },
+          "mode": {
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Mode",
+            "type": "string"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/InterventionScope"
+          },
+          "text": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id",
+          "client_request_id",
+          "text",
+          "mode"
+        ],
+        "title": "InterventionRequest",
+        "type": "object"
+      },
+      "InterventionScope": {
+        "additionalProperties": false,
+        "properties": {
+          "character_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Character Ids",
+            "type": "array"
+          },
+          "kind": {
+            "default": "world",
+            "maxLength": 32,
+            "title": "Kind",
+            "type": "string"
+          },
+          "location_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Location Ids",
+            "type": "array"
+          }
+        },
+        "title": "InterventionScope",
+        "type": "object"
+      },
+      "InterventionStepView": {
+        "additionalProperties": false,
+        "properties": {
+          "explanation": {
+            "default": "",
+            "title": "Explanation",
+            "type": "string"
+          },
+          "failure_reason": {
+            "default": "",
+            "title": "Failure Reason",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "result_activity_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Activity Id"
+          },
+          "result_event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Event Id"
+          },
+          "result_hook_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Hook Id"
+          },
+          "seq": {
+            "title": "Seq",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "seq",
+          "kind",
+          "status",
+          "version"
+        ],
+        "title": "InterventionStepView",
+        "type": "object"
+      },
+      "InterventionView": {
+        "additionalProperties": false,
+        "properties": {
+          "failure_reason": {
+            "default": "",
+            "title": "Failure Reason",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mode": {
+            "title": "Mode",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/InterventionStepView"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "status",
+          "mode",
+          "role",
+          "text",
+          "version"
+        ],
+        "title": "InterventionView",
+        "type": "object"
+      },
       "ItemGiveRequest": {
         "additionalProperties": false,
         "properties": {
@@ -4417,6 +4670,244 @@
         "summary": "Ready",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/interventions": {
+      "get": {
+        "description": "Queued and recent queue items with their step states.",
+        "operationId": "list_interventions_api_v1_interventions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/InterventionView"
+                  },
+                  "title": "Response List Interventions Api V1 Interventions Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Interventions",
+        "tags": [
+          "interventions"
+        ]
+      },
+      "post": {
+        "description": "Interpret and queue a direction; same client key replays the same item.",
+        "operationId": "submit_intervention_api_v1_interventions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterventionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Submit Intervention",
+        "tags": [
+          "interventions"
+        ]
+      }
+    },
+    "/api/v1/interventions/{intervention_id}": {
+      "get": {
+        "description": "Reconcile one queued command by id.",
+        "operationId": "read_intervention_api_v1_interventions__intervention_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intervention_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intervention Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Intervention",
+        "tags": [
+          "interventions"
+        ]
+      },
+      "patch": {
+        "description": "Reinterpret before claim; version-checked with restarted history.",
+        "operationId": "edit_intervention_api_v1_interventions__intervention_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intervention_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intervention Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterventionEditRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Edit Intervention",
+        "tags": [
+          "interventions"
+        ]
+      }
+    },
+    "/api/v1/interventions/{intervention_id}/cancel": {
+      "post": {
+        "description": "Cancel before application; executing work cannot stop.",
+        "operationId": "cancel_intervention_api_v1_interventions__intervention_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "intervention_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Intervention Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InterventionCancelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InterventionView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Cancel Intervention",
+        "tags": [
+          "interventions"
         ]
       }
     },

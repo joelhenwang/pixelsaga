@@ -7,7 +7,7 @@
 - [x] P04 asset pipeline and starter visual content. Next: P05.
 - [x] P05 world map, chronicle, selection. Next: P06.
 - [x] P06 reliable manual progression and autoplay. Next: P07.
-- [ ] P07 durable interventions and typed execution.
+- [x] P07 durable interventions and typed execution. Next: P08.
 - [ ] P08 adventure, player actions, character creation.
 - [ ] P09 persistent world events and multi-step direction.
 - [ ] P10 remaining screens and operational completeness.

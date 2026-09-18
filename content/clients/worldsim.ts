@@ -632,27 +632,6 @@ export interface PresentationResponse {
   world_id: string;
 }
 
-export interface JobRequest {
-  idempotency_key: string;
-  kind: string;
-  style_pack_version?: string | null;
-  subject_id?: string | null;
-  world_id?: string | null;
-}
-
-export interface JobView {
-  attempt_count: number;
-  error?: string | null;
-  id: string;
-  kind: string;
-  result_asset_id?: string | null;
-  status: string;
-  style_pack_version: string;
-  subject_id?: string | null;
-  version: number;
-  world_id?: string | null;
-}
-
 export interface AssetView {
   content_ref: string;
   height: number;
@@ -670,6 +649,56 @@ export interface AssetView {
 
 export interface EnsureStarterRequest {
   world_id: string;
+}
+
+export interface InterventionScope {
+  character_ids?: string[] | null;
+  kind?: string | null;
+  location_ids?: string[] | null;
+}
+
+export interface InterventionRequest {
+  client_request_id: string;
+  effective_at?: string | null;
+  mode: string;
+  scope?: InterventionScope | null;
+  text: string;
+  world_id: string;
+}
+
+export interface InterventionStepView {
+  explanation?: string | null;
+  failure_reason?: string | null;
+  id: string;
+  kind: string;
+  result_activity_id?: string | null;
+  result_event_id?: string | null;
+  result_hook_id?: string | null;
+  seq: number;
+  status: string;
+  version: number;
+}
+
+export interface InterventionView {
+  failure_reason?: string | null;
+  id: string;
+  mode: string;
+  role: string;
+  status: string;
+  steps?: InterventionStepView[] | null;
+  text: string;
+  version: number;
+  world_id: string;
+}
+
+export interface InterventionEditRequest {
+  expected_version: number;
+  scope?: InterventionScope | null;
+  text: string;
+}
+
+export interface InterventionCancelRequest {
+  expected_version: number;
 }
 
 export type WatcherHeaders = {
@@ -724,11 +753,14 @@ export const ROUTES = {
   listMacroRuns: "GET /api/v1/macro/runs",
   readLineage: "GET /api/v1/macro/lineage",
   listFocus: "GET /api/v1/macro/focus",
-  listEras: "GET /api/v1/macro/eras",
-  listEndings: "GET /api/v1/macro/endings",
   requestImageJob: "POST /api/v1/assets/jobs",
   readImageJob: "GET /api/v1/assets/jobs/{job_id}",
   ensureStarterAssets: "POST /api/v1/assets/ensure-starter",
+  submitIntervention: "POST /api/v1/interventions",
+  listInterventions: "GET /api/v1/interventions",
+  readIntervention: "GET /api/v1/interventions/{intervention_id}",
+  editIntervention: "PATCH /api/v1/interventions/{intervention_id}",
+  cancelIntervention: "POST /api/v1/interventions/{intervention_id}/cancel",
   evaluateEndings: "POST /api/v1/macro/endings/evaluate",
   assignFocus: "POST /api/v1/macro/focus/assign",
   cancelSchedule: "POST /api/v1/macro/schedules/{schedule_id}/cancel",

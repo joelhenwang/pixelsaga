@@ -1017,3 +1017,64 @@ class SimulationStatus(BaseModel):
     open_run_state: str | None = None
     latest_run_id: UUID | None = None
     latest_run_state: str | None = None
+
+class InterventionScope(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: str = Field(default="world", max_length=32)
+    character_ids: list[UUID] = Field(default_factory=list)
+    location_ids: list[UUID] = Field(default_factory=list)
+
+
+class InterventionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    client_request_id: str = Field(min_length=1, max_length=128)
+    text: str = Field(min_length=1, max_length=2000)
+    mode: str = Field(min_length=1, max_length=16)
+    scope: InterventionScope = Field(default_factory=InterventionScope)
+    effective_at: str = Field(default="next_boundary", max_length=32)
+
+
+class InterventionStepView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    seq: int
+    kind: str
+    status: str
+    explanation: str = ""
+    result_event_id: UUID | None = None
+    result_activity_id: UUID | None = None
+    result_hook_id: UUID | None = None
+    failure_reason: str = ""
+    version: int
+
+
+class InterventionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    status: str
+    mode: str
+    role: str
+    text: str
+    steps: list[InterventionStepView] = Field(default_factory=list)
+    failure_reason: str = ""
+    version: int
+
+
+class InterventionEditRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    text: str = Field(min_length=1, max_length=2000)
+    scope: InterventionScope = Field(default_factory=InterventionScope)
+    expected_version: int = Field(ge=0)
+
+
+class InterventionCancelRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    expected_version: int = Field(ge=0)
