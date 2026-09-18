@@ -321,7 +321,7 @@ def test_touch_without_save_never_desyncs(verbs: tuple[ApiClient, FakeGateway]) 
     drift that compare-and-bump-everything introduced."""
     client, gateway = verbs
     gateway.route = _route_for()
-    headers = {"X-Worldsim-Role": "watcher"}
+    headers = {"X-Worldsim-Role": "player", "X-Worldsim-Character": str(WREN_ID)}
     _setup_world(client, headers, {})
     for index, family in (
         (
