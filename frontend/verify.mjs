@@ -51,18 +51,18 @@ try {
     consoleErrors.length = 0;
   });
 
+  await check("switch to player", async () => {
+    await page.locator(".settings select").first().selectOption("player", { timeout: 12000 });
+    await page.getByText(/day 1/).first().waitFor({ timeout: 15000 });
+  });
+
   await check("advance renders scenes and beats", async () => {
     await page.getByRole("button", { name: /advance to/ }).click({ timeout: 12000 });
     await page.locator(".strip button").first().waitFor({ timeout: 60000 });
-    await page.locator(".strip button").first().click({ timeout: 12000 });
+    await page.locator(".strip button").last().click({ timeout: 12000 });
     await page.locator(".beat").first().waitFor({ timeout: 15000 });
     const beats = await page.locator(".beat").count();
     assert(beats > 0, "expected at least one beat");
-  });
-
-  await check("switch to player", async () => {
-    await page.locator(".settings select").first().selectOption("player", { timeout: 12000 });
-    await page.locator("#draft").waitFor({ timeout: 15000 });
   });
 
   await check("action submit queues without doubles", async () => {
@@ -107,11 +107,12 @@ try {
   await check("clean console", async () => {
     assert(consoleErrors.length === 0, consoleErrors.slice(0, 3).join(" | "));
   });
-
   await check("mobile layout renders action bar", async () => {
     const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
     try {
       await mobile.goto(base, { waitUntil: "networkidle" });
+      await mobile.getByRole("button", { name: "settings" }).click({ timeout: 12000 });
+      await mobile.locator(".settings select").first().selectOption("player", { timeout: 12000 });
       await mobile.locator(".composer input").waitFor({ timeout: 15000 });
       const box = await mobile.locator(".composer input").boundingBox();
       assert(box && box.width > 0, "composer not visible on mobile");

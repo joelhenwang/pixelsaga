@@ -26,11 +26,12 @@ router = APIRouter(tags=["interventions"])
 
 
 def _gateway_for(request: Request, role: UserRole) -> ModelGateway:
-    """The injected factory supplies the interpreting gateway directly."""
+    """The director model gateway interprets for every operating role."""
+    del role
     state = request.app.state.app_state
     if state.gateway_factory is stage0_gateway:
         gateways, _ = gateways_for_settings(state.settings, None)
-        return gateways[role.value]
+        return gateways["director"]
     return state.gateway_factory()
 
 
