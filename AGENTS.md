@@ -18,6 +18,7 @@ I like to prototype complex ideas into simple, production ready apps.
 - Typescript code that looks like Python code equals bad TypeScript code.
 - Do not edit real components first. For any non-trivial UI, layout, or copy change, build distinct static mocks (HTML + embedded vanilla JavaScript) and stop. Wait for a pick before implementing.
 - Standing constraints: true dark mode (`#000`), true white mode. Information dense, no decorative card/pill chrome, no light gray subtitle lines above sections. Minimal copy. No em dashes.
+- Revamp supersession (2026-09-18, settled in `docs/pixelsaga-revamp/SETTLED_DIRECTION.md`): warm ivory/teal/gold anime direction replaces the true black/white-only and no-card-chrome styling constraints for revamp surfaces. Retained: static-mock gate, KISS, type safety, minimal copy, no em dashes, no perpetual animation, architecture boundaries, verification.
 - Avoid continuously repainting CSS animations (pulse, shimmer, blur, spinners); GPU heavy
 
 # This project (pixelsaga / worldsim)

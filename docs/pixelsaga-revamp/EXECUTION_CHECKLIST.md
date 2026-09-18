@@ -1,7 +1,7 @@
 # Execution checklist
 
 - [x] P00 reconcile and baseline (`P00_BASELINE.md`). Next: P01.
-- [ ] P01 static prototypes (`mocks/revamp/`). Stop for pick.
+- [x] P01 static prototypes (`mocks/revamp/`). Direction settled in `SETTLED_DIRECTION.md`; gate passed.
 - [ ] P02 shell, tokens, errors, shared state.
 - [ ] P03 capability policy, identity linkage, presentation contracts.
 - [ ] P04 asset pipeline and starter visual content.
