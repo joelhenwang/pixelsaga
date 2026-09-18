@@ -999,6 +999,97 @@
         "title": "ClockResponse",
         "type": "object"
       },
+      "ConditionView": {
+        "additionalProperties": false,
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "ends_absolute": {
+            "title": "Ends Absolute",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "public_label": {
+            "title": "Public Label",
+            "type": "string"
+          },
+          "scope_location_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Scope Location Ids",
+            "type": "array"
+          },
+          "severity": {
+            "title": "Severity",
+            "type": "integer"
+          },
+          "started_absolute": {
+            "title": "Started Absolute",
+            "type": "integer"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "world_id",
+          "kind",
+          "public_label",
+          "severity",
+          "started_absolute",
+          "ends_absolute",
+          "status",
+          "version"
+        ],
+        "title": "ConditionView",
+        "type": "object"
+      },
+      "ConditionsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "conditions": {
+            "items": {
+              "$ref": "#/components/schemas/ConditionView"
+            },
+            "title": "Conditions",
+            "type": "array"
+          },
+          "world_id": {
+            "format": "uuid",
+            "title": "World Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "world_id"
+        ],
+        "title": "ConditionsResponse",
+        "type": "object"
+      },
       "CurrentPhaseResponse": {
         "additionalProperties": false,
         "properties": {
@@ -7504,6 +7595,50 @@
           }
         },
         "summary": "Get Clock",
+        "tags": [
+          "world"
+        ]
+      }
+    },
+    "/api/v1/world/conditions": {
+      "get": {
+        "description": "Active and past conditions; players see public labels only.",
+        "operationId": "get_conditions_api_v1_world_conditions_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "World Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConditionsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Conditions",
         "tags": [
           "world"
         ]

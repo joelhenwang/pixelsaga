@@ -10,6 +10,7 @@ from worldsim.application.ports.repositories import (
     AssetRepository,
     CharacterRepository,
     CommandRepository,
+    ConditionRepository,
     CostRepository,
     DigestRepository,
     EventRepository,
@@ -50,6 +51,8 @@ class UnitOfWork(Protocol):
     def party(self) -> PartyRepository: ...
     @property
     def interventions(self) -> InterventionRepository: ...
+    @property
+    def conditions(self) -> ConditionRepository: ...
     @property
     def assets(self) -> AssetRepository: ...
     @property

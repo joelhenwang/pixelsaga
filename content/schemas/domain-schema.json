@@ -8374,7 +8374,8 @@
             "action_resolved",
             "deity_override",
             "schedule_fired",
-            "world_ended"
+            "world_ended",
+            "condition_tick"
           ],
           "title": "EventType",
           "type": "string"
@@ -8755,7 +8756,8 @@
             "action_resolved",
             "deity_override",
             "schedule_fired",
-            "world_ended"
+            "world_ended",
+            "condition_tick"
           ],
           "title": "EventType",
           "type": "string"

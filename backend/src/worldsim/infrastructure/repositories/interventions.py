@@ -120,6 +120,21 @@ class SqlAlchemyInterventionRepository:
         ).scalars()
         return [self._to_intervention(row) for row in rows]
 
+    async def list_open_for_world(self, world_id: UUID) -> list[Intervention]:
+        rows = (
+            await self._session.execute(
+                select(InterventionRow)
+                .where(
+                    InterventionRow.world_id == world_id,
+                    InterventionRow.status.in_(
+                        [InterventionStatus.QUEUED.value, InterventionStatus.EXECUTING.value]
+                    ),
+                )
+                .order_by(InterventionRow.id)
+            )
+        ).scalars()
+        return [self._to_intervention(row) for row in rows]
+
     async def add_step(self, step: InterventionStep) -> None:
         self._session.add(
             InterventionStepRow(

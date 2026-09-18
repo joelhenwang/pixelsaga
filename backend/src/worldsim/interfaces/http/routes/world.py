@@ -6,7 +6,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Header, Query, Request
 
-from worldsim.application.capabilities import parse_role
+from worldsim.application.capabilities import is_omniscient, parse_role
 from worldsim.application.commands.seed_world import SeedService
 from worldsim.application.queries.presentation import (
     chronicle as chronicle_query,
@@ -166,3 +166,31 @@ async def get_chronicle(
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         return await chronicle_query(uow, world_id, parse_role(role), viewer, after, limit)
+
+@router.get("/world/conditions", response_model=api.ConditionsResponse)
+async def get_conditions(world_id: UUID, request: Request) -> api.ConditionsResponse:
+    """Active and past conditions; players see public labels only."""
+    role, _ = await effective_role(request, world_id)
+    parsed = parse_role(role)
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        conditions = await uow.conditions.list_for_world(world_id)
+    views: list[api.ConditionView] = []
+    for condition in conditions:
+        detail = condition.detail if is_omniscient(parsed) else ""
+        views.append(
+            api.ConditionView(
+                id=condition.id,
+                world_id=condition.world_id,
+                kind=condition.kind.value,
+                public_label=condition.public_label,
+                detail=detail,
+                scope_location_ids=list(condition.scope_location_ids),
+                severity=condition.severity,
+                started_absolute=condition.started_absolute,
+                ends_absolute=condition.ends_absolute,
+                status=condition.status.value,
+                version=condition.version,
+            )
+        )
+    return api.ConditionsResponse(world_id=world_id, conditions=views)

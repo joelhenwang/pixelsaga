@@ -705,6 +705,25 @@ export interface SuggestionView {
   title: string;
 }
 
+export interface ConditionView {
+  detail?: string | null;
+  ends_absolute: number;
+  id: string;
+  kind: string;
+  public_label: string;
+  scope_location_ids?: string[] | null;
+  severity: number;
+  started_absolute: number;
+  status: string;
+  version: number;
+  world_id: string;
+}
+
+export interface ConditionsResponse {
+  conditions?: ConditionView[] | null;
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -743,8 +762,7 @@ export const ROUTES = {
   listSkills: "GET /api/v1/stage2/skills",
   selectRole: "POST /api/v1/stage2/roles/select",
   readRole: "GET /api/v1/stage2/roles",
-  proposeDirectorHook: "POST /api/v1/stage2/director/proposals",
-  applyDeityOverride: "POST /api/v1/stage2/deity/overrides",
+  readConditions: "GET /api/v1/world/conditions",
   listTimeline: "GET /api/v1/stage2/timeline",
   readMap: "GET /api/v1/stage2/map",
   readDiary: "GET /api/v1/stage2/characters/{character_id}/diary",

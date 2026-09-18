@@ -29,6 +29,7 @@ from worldsim.domain.ids import new_arc_id, new_hook_id, new_intervention_id
 from worldsim.domain.interventions import (
     SUPPORTED_ACTIVITY_KINDS,
     SUPPORTED_ATTEMPT_FAMILIES,
+    CreateConditionStep,
     DirectActivityStep,
     DirectAttemptStep,
     Interpretation,
@@ -37,8 +38,7 @@ from worldsim.domain.interventions import (
     InterventionMode,
     InterventionStatus,
     InterventionStep,
-    ProposeArcStep,
-    ProposeHookStep,
+    OverrideCharacterStep,
     StepKind,
     StepStatus,
     new_intervention_steps,
@@ -59,7 +59,8 @@ _SYSTEM = (
     "direct_activity: {character_id, activity, to_location_id?, duration?} - start one activity. "
     "direct_attempt: {character_id, family, action} - one resolved attempt. "
     "override_character: {character_id, stamina?, mana?, life_status?, conditions[], retcon?}. "
-    "Rules: use only the supplied IDs; at most 5 steps; never invent entities or outcomes. "
+    "world_condition: {label, detail?, location_ids[], severity 1-5, duration_phases} - "
+    "a persistent illness with bounded effects; God mode only. "
     "Lethal combat is unsupported: say so in clarification and offer sparring. "
     "Ambiguous references go in clarification with candidates; steps stay empty."
 )
@@ -191,10 +192,10 @@ def _validate_plan(
 def _validate_step(
     step: InterpretationStep, by_id: dict[UUID, Any], loc_by_id: dict[UUID, Any]
 ) -> tuple[InterventionStatus, str] | None:
-    if isinstance(step, (ProposeHookStep, ProposeArcStep)):
-        unknown = [c for c in step.participant_ids if c not in by_id]
+    if isinstance(step, CreateConditionStep):
+        unknown = [loc for loc in step.location_ids if loc not in loc_by_id]
         if unknown:
-            return InterventionStatus.NEEDS_CLARIFICATION, "one participant is unknown"
+            return InterventionStatus.NEEDS_CLARIFICATION, "the condition scope is unknown"
         return None
     if isinstance(step, DirectActivityStep):
         if step.activity not in SUPPORTED_ACTIVITY_KINDS:
@@ -217,7 +218,7 @@ def _validate_step(
         except Exception:
             return InterventionStatus.NEEDS_CLARIFICATION, "the attempt details do not parse"
         return None
-    else:
+    elif isinstance(step, OverrideCharacterStep):
         if step.character_id not in by_id:
             return InterventionStatus.NEEDS_CLARIFICATION, "the character is unknown"
         if all(
@@ -231,6 +232,7 @@ def _validate_step(
             except ValueError:
                 return InterventionStatus.FAILED, f"unknown life status: {step.life_status}"
         return None
+    return None
 
 
 async def submit(
@@ -294,7 +296,8 @@ async def submit(
         )
         try:
             await uow.interventions.add_intervention(intervention)
-            for step in new_intervention_steps(intervention.id, list(interpretation.steps)):
+            steps = _chain_travel(new_intervention_steps(intervention.id, list(interpretation.steps)))
+            for step in steps:
                 await uow.interventions.add_step(step)
             await uow.commit()
         except Exception:
@@ -306,16 +309,37 @@ async def submit(
         return intervention
 
 
+def _chain_travel(steps: list[InterventionStep]) -> list[InterventionStep]:
+    """Link consecutive travel legs for one character across boundaries."""
+    last_travel: dict[str, int] = {}
+    chained: list[InterventionStep] = []
+    for step in steps:
+        if step.kind == StepKind.DIRECT_ACTIVITY and step.targets.get("activity") == "travel":
+            actor = str(step.targets.get("character_id", ""))
+            if actor in last_travel:
+                targets = dict(step.targets)
+                targets["after_seq"] = last_travel[actor]
+                chained.append(step.model_copy(update={"targets": targets}))
+                last_travel[actor] = step.seq
+                continue
+            last_travel[actor] = step.seq
+        chained.append(step)
+    return chained
+
+
 async def claim_for_boundary(
     factory: Callable[[], UnitOfWork], world_id: UUID, owner: str
 ) -> list[tuple[Intervention, list[InterventionStep]]]:
-    """Claim queued (and stranded executing) items for one boundary."""
+    """Claim open items for one boundary, including stranded executing ones."""
     async with factory() as uow:
-        queued = await uow.interventions.list_queued_for_world(world_id)
+        queued = await uow.interventions.list_open_for_world(world_id)
         batch: list[tuple[Intervention, list[InterventionStep]]] = []
         for intervention in queued:
-            claimed = intervention.model_copy(update={"status": InterventionStatus.EXECUTING})
-            saved = await uow.interventions.save_intervention(claimed, intervention.version)
+            if intervention.status == InterventionStatus.QUEUED:
+                claimed = intervention.model_copy(update={"status": InterventionStatus.EXECUTING})
+                saved = await uow.interventions.save_intervention(claimed, intervention.version)
+            else:
+                saved = intervention
             steps = await uow.interventions.list_steps(intervention.id)
             batch.append((saved, steps))
         await uow.commit()
@@ -333,13 +357,28 @@ async def apply_batch(
     directed: dict[UUID, ActionIntent] = {}
     async with factory() as uow:
         characters = {c.id: c for c in await uow.characters.list_for_world(world_id)}
+        actives = await uow.activities.list_active_for_world(world_id)
+    active_actors = {a.character_id for a in actives}
     for intervention, steps in batch:
+        done = {step.seq for step in steps if step.status == StepStatus.COMPLETED}
         for step in steps:
             if step.status != StepStatus.QUEUED:
                 continue
+            dep = step.targets.get("after_seq")
+            if isinstance(dep, int) and dep not in done:
+                continue
+            if isinstance(dep, int):
+                actor_raw = step.targets.get("character_id")
+                try:
+                    actor = UUID(str(actor_raw))
+                except ValueError:
+                    actor = None
+                if actor is not None and actor in active_actors:
+                    continue
             try:
                 attempt, current = await _apply_step(
-                    factory, world_id, index, step, characters, player_actors, directed
+                    factory, world_id, index, step, characters, player_actors, directed,
+                    intervention.id,
                 )
                 if attempt is not None:
                     directed[attempt[0]] = attempt[1]
@@ -366,7 +405,9 @@ async def _finish_intervention(
     async with factory() as uow:
         steps = await uow.interventions.list_steps(intervention.id)
         states = {step.status for step in steps}
-        if states <= {StepStatus.COMPLETED}:
+        if StepStatus.QUEUED in states:
+            status = InterventionStatus.EXECUTING
+        elif states <= {StepStatus.COMPLETED}:
             status = InterventionStatus.COMPLETED
         elif StepStatus.COMPLETED in states:
             status = InterventionStatus.PARTIALLY_COMPLETED
@@ -387,6 +428,7 @@ async def _apply_step(
     characters: dict[UUID, Any],
     player_actors: set[UUID],
     directed: dict[UUID, ActionIntent],
+    intervention_id: UUID,
 ) -> tuple[tuple[UUID, ActionIntent] | None, InterventionStep]:
     targets = step.targets
     if step.kind == StepKind.DIRECT_ACTIVITY:
@@ -399,6 +441,9 @@ async def _apply_step(
         return None, step
     if step.kind == StepKind.OVERRIDE_CHARACTER:
         await _apply_override(factory, world_id, index, targets)
+        return None, step
+    if step.kind == StepKind.WORLD_CONDITION:
+        await _create_condition(factory, world_id, index, step, targets, intervention_id)
         return None, step
     raise DomainError(ErrorCode.VALIDATION_FAILED, f"unsupported step: {step.kind.value}")
 
@@ -478,6 +523,14 @@ def _direct_attempt(
     action = dict(targets.get("action") or {})
     action.setdefault("character_id", str(character_id))
     intent = _ACTION_ADAPTER.validate_python({"family": targets["family"], **action})
+    if targets["family"] in ("spar", "communicate", "transfer"):
+        other_raw = action.get("target_character_id")
+        other = characters.get(UUID(str(other_raw))) if other_raw else None
+        if other is None or other.location_id != characters[character_id].location_id:
+            raise DomainError(
+                ErrorCode.PRECONDITION_FAILED,
+                "actors are not co-located; arrange travel first",
+            )
     return character_id, intent
 
 
@@ -533,19 +586,48 @@ async def _apply_override(
     )
 
 
+async def _create_condition(
+    factory: Callable[[], UnitOfWork],
+    world_id: UUID,
+    index: int,
+    step: InterventionStep,
+    targets: dict[str, Any],
+    intervention_id: UUID,
+) -> None:
+    from worldsim.application.conditions import create_condition
+    from worldsim.domain.conditions import ConditionType
+
+    async with factory() as uow:
+        existing = await uow.conditions.list_active_for_world(world_id)
+        if any(c.public_label == targets["label"] for c in existing):
+            return
+    duration = int(targets.get("duration_phases") or 1)
+    async with factory() as uow:
+        await create_condition(
+            uow,
+            world_id,
+            ConditionType.ILLNESS,
+            str(targets["label"]),
+            str(targets.get("detail", "")),
+            [UUID(str(loc)) for loc in targets.get("location_ids", [])],
+            int(targets["severity"]),
+            index,
+            index + duration,
+            source_intervention_id=intervention_id,
+        )
+
+
 async def cancel(
     factory: Callable[[], UnitOfWork], intervention_id: UUID, expected_version: int
 ) -> Intervention:
-    """Cancel before claim; executing work reports that it cannot stop."""
+    """Cancel queued work; completed history is preserved, not rewritten."""
     async with factory() as uow:
         intervention = await uow.interventions.get_intervention(intervention_id)
-        if intervention.status == InterventionStatus.EXECUTING:
-            raise DomainError(
-                ErrorCode.PRECONDITION_FAILED, "execution started; cancellation is too late"
-            )
         if intervention.status not in (
             InterventionStatus.QUEUED,
             InterventionStatus.NEEDS_CLARIFICATION,
+            InterventionStatus.EXECUTING,
+            InterventionStatus.PARTIALLY_COMPLETED,
         ):
             raise DomainError(
                 ErrorCode.PRECONDITION_FAILED, f"cannot cancel {intervention.status.value}"
@@ -623,7 +705,7 @@ async def edit_text(
             await uow.interventions.save_step(
                 old.model_copy(update={"status": StepStatus.CANCELLED}), old.version
             )
-        for step in new_intervention_steps(saved.id, list(interpretation.steps)):
+        for step in _chain_travel(new_intervention_steps(saved.id, list(interpretation.steps))):
             await uow.interventions.add_step(step)
         await uow.commit()
         return saved

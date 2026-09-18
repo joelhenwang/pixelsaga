@@ -19,6 +19,7 @@ from worldsim.application.capabilities import (
     parse_role,
     require_capability,
 )
+from worldsim.application.conditions import active_conditions
 from worldsim.application.execution import guarded, new_owner
 from worldsim.application.macro.endings import evaluate_endings
 from worldsim.application.macro.engine import MacroEngine
@@ -222,6 +223,13 @@ async def macro_advance(
     engine = _engine_of(request)
     state = request.app.state.app_state
     factory = state.uow_factory()
+    pending = await active_conditions(factory, body.world_id)
+    if pending:
+        raise DomainError(
+            ErrorCode.PRECONDITION_FAILED,
+            "active world conditions must resolve before macro advance: "
+            + ", ".join(c.public_label for c in pending),
+        )
 
     async def _hook(world_id: UUID, start: int, end: int) -> int | None:
         return await find_break(factory, world_id, start, end)

@@ -300,3 +300,10 @@ def new_intervention_id() -> InterventionId:
 
 def new_intervention_step_id() -> InterventionStepId:
     return uuid4()
+
+
+WorldConditionId = UUID
+
+
+def new_world_condition_id() -> WorldConditionId:
+    return uuid4()

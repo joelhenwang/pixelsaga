@@ -1090,3 +1090,26 @@ class SuggestionView(BaseModel):
     target_character_id: UUID | None = None
     destination_location_id: UUID | None = None
     needs_topic: bool = False
+
+
+class ConditionView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID
+    kind: str
+    public_label: str
+    detail: str = ""
+    scope_location_ids: list[UUID] = Field(default_factory=list)
+    severity: int
+    started_absolute: int
+    ends_absolute: int
+    status: str
+    version: int
+
+
+class ConditionsResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID
+    conditions: list[ConditionView] = Field(default_factory=list)

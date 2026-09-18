@@ -9,6 +9,6 @@
 - [x] P06 reliable manual progression and autoplay. Next: P07.
 - [x] P07 durable interventions and typed execution. Next: P08.
 - [x] P08 adventure, player actions, character creation. Next: P09.
-- [ ] P09 persistent world events and multi-step direction.
+- [x] P09 persistent world events and multi-step direction. Next: P10.
 - [ ] P10 remaining screens and operational completeness.
 - [ ] P11 integrated verification and release handoff.

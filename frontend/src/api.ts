@@ -5,6 +5,7 @@ import type {
   CharacterDetail,
   CharacterSummary,
   ChronicleResponse,
+  ConditionsResponse,
   DiaryResponse,
   EndingsResponse,
   EraView,
@@ -383,6 +384,9 @@ export const api = {
   listAssets(worldId: string, kind: string | null, headers: Record<string, string>): Promise<AssetView[]> {
     const query = kind ? `?world_id=${worldId}&kind=${kind}` : `?world_id=${worldId}`;
     return request<AssetView[]>(`/api/v1/assets${query}`, {}, headers);
+  },
+  worldConditions(worldId: string, headers: Record<string, string>): Promise<ConditionsResponse> {
+    return request<ConditionsResponse>(`/api/v1/world/conditions?world_id=${worldId}`, {}, headers);
   },
   presentation(worldId: string, headers: Record<string, string>): Promise<PresentationResponse> {
     return request<PresentationResponse>(`/api/v1/world/presentation?world_id=${worldId}`, {}, headers);

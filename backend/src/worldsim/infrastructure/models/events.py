@@ -62,7 +62,7 @@ class WorldEventRow(Base):
         CheckConstraint("sequence >= 1", name="ck_event_sequence"),
         CheckConstraint(
             "event_type IN ('world_seeded','world_ticked','macro_ticked','action_resolved',"
-            "'schedule_fired','deity_override','world_ended')",
+            "'schedule_fired','deity_override','world_ended','condition_tick')",
             name="ck_event_type",
         ),
         CheckConstraint("schema_version >= 1", name="ck_event_schema"),

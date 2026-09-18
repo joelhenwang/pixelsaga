@@ -56,6 +56,7 @@ class StepKind(StrEnum):
     DIRECT_ACTIVITY = "direct_activity"
     DIRECT_ATTEMPT = "direct_attempt"
     OVERRIDE_CHARACTER = "override_character"
+    WORLD_CONDITION = "world_condition"
 
 
 #: Attempt families with executable resolvers. Sparring is not hostile
@@ -113,12 +114,22 @@ class OverrideCharacterStep(_StepBase):
     retcon: bool = False
 
 
+class CreateConditionStep(_StepBase):
+    kind: Literal[StepKind.WORLD_CONDITION] = StepKind.WORLD_CONDITION
+    label: str = Field(min_length=1, max_length=128)
+    detail: str = Field(default="", max_length=1024)
+    location_ids: list[LocationId] = Field(min_length=1)
+    severity: int = Field(ge=1, le=5)
+    duration_phases: int = Field(ge=1, le=60)
+
+
 InterpretationStep = Annotated[
     ProposeHookStep
     | ProposeArcStep
     | DirectActivityStep
     | DirectAttemptStep
-    | OverrideCharacterStep,
+    | OverrideCharacterStep
+    | CreateConditionStep,
     Field(discriminator="kind"),
 ]
 
@@ -185,6 +196,7 @@ def new_intervention_steps(
 __all__ = [
     "DirectActivityStep",
     "DirectAttemptStep",
+    "CreateConditionStep",
     "Interpretation",
     "InterpretationStep",
     "Intervention",

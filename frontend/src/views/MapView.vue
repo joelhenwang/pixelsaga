@@ -153,12 +153,20 @@ async function reloadQueue(): Promise<void> {
   }
 }
 
+const conditions = ref<{ public_label: string; status: string }[]>([]);
+
 async function reload(): Promise<void> {
   faceSrc.value = {};
   mapSrc.value = "";
   await loadProjection(fail);
   await resolveFaces();
   await reloadQueue();
+  try {
+    const response = await api.worldConditions(worldId.value, headers.value);
+    conditions.value = (response.conditions ?? []).filter((c) => c.status === "active");
+  } catch {
+    conditions.value = [];
+  }
 }
 
 async function submitCommand(): Promise<void> {
@@ -304,6 +312,7 @@ watch(worldId, () => {
     </div>
     <aside class="chronicle" aria-label="Chronicle">
       <h1>World Chronicle</h1>
+      <p v-for="c in conditions" :key="c.public_label" class="condition">✦ {{ c.public_label }}</p>
       <div class="filters" role="group" aria-label="Filters">
         <button
           v-for="f in (['meaningful', 'all', 'following', 'major'] as const)"
@@ -381,6 +390,7 @@ watch(worldId, () => {
 .accesslist { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--text-secondary); }
 .accesslist button { border: 1px solid var(--border-subtle); background: var(--surface-panel); border-radius: 12px; padding: 1px 10px; cursor: pointer; font-size: 12px; }
 .chronicle { background: var(--surface-panel); border-left: 1px solid var(--border-subtle); overflow-y: auto; padding: 12px 14px; max-height: calc(100vh - 44px); }
+.chronicle .condition { border: 1px solid var(--accent-magic); border-radius: 10px; padding: 6px 10px; font-size: 13px; background: #f6f1fb; margin: 0 0 6px; }
 .chronicle h1 { font-family: var(--font-title); font-size: 17px; margin: 0 0 8px; }
 .filters { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
 .filters button { border: 1px solid var(--border-subtle); background: #fff; border-radius: 14px; padding: 2px 10px; cursor: pointer; font-size: 12.5px; }
