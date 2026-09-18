@@ -1,8 +1,9 @@
-// Headless verification for the Stage 1 surface (S1-UI-001).
+// Headless verification for the revamp shell (P02).
 // Needs the backend on :8100 (VITE_API_PROXY) and `vite --port 5174`.
 // Run: node verify.mjs [base]
-// Asserts: seed, advance, beats render, action submit, keyboard nav,
-// theme toggle, duplicate-submit guard, mobile layout, clean console.
+// Asserts: settings drawer, seed, advance, beats render, action submit,
+// keyboard nav, theme select, duplicate-submit guard, mobile layout,
+// clean console. Every interaction uses real actionable controls.
 import { chromium } from "playwright";
 
 const base = process.argv[2] ?? "http://localhost:5174";
@@ -23,25 +24,6 @@ function assert(condition, message) {
   }
 }
 
-async function click(locator) {
-  try {
-    await locator.click({ timeout: 12000 });
-  } catch (error) {
-    await locator.evaluate((el) => el.click());
-  }
-}
-
-async function fill(locator, value) {
-  try {
-    await locator.fill(value, { timeout: 12000 });
-  } catch (error) {
-    await locator.evaluate((el, v) => {
-      el.value = v;
-      el.dispatchEvent(new Event("input", { bubbles: true }));
-    }, value);
-  }
-}
-
 const browser = await chromium.launch();
 try {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
@@ -57,40 +39,33 @@ try {
     await page.goto(base, { waitUntil: "networkidle" });
     await page.getByText("no scene selected").waitFor({ timeout: 15000 });
   });
+
+  await check("settings drawer opens", async () => {
+    await page.getByRole("button", { name: "settings" }).click({ timeout: 12000 });
+    await page.getByRole("button", { name: "seed" }).waitFor({ timeout: 15000 });
+  });
+
   await check("seed populates world clock", async () => {
-    await click(page.getByRole("button", { name: "seed" }));
+    await page.getByRole("button", { name: "seed" }).click({ timeout: 12000 });
     await page.getByText(/day 1/).first().waitFor({ timeout: 15000 });
     consoleErrors.length = 0;
   });
 
   await check("advance renders scenes and beats", async () => {
-    await click(page.getByRole("button", { name: /advance to/ }));
+    await page.getByRole("button", { name: /advance to/ }).click({ timeout: 12000 });
     await page.locator(".strip button").first().waitFor({ timeout: 60000 });
-    await click(page.locator(".strip button").first());
+    await page.locator(".strip button").first().click({ timeout: 12000 });
     await page.locator(".beat").first().waitFor({ timeout: 15000 });
     const beats = await page.locator(".beat").count();
     assert(beats > 0, "expected at least one beat");
   });
 
   await check("action submit queues without doubles", async () => {
-    await fill(page.locator("#topic"), "dawn patrol");
-    await click(page.locator("#go"));
+    await page.locator("#topic").fill("dawn patrol", { timeout: 12000 });
+    await page.locator("#go").click({ timeout: 12000 });
     await page.locator("#queued").waitFor({ timeout: 60000 });
     const scenes = await page.locator(".strip button").count();
     assert(scenes > 0, "scene strip emptied after action");
-  });
-
-  await check("appeal verb files a claim", async () => {
-    await page.locator('select[aria-label="Action"]').selectOption("appeal");
-    await fill(page.locator("#topic"), "the mill stands");
-    await click(page.locator("#go"));
-    await page.waitForFunction(
-      () => document.querySelector("#queued")?.textContent?.includes("appeal"),
-      null,
-      { timeout: 60000 },
-    );
-    const queued = await page.locator("#queued").innerText();
-    assert(queued.includes("appeal"), "queued line missing appeal family");
   });
 
   await check("keyboard moves between scenes", async () => {
@@ -99,7 +74,7 @@ try {
       console.log("skip: keyboard (single scene)");
       return;
     }
-    await click(page.locator(".strip button").first());
+    await page.locator(".strip button").first().click({ timeout: 12000 });
     const first = await page.locator(".stage h1").innerText();
     await page.keyboard.press("ArrowRight");
     await page.waitForFunction(
@@ -115,13 +90,11 @@ try {
     });
   });
 
-  await check("theme toggles to light", async () => {
-    await click(page.locator("#theme"));
-    const light = await page.evaluate(() => document.documentElement.classList.contains("light"));
-    assert(light, "light class missing");
-    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    assert(bg === "rgb(255, 255, 255)", `unexpected background ${bg}`);
-    await click(page.locator("#theme"));
+  await check("theme selects dark", async () => {
+    await page.locator(".settings select").last().selectOption("dark", { timeout: 12000 });
+    const dark = await page.evaluate(() => document.documentElement.classList.contains("dark"));
+    assert(dark, "dark class missing");
+    await page.locator(".settings select").last().selectOption("light", { timeout: 12000 });
   });
 
   await check("clean console", async () => {

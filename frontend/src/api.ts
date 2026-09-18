@@ -30,21 +30,59 @@ import type {
 
 export type Role = "watcher" | "player";
 
+export type ErrorKind =
+  | "transport"
+  | "auth"
+  | "forbidden"
+  | "empty"
+  | "conflict"
+  | "validation"
+  | "unknown";
+
+export class ApiError extends Error {
+  readonly status: number;
+  readonly code: string;
+  readonly requestId: string;
+  readonly kind: ErrorKind;
+  readonly retryable: boolean;
+
+  constructor(status: number, code: string, message: string, requestId: string) {
+    super(message);
+    this.status = status;
+    this.code = code;
+    this.requestId = requestId;
+    this.kind = kindFor(status, code);
+    this.retryable = status === 429 || status >= 500;
+  }
+}
+
+export function kindFor(status: number, code: string): ErrorKind {
+  if (status === 0) {
+    return "transport";
+  }
+  if (status === 401) {
+    return "auth";
+  }
+  if (status === 403) {
+    return "forbidden";
+  }
+  if (status === 404) {
+    return code === "WORLD_NOT_FOUND" ? "empty" : "unknown";
+  }
+  if (status === 409) {
+    return "conflict";
+  }
+  if (status === 422) {
+    return "validation";
+  }
+  return "unknown";
+}
+
 export function headersFor(role: Role, characterId: string | null): WatcherHeaders | PlayerHeaders {
   if (role === "player" && characterId) {
     return { "X-Worldsim-Role": "player", "X-Worldsim-Character": characterId };
   }
   return { "X-Worldsim-Role": "watcher" };
-}
-
-function errorCode(body: unknown, status: number): string {
-  if (body && typeof body === "object" && "error" in body) {
-    const nested = body.error;
-    if (nested && typeof nested === "object" && "code" in nested && typeof nested.code === "string") {
-      return nested.code;
-    }
-  }
-  return `HTTP_${status}`;
 }
 
 function mergeHeaders(base: Record<string, string>, extra: RequestInit["headers"]): Record<string, string> {
@@ -64,32 +102,64 @@ function mergeHeaders(base: Record<string, string>, extra: RequestInit["headers"
   return { ...base, ...extra };
 }
 
-async function request<T>(path: string, init: RequestInit, headers: Record<string, string>): Promise<T> {
+export interface RequestOptions {
+  signal?: AbortSignal;
+}
+
+async function request<T>(
+  path: string,
+  init: RequestInit,
+  headers: Record<string, string>,
+  options: RequestOptions = {},
+): Promise<T> {
+  // Only safe reads retry. Writes never replay: a retry could double-apply.
+  const safe = !init.method || init.method === "GET";
   let attempt = 0;
   for (;;) {
+    let response: Response;
     try {
-      const response = await fetch(path, { ...init, headers: mergeHeaders(headers, init.headers) });
-      if (!response.ok) {
-        const body: unknown = await response.json().catch(() => ({}));
-        throw new Error(`${response.status}: ${errorCode(body, response.status)}`);
-      }
-      return (await response.json()) as T;
+      response = await fetch(path, { ...init, headers: mergeHeaders(headers, init.headers), signal: options.signal });
     } catch (error) {
-      attempt += 1;
-      const message = error instanceof Error ? error.message : "";
-      if (attempt > 2 || message.startsWith("403") || message.startsWith("422")) {
+      if (error instanceof DOMException && error.name === "AbortError") {
         throw error;
       }
-      const { promise, resolve } = Promise.withResolvers<void>();
-      setTimeout(resolve, 300 * attempt);
-      await promise;
+      attempt += 1;
+      if (!safe || attempt > 2) {
+        throw new ApiError(0, "TRANSPORT", "request failed", "");
+      }
+      const backoff = Promise.withResolvers<void>();
+      setTimeout(backoff.resolve, 300 * attempt);
+      await backoff.promise;
+      continue;
     }
+    if (!response.ok) {
+      const body: unknown = await response.json().catch(() => ({}));
+      const nested = body && typeof body === "object" && "error" in body ? body.error : null;
+      const code =
+        nested && typeof nested === "object" && "code" in nested && typeof nested.code === "string"
+          ? nested.code
+          : `HTTP_${response.status}`;
+      const message =
+        nested && typeof nested === "object" && "message" in nested && typeof nested.message === "string"
+          ? nested.message
+          : `${response.status} ${code}`;
+      const error = new ApiError(response.status, code, message, response.headers.get("X-Request-ID") ?? "");
+      attempt += 1;
+      if (safe && error.retryable && attempt <= 2) {
+        const retry = Promise.withResolvers<void>();
+        setTimeout(retry.resolve, 300 * attempt);
+        await retry.promise;
+        continue;
+      }
+      throw error;
+    }
+    return (await response.json()) as T;
   }
 }
 
 export const api = {
-  characters(worldId: string, headers: Record<string, string>): Promise<CharacterSummary[]> {
-    return request<CharacterSummary[]>(`/api/v1/stage1/characters?world_id=${worldId}`, {}, headers);
+  characters(worldId: string, headers: Record<string, string>, options: RequestOptions = {}): Promise<CharacterSummary[]> {
+    return request<CharacterSummary[]>(`/api/v1/stage1/characters?world_id=${worldId}`, {}, headers, options);
   },
   character(id: string, headers: Record<string, string>): Promise<CharacterDetail> {
     return request<CharacterDetail>(`/api/v1/stage1/characters/${id}`, {}, headers);
@@ -119,11 +189,17 @@ export const api = {
       headers,
     );
   },
+  world(headers: Record<string, string>, options: RequestOptions = {}): Promise<{ id: string; day: number; phase: string }> {
+    return request("/api/v1/world", {}, headers, options);
+  },
+  seed(headers: Record<string, string>): Promise<{ world_id: string; duplicate: boolean }> {
+    return request("/api/v1/world/seed", { method: "POST" }, headers);
+  },
+  currentPhase(headers: Record<string, string>, options: RequestOptions = {}): Promise<{ absolute_index: number }> {
+    return request("/api/v1/world/phases/current", {}, headers, options);
+  },
   timeline(worldId: string, headers: Record<string, string>, after = 0, limit = 20): Promise<TimelineResponse> {
     return request<TimelineResponse>(`/api/v1/stage2/timeline?world_id=${worldId}&after=${after}&limit=${limit}`, {}, headers);
-  },
-  world(headers: Record<string, string>): Promise<{ id: string; day: number; phase: string }> {
-    return request("/api/v1/world", {}, headers);
   },
   map(worldId: string, headers: Record<string, string>): Promise<MapResponse> {
     return request<MapResponse>(`/api/v1/stage2/map?world_id=${worldId}`, {}, headers);

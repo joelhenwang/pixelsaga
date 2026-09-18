@@ -13,11 +13,14 @@ export const router = createRouter({
   routes: [
     { path: "/", redirect: "/scene" },
     { path: "/scene", component: SceneView },
+    { path: "/adventure", redirect: "/scene" },
     { path: "/party", component: PartyView },
     { path: "/timeline", component: TimelineView },
     { path: "/map", component: MapView },
+    { path: "/world", redirect: "/map" },
     { path: "/diary", component: DiaryView },
     { path: "/relations", component: RelationsView },
     { path: "/generations", component: GenerationsView },
+    { path: "/operations", component: OpsView },
   ],
 });

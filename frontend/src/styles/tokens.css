@@ -1,0 +1,28 @@
+/* Settled revamp design tokens (P02). Warm light is the default surface;
+ * `html.dark` restores the true-black developer theme. */
+:root {
+  --surface-page: #f7f4ed;
+  --surface-panel: #fffcf7;
+  --text-primary: #253247;
+  --text-secondary: #627084;
+  --action-primary: #216b63;
+  --accent-magic: #7155a5;
+  --accent-social: #b84f68;
+  --accent-gold: #a8792b;
+  --status-danger: #ba5148;
+  --border-subtle: #ddd8ce;
+  --radius-panel: 12px;
+  --radius-control: 8px;
+  --font-body: -apple-system, "Source Sans 3", "Segoe UI", sans-serif;
+  --font-title: Georgia, "Source Serif 4", serif;
+}
+
+html.dark {
+  --surface-page: #000;
+  --surface-panel: #101018;
+  --text-primary: #e0e0e0;
+  --text-secondary: #888;
+  --action-primary: #6b9dff;
+  --accent-gold: #e0a63c;
+  --border-subtle: #2a2a4a;
+}

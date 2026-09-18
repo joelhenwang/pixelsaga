@@ -2,7 +2,7 @@
 import { onMounted, onUnmounted, ref } from "vue";
 import type { BeatView, SceneDetail, SceneSummary } from "@gen";
 import { api } from "../api";
-import { busy, characters, characterId, clock, fail, headers, nextIndex, refresh, role, worldId } from "../store";
+import { advance, busy, characters, characterId, clock, fail, headers, nextIndex, refresh, role, worldId } from "../store";
 import Portrait from "../Portrait.vue";
 
 const scenes = ref<SceneSummary[]>([]);
@@ -28,25 +28,18 @@ async function selectScene(id: string): Promise<void> {
 }
 
 async function advanceHere(): Promise<void> {
-  if (busy.value) {
+  const runId = await advance();
+  if (!runId) {
     return;
   }
-  busy.value = true;
   try {
-    const report = await api.advance(worldId.value, nextIndex.value, headers.value);
-    nextIndex.value = report.absolute_index + 1;
-    quietPhase.value = report.quiet ?? false;
-    const summaries = await api.scenes(report.run_id, headers.value);
+    const summaries = await api.scenes(runId, headers.value);
     scenes.value = summaries;
     if (summaries.length > 0) {
       await selectScene(summaries[summaries.length - 1].id);
     }
-    const world = await api.world(headers.value);
-    clock.value = `day ${world.day}, ${world.phase}`;
   } catch (error) {
-    fail("advance failed", error);
-  } finally {
-    busy.value = false;
+    fail("scene load failed", error);
   }
 }
 
