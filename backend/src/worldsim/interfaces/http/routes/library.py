@@ -12,13 +12,15 @@ import json
 from typing import Any
 from uuid import UUID
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from pydantic import TypeAdapter
 
+from worldsim.domain.assets import AssetRecord
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import new_preset_id
 from worldsim.domain.presets import Preset, PresetKind, PresetPayload, PresetRevision
 from worldsim.domain.time import utcnow
+from worldsim.infrastructure.storage.local import LocalStorage
 from worldsim.interfaces.http import schemas as api
 
 router = APIRouter(tags=["library"])
@@ -163,34 +165,28 @@ async def add_revision(
 
 @router.post("/library/presets/{preset_id}/archive", response_model=api.PresetDetail)
 async def archive_preset(
-    preset_id: UUID, body: api.StoryArchiveRequest, request: Request
+    preset_id: UUID, body: api.PresetArchiveRequest, request: Request
 ) -> api.PresetDetail:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
-        preset = await uow.presets.get_preset(preset_id)
-        await uow.presets.save_preset(
-            preset.model_copy(update={"archived_at": utcnow()}), body.expected_version
-        )
+        await uow.presets.set_archived(preset_id, utcnow(), body.expected_version)
         await uow.commit()
     return await _detail(request, preset_id)
 
 
 @router.post("/library/presets/{preset_id}/unarchive", response_model=api.PresetDetail)
 async def unarchive_preset(
-    preset_id: UUID, body: api.StoryArchiveRequest, request: Request
+    preset_id: UUID, body: api.PresetArchiveRequest, request: Request
 ) -> api.PresetDetail:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
-        preset = await uow.presets.get_preset(preset_id)
-        await uow.presets.save_preset(
-            preset.model_copy(update={"archived_at": None}), body.expected_version
-        )
+        await uow.presets.set_archived(preset_id, None, body.expected_version)
         await uow.commit()
     return await _detail(request, preset_id)
 
 
 @router.get("/library/presets/{preset_id}/export")
-async def export_preset(preset_id: UUID, request: Request) -> dict:
+async def export_preset(preset_id: UUID, request: Request) -> dict[str, Any]:
     """Versioned redacted preset JSON; referenced assets travel by ID."""
     detail = await _detail(request, preset_id)
     return {
@@ -205,7 +201,7 @@ async def export_preset(preset_id: UUID, request: Request) -> dict:
 
 
 @router.post("/library/import/validate")
-async def validate_import(body: api.PresetCreateRequest, request: Request) -> dict:
+async def validate_import(body: api.PresetCreateRequest, request: Request) -> dict[str, Any]:
     """Preview validation only; writes nothing."""
     del request
     try:
@@ -225,3 +221,95 @@ async def validate_import(body: api.PresetCreateRequest, request: Request) -> di
 async def apply_import(body: api.PresetCreateRequest, request: Request) -> api.PresetDetail:
     """Explicit atomic apply after a validate preview."""
     return await create_preset(body, request)
+
+
+def _asset_view(asset: AssetRecord) -> api.AssetView:
+    return api.AssetView(
+        id=asset.id,
+        world_id=asset.world_id,
+        kind=asset.kind.value,
+        subject_id=asset.subject_id,
+        content_ref=asset.content_ref,
+        mime=asset.mime,
+        width=asset.width,
+        height=asset.height,
+        style_pack_version=asset.style_pack_version,
+        subject_visual_version=asset.subject_visual_version,
+        status=asset.status.value,
+        version=asset.version,
+    )
+
+
+@router.post("/library/presets/{preset_id}/duplicate", response_model=api.PresetDetail)
+async def duplicate_preset(preset_id: UUID, request: Request) -> api.PresetDetail:
+    """Copy the current revision into a new editable preset; built-ins stay put."""
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        source = await uow.presets.get_preset(preset_id)
+        current = await uow.presets.get_revision(preset_id, source.current_revision)
+        now = utcnow()
+        copy = Preset(
+            id=new_preset_id(),
+            kind=source.kind,
+            name=f"{source.name} copy",
+            created_at=now,
+        )
+        await uow.presets.add_preset(copy)
+        await uow.presets.add_revision(
+            PresetRevision(
+                preset_id=copy.id,
+                revision=1,
+                schema_version=current.schema_version,
+                payload=current.payload,
+                content_hash=current.content_hash,
+                created_at=now,
+            )
+        )
+        await uow.commit()
+    return await _detail(request, copy.id, 1)
+
+
+@router.get("/library/assets", response_model=list[api.AssetView])
+async def list_library_assets(request: Request, kind: str = "portrait") -> list[api.AssetView]:
+    """Unscoped (preset-pickable) ready assets; world-bound art stays world-scoped."""
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        assets = await uow.assets.list_unscoped(kind)
+    return [_asset_view(asset) for asset in assets]
+
+
+@router.get("/library/presets/{preset_id}/assets")
+async def preset_assets(preset_id: UUID, request: Request) -> dict[str, Any]:
+    """Resolve a preset revision's asset references with explicit miss warnings."""
+    detail = await _detail(request, preset_id)
+    refs: list[str] = []
+    portrait = detail.revision.get("portrait_asset_id")
+    if isinstance(portrait, str) and portrait:
+        refs.append(portrait)
+    state = request.app.state.app_state
+    resolved: list[dict[str, Any]] = []
+    async with state.uow_factory()() as uow:
+        for ref in refs:
+            try:
+                asset = await uow.assets.get_asset(UUID(ref))
+            except Exception:
+                resolved.append({"asset_id": ref, "status": "missing"})
+                continue
+            resolved.append(_asset_view(asset).model_dump(mode="json"))
+    return {"preset_id": str(preset_id), "assets": resolved}
+
+
+@router.get("/library/assets/{asset_id}/bytes")
+async def read_library_asset_bytes(asset_id: UUID, request: Request) -> Response:
+    """Serve unscoped bytes only; world-bound assets 404 here by design."""
+    state = request.app.state.app_state
+    async with state.uow_factory()() as uow:
+        asset = await uow.assets.get_asset(asset_id)
+        if asset.world_id is not None:
+            raise DomainError(ErrorCode.NOT_FOUND, "world-bound assets stay world-scoped")
+    storage = LocalStorage(state.seed_dir.parent.parent / "assets")
+    try:
+        data = await storage.read(asset.content_ref)
+    except (FileNotFoundError, OSError) as exc:
+        raise DomainError(ErrorCode.NOT_FOUND, "stored bytes are missing") from exc
+    return Response(content=data, media_type=asset.mime)

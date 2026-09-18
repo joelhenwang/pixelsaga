@@ -1018,6 +1018,7 @@ class SimulationStatus(BaseModel):
     latest_run_id: UUID | None = None
     latest_run_state: str | None = None
 
+
 class InterventionScope(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
@@ -1162,7 +1163,7 @@ class StorySetupView(BaseModel):
     world_id: UUID
     schema_version: int
     provenance: str
-    payload: dict = Field(default_factory=dict)
+    payload: dict[str, Any] = Field(default_factory=dict)
     content_hash: str
     created_at: datetime
 
@@ -1184,11 +1185,11 @@ class StoryArchiveRequest(BaseModel):
 class StoryDraftPayload(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
-    world: dict | None = None
-    cast: list[dict] | None = None
-    mode: dict | None = None
-    story: dict | None = None
-    ai: dict | None = None
+    world: dict[str, Any] | None = None
+    cast: list[dict[str, Any]] | None = None
+    mode: dict[str, Any] | None = None
+    story: dict[str, Any] | None = None
+    ai: dict[str, Any] | None = None
 
 
 class StoryDraftCreateRequest(BaseModel):
@@ -1223,7 +1224,7 @@ class DraftValidationView(BaseModel):
 
     valid: bool
     issues: list[str] = Field(default_factory=list)
-    resolved: dict = Field(default_factory=dict)
+    resolved: dict[str, Any] = Field(default_factory=dict)
 
 
 class PresetSummary(BaseModel):
@@ -1250,7 +1251,7 @@ class PresetDetail(BaseModel):
     archived_at: datetime | None = None
     current_revision: int
     version: int
-    revision: dict = Field(default_factory=dict)
+    revision: dict[str, Any] = Field(default_factory=dict)
 
 
 class PresetCreateRequest(BaseModel):
@@ -1259,6 +1260,12 @@ class PresetCreateRequest(BaseModel):
     kind: str
     name: str = Field(min_length=1, max_length=128)
     payload: dict[str, Any]
+
+
+class PresetArchiveRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    expected_version: int = Field(ge=0)
 
 
 class PresetRevisionRequest(BaseModel):

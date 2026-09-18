@@ -6,6 +6,7 @@ snapshots are immutable and read-only; drafts carry typed nonsecret JSON.
 
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Request
@@ -149,7 +150,7 @@ async def read_setup(story_id: UUID, request: Request) -> api.StorySetupView:
 
 
 @router.get("/stories/{story_id}/setup/export")
-async def export_setup(story_id: UUID, request: Request) -> dict:
+async def export_setup(story_id: UUID, request: Request) -> dict[str, Any]:
     """Redacted setup export: resolved configuration, never a save backup."""
     view = await read_setup(story_id, request)
     return {
@@ -333,7 +334,7 @@ async def validate_draft(draft_id: UUID, request: Request) -> api.DraftValidatio
     async with state.uow_factory()() as uow:
         draft = await uow.stories.get_draft(draft_id)
         issues = _validate(draft.payload)
-        resolved: dict = {}
+        resolved: dict[str, Any] = {}
         if draft.payload.world.preset_id is not None:
             try:
                 revision = draft.payload.world.preset_revision or 1

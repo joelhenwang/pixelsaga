@@ -18,6 +18,7 @@ from worldsim.application.queries.presentation import (
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.stories import SetupProvenance, StoryCatalogEntry, StoryInitialSetup
 from worldsim.domain.time import absolute_index, utcnow
+from worldsim.domain.world import World
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role
 from worldsim.interfaces.http.schemas import (

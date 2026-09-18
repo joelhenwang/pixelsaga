@@ -116,6 +116,20 @@ class SqlAlchemyAssetRepository:
         ).scalars()
         return [self._to_asset(row) for row in rows]
 
+    async def list_unscoped(self, kind: str) -> list[AssetRecord]:
+        rows = (
+            await self._session.execute(
+                select(AssetRow)
+                .where(
+                    AssetRow.world_id.is_(None),
+                    AssetRow.kind == kind,
+                    AssetRow.status == "ready",
+                )
+                .order_by(AssetRow.subject_visual_version.desc())
+            )
+        ).scalars()
+        return [self._to_asset(row) for row in rows]
+
     async def add_job(self, job: ImageJob) -> None:
         self._session.add(
             ImageJobRow(

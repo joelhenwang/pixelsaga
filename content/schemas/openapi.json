@@ -3491,6 +3491,21 @@
         "title": "PresentationResponse",
         "type": "object"
       },
+      "PresetArchiveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "expected_version": {
+            "minimum": 0.0,
+            "title": "Expected Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "expected_version"
+        ],
+        "title": "PresetArchiveRequest",
+        "type": "object"
+      },
       "PresetCreateRequest": {
         "additionalProperties": false,
         "properties": {
@@ -5756,6 +5771,96 @@
         ]
       }
     },
+    "/api/v1/library/assets": {
+      "get": {
+        "description": "Unscoped (preset-pickable) ready assets; world-bound art stays world-scoped.",
+        "operationId": "list_library_assets_api_v1_library_assets_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "default": "portrait",
+              "title": "Kind",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AssetView"
+                  },
+                  "title": "Response List Library Assets Api V1 Library Assets Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Library Assets",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/api/v1/library/assets/{asset_id}/bytes": {
+      "get": {
+        "description": "Serve unscoped bytes only; world-bound assets 404 here by design.",
+        "operationId": "read_library_asset_bytes_api_v1_library_assets__asset_id__bytes_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "asset_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Asset Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Read Library Asset Bytes",
+        "tags": [
+          "library"
+        ]
+      }
+    },
     "/api/v1/library/import/apply": {
       "post": {
         "description": "Explicit atomic apply after a validate preview.",
@@ -6032,7 +6137,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StoryArchiveRequest"
+                "$ref": "#/components/schemas/PresetArchiveRequest"
               }
             }
           },
@@ -6061,6 +6166,96 @@
           }
         },
         "summary": "Archive Preset",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/api/v1/library/presets/{preset_id}/assets": {
+      "get": {
+        "description": "Resolve a preset revision's asset references with explicit miss warnings.",
+        "operationId": "preset_assets_api_v1_library_presets__preset_id__assets_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "preset_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Preset Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preset Assets Api V1 Library Presets  Preset Id  Assets Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preset Assets",
+        "tags": [
+          "library"
+        ]
+      }
+    },
+    "/api/v1/library/presets/{preset_id}/duplicate": {
+      "post": {
+        "description": "Copy the current revision into a new editable preset; built-ins stay put.",
+        "operationId": "duplicate_preset_api_v1_library_presets__preset_id__duplicate_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "preset_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Preset Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PresetDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Duplicate Preset",
         "tags": [
           "library"
         ]
@@ -6184,7 +6379,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StoryArchiveRequest"
+                "$ref": "#/components/schemas/PresetArchiveRequest"
               }
             }
           },

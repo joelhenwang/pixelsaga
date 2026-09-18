@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import select
@@ -94,6 +95,19 @@ class SqlAlchemyPresetRepository:
         row.version = expected_version + 1
         await self._session.flush()
         return preset.model_copy(update={"version": expected_version + 1})
+
+    async def set_archived(
+        self, preset_id: UUID, archived_at: datetime | None, expected_version: int
+    ) -> Preset:
+        row = await self._session.get(PresetRow, preset_id)
+        if row is None:
+            raise missing("preset", preset_id)
+        if row.version != expected_version:
+            raise version_conflict("preset", preset_id, expected_version, row.version)
+        row.archived_at = archived_at
+        row.version = expected_version + 1
+        await self._session.flush()
+        return self._to_preset(row)
 
     async def add_revision(self, revision: PresetRevision) -> None:
         self._session.add(
