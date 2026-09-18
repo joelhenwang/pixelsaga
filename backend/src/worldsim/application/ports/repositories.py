@@ -11,6 +11,7 @@ from typing import Protocol
 from uuid import UUID
 
 from worldsim.domain.activities import Activity, TravelRoute
+from worldsim.domain.assets import AssetRecord, ImageJob
 from worldsim.domain.characters import Character, CharacterCard
 from worldsim.domain.costs import ModelCost
 from worldsim.domain.enums import FocusSlot
@@ -90,6 +91,21 @@ class PartyRepository(Protocol):
     async def save_link(
         self, member_id: UUID, character_id: UUID, expected_version: int
     ) -> PartyMember: ...
+
+
+class AssetRepository(Protocol):
+    async def add_asset(self, asset: AssetRecord) -> None: ...
+    async def get_asset(self, asset_id: UUID) -> AssetRecord: ...
+    async def find_asset_by_ref(
+        self, world_id: UUID | None, content_ref: str
+    ) -> AssetRecord | None: ...
+    async def list_assets_for_subject(
+        self, world_id: UUID, kind: str, subject_id: UUID
+    ) -> list[AssetRecord]: ...
+    async def add_job(self, job: ImageJob) -> None: ...
+    async def get_job(self, job_id: UUID) -> ImageJob: ...
+    async def find_job_by_key(self, world_id: UUID | None, key: str) -> ImageJob | None: ...
+    async def save_job(self, job: ImageJob, expected_version: int) -> ImageJob: ...
 
 
 class MonsterRepository(Protocol):

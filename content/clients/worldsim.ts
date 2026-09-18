@@ -623,6 +623,46 @@ export interface PresentationResponse {
   world_id: string;
 }
 
+export interface JobRequest {
+  idempotency_key: string;
+  kind: string;
+  style_pack_version?: string | null;
+  subject_id?: string | null;
+  world_id?: string | null;
+}
+
+export interface JobView {
+  attempt_count: number;
+  error?: string | null;
+  id: string;
+  kind: string;
+  result_asset_id?: string | null;
+  status: string;
+  style_pack_version: string;
+  subject_id?: string | null;
+  version: number;
+  world_id?: string | null;
+}
+
+export interface AssetView {
+  content_ref: string;
+  height: number;
+  id: string;
+  kind: string;
+  mime: string;
+  status: string;
+  style_pack_version: string;
+  subject_id?: string | null;
+  subject_visual_version: number;
+  version: number;
+  width: number;
+  world_id?: string | null;
+}
+
+export interface EnsureStarterRequest {
+  world_id: string;
+}
+
 export type WatcherHeaders = {
   "X-Worldsim-Role": "watcher";
 };
@@ -678,8 +718,9 @@ export const ROUTES = {
   listFocus: "GET /api/v1/macro/focus",
   listEras: "GET /api/v1/macro/eras",
   listEndings: "GET /api/v1/macro/endings",
-  advanceMacro: "POST /api/v1/macro/advance",
-  composeEra: "POST /api/v1/macro/eras/compose",
+  requestImageJob: "POST /api/v1/assets/jobs",
+  readImageJob: "GET /api/v1/assets/jobs/{job_id}",
+  ensureStarterAssets: "POST /api/v1/assets/ensure-starter",
   evaluateEndings: "POST /api/v1/macro/endings/evaluate",
   assignFocus: "POST /api/v1/macro/focus/assign",
   cancelSchedule: "POST /api/v1/macro/schedules/{schedule_id}/cancel",

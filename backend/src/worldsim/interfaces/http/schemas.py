@@ -958,3 +958,51 @@ class PresentationResponse(BaseModel):
     activities: list[ActivityView] = Field(default_factory=list)
     recent_event_id: UUID | None = None
     threads: list[str] = Field(default_factory=list)
+
+
+class JobRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID | None = None
+    kind: str = Field(min_length=1, max_length=16)
+    subject_id: UUID | None = None
+    style_pack_version: str = Field(default="anime-saga-v1", max_length=64)
+    idempotency_key: str = Field(min_length=1, max_length=128)
+
+
+class JobView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID | None = None
+    kind: str
+    subject_id: UUID | None = None
+    style_pack_version: str
+    status: str
+    attempt_count: int
+    result_asset_id: UUID | None = None
+    error: str = ""
+    version: int
+
+
+class AssetView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    world_id: UUID | None = None
+    kind: str
+    subject_id: UUID | None = None
+    content_ref: str
+    mime: str
+    width: int
+    height: int
+    style_pack_version: str
+    subject_visual_version: int
+    status: str
+    version: int
+
+
+class EnsureStarterRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world_id: UUID

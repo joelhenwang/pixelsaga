@@ -12,6 +12,7 @@ from worldsim.infrastructure.repositories.activities import (
     SqlAlchemyActivityRepository,
     SqlAlchemyRouteRepository,
 )
+from worldsim.infrastructure.repositories.assets import SqlAlchemyAssetRepository
 from worldsim.infrastructure.repositories.characters import (
     SqlAlchemyCharacterRepository,
 )
@@ -73,6 +74,7 @@ class SqlAlchemyUnitOfWork:
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
+        self._assets: SqlAlchemyAssetRepository | None = None
         self._narrative: SqlAlchemyNarrativeRepository | None = None
         self._digests: SqlAlchemyDigestRepository | None = None
         self._summaries: SqlAlchemySummaryRepository | None = None
@@ -256,6 +258,12 @@ class SqlAlchemyUnitOfWork:
             self._party = SqlAlchemyPartyRepository(self._require_session())
         return self._party
 
+    @property
+    def assets(self) -> SqlAlchemyAssetRepository:
+        if self._assets is None:
+            self._assets = SqlAlchemyAssetRepository(self._require_session())
+        return self._assets
+
     async def __aenter__(self) -> Self:
         self._session = self._sessions()
         return self
@@ -282,7 +290,7 @@ class SqlAlchemyUnitOfWork:
             self._versions = None
             self._tasks = None
             self._party = None
-            self._monsters = None
+            self._assets = None
             self._narrative = None
             self._summaries = None
             self._roles = None

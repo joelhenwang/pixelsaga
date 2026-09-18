@@ -27,6 +27,7 @@ from worldsim.interfaces.http.errors import (
 )
 from worldsim.interfaces.http.routes import (
     activities,
+    assets,
     health,
     knowledge,
     macro,
@@ -97,4 +98,5 @@ def create_app(
     app.include_router(roles.router, prefix="/api/v1")
     app.include_router(stage2.router, prefix="/api/v1")
     app.include_router(macro.router, prefix="/api/v1")
+    app.include_router(assets.router, prefix="/api/v1")
     return app

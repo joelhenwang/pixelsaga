@@ -352,6 +352,19 @@ export const api = {
       headers,
     );
   },
+  async assetBytes(assetId: string, worldId: string, headers: Record<string, string>): Promise<Blob> {
+    const response = await fetch(`/api/v1/assets/${assetId}?world_id=${worldId}`, { headers });
+    if (!response.ok) {
+      const body: unknown = await response.json().catch(() => ({}));
+      const nested = body && typeof body === "object" && "error" in body ? body.error : null;
+      const code =
+        nested && typeof nested === "object" && "code" in nested && typeof nested.code === "string"
+          ? nested.code
+          : `HTTP_${response.status}`;
+      throw new ApiError(response.status, code, code, response.headers.get("X-Request-ID") ?? "");
+    }
+    return await response.blob();
+  },
   cancelSchedule(scheduleId: string, headers: Record<string, string>): Promise<ScheduleCancelResponse> {
     return request<ScheduleCancelResponse>(`/api/v1/macro/schedules/${scheduleId}/cancel`, { method: "POST" }, headers);
   },

@@ -7,6 +7,7 @@ from typing import Protocol, Self
 
 from worldsim.application.ports.repositories import (
     ActivityRepository,
+    AssetRepository,
     CharacterRepository,
     CommandRepository,
     CostRepository,
@@ -46,6 +47,8 @@ class UnitOfWork(Protocol):
     def characters(self) -> CharacterRepository: ...
     @property
     def party(self) -> PartyRepository: ...
+    @property
+    def assets(self) -> AssetRepository: ...
     @property
     def monsters(self) -> MonsterRepository: ...
     @property

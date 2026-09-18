@@ -99,6 +99,10 @@ WANTED = (
     "MapManifestView",
     "CastEntry",
     "PresentationResponse",
+    "JobRequest",
+    "JobView",
+    "AssetView",
+    "EnsureStarterRequest",
 )
 
 #: Routes emitted into the ROUTES map (method, openapi path, const name).
@@ -148,8 +152,9 @@ ROUTES = (
     ("get", "/api/v1/macro/focus", "listFocus"),
     ("get", "/api/v1/macro/eras", "listEras"),
     ("get", "/api/v1/macro/endings", "listEndings"),
-    ("post", "/api/v1/macro/advance", "advanceMacro"),
-    ("post", "/api/v1/macro/eras/compose", "composeEra"),
+    ("post", "/api/v1/assets/jobs", "requestImageJob"),
+    ("get", "/api/v1/assets/jobs/{job_id}", "readImageJob"),
+    ("post", "/api/v1/assets/ensure-starter", "ensureStarterAssets"),
     ("post", "/api/v1/macro/endings/evaluate", "evaluateEndings"),
     ("post", "/api/v1/macro/focus/assign", "assignFocus"),
     ("post", "/api/v1/macro/schedules/{schedule_id}/cancel", "cancelSchedule"),

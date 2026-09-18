@@ -276,3 +276,15 @@ def new_resolution_id() -> ResolutionId:
 
 def new_narration_id() -> NarrationId:
     return uuid4()
+
+
+AssetId = UUID
+ImageJobId = UUID
+
+
+def new_asset_id() -> AssetId:
+    return uuid4()
+
+
+def new_job_id() -> ImageJobId:
+    return uuid4()
