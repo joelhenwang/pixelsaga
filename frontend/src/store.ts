@@ -87,7 +87,7 @@ export function switchRole(next: Role, character: string | null): void {
   notice.value = "";
 }
 
-export async function refresh(): Promise<void> {
+export async function refresh(explicitWorldId?: string): Promise<void> {
   const key = sessionKey;
   refreshAbort?.abort();
   const controller = new AbortController();
@@ -95,13 +95,13 @@ export async function refresh(): Promise<void> {
   const options = { signal: controller.signal };
   notice.value = "";
   try {
-    const world = await api.world(headers.value, options);
+    const world = await api.world(headers.value, options, explicitWorldId || worldId.value || undefined);
     if (key !== sessionKey) {
       return;
     }
     worldId.value = world.id;
     clock.value = `day ${world.day}, ${world.phase}`;
-    const current = await api.currentPhase(headers.value, options);
+    const current = await api.currentPhase(headers.value, options, world.id);
     if (key !== sessionKey) {
       return;
     }
@@ -111,8 +111,9 @@ export async function refresh(): Promise<void> {
       return;
     }
     characters.value = list.map((c) => ({ id: c.id, name: c.name }));
-    if (!characterId.value && list.length > 0) {
-      characterId.value = list[0].id;
+    // No implicit actor binding: an unbound Player gets repair UI, never list[0].
+    if (characterId.value && !list.some((c) => c.id === characterId.value)) {
+      characterId.value = "";
     }
     errorKind.value = null;
     connection.value = "online";
@@ -138,22 +139,32 @@ export async function seedWorld(): Promise<boolean> {
 }
 
 // Central phase advancement (P02). One caller at a time; views report the
-// returned run id and reload their own projections.
 export async function advance(): Promise<string> {
   if (busy.value) {
     return "";
   }
   busy.value = true;
   notice.value = "";
+  const key = sessionKey;
+  const world = worldId.value;
   try {
     const report = await api.advance(worldId.value, nextIndex.value, headers.value);
+    if (key !== sessionKey || worldId.value !== world) {
+      return "";
+    }
     nextIndex.value = report.absolute_index + 1;
-    const world = await api.world(headers.value);
-    clock.value = `day ${world.day}, ${world.phase}`;
+    const fresh = await api.world(headers.value, {}, worldId.value || undefined);
+    if (key !== sessionKey || worldId.value !== world) {
+      return "";
+    }
+    clock.value = `day ${fresh.day}, ${fresh.phase}`;
     errorKind.value = null;
     connection.value = "online";
     return report.run_id;
   } catch (error) {
+    if (key !== sessionKey || worldId.value !== world) {
+      return "";
+    }
     fail("advance failed", error);
     return "";
   } finally {

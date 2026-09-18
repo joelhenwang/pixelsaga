@@ -6,7 +6,7 @@
 // and never silently resume autoplay.
 import { ref } from "vue";
 import { api } from "../api";
-import { advance, busy, fail, headers, worldId } from "../store";
+import { advance, busy, fail, headers, session, worldId } from "../store";
 
 export type ControlState = "idle" | "resolving" | "pause-requested" | "paused" | "failed" | "ended";
 export type Pace = "slow" | "normal" | "fast";
@@ -27,16 +27,32 @@ export async function nextPhase(onResolve: (runId: string) => Promise<PhaseOutco
   }
   controlState.value = "resolving";
   controlNotice.value = "";
+  const key = session();
+  const world = worldId.value;
   try {
     const runId = await advance();
-    if (!runId) {
+    if (!runId || key !== session() || worldId.value !== world) {
+      // Story switched mid-phase: the server run may finish, but this
+      // controller resolves nothing into the new story.
+      if (key !== session() || worldId.value !== world) {
+        controlState.value = "idle";
+        return;
+      }
       controlState.value = "failed";
       controlNotice.value = "advance produced no run; see notice";
       return;
     }
     const outcome = await onResolve(runId);
+    if (key !== session() || worldId.value !== world) {
+      controlState.value = "idle";
+      return;
+    }
     controlState.value = outcome === "continue" ? "idle" : outcome === "pause" ? "paused" : "ended";
   } catch (error) {
+    if (key !== session() || worldId.value !== world) {
+      controlState.value = "idle";
+      return;
+    }
     fail("controlled advance failed", error);
     controlState.value = "failed";
   }
@@ -44,7 +60,8 @@ export async function nextPhase(onResolve: (runId: string) => Promise<PhaseOutco
 
 export async function play(onResolve: (runId: string) => Promise<PhaseOutcome>): Promise<void> {
   const token = ++playToken;
-  while (token === playToken) {
+  const key = session();
+  while (token === playToken && key === session()) {
     if (controlState.value === "pause-requested") {
       controlState.value = "paused";
       return;

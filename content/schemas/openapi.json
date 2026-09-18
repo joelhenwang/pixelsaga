@@ -7494,6 +7494,25 @@
     "/api/v1/world": {
       "get": {
         "operationId": "get_world_api_v1_world_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -7504,6 +7523,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Get World",
@@ -7582,6 +7611,25 @@
     "/api/v1/world/clock": {
       "get": {
         "operationId": "get_clock_api_v1_world_clock_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -7592,6 +7640,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Get Clock",
@@ -7648,6 +7706,23 @@
       "get": {
         "operationId": "list_events_api_v1_world_events_get",
         "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World Id"
+            }
+          },
           {
             "in": "query",
             "name": "after",
@@ -7759,6 +7834,25 @@
     "/api/v1/world/phases/current": {
       "get": {
         "operationId": "get_current_phase_api_v1_world_phases_current_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "world_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "World Id"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -7769,6 +7863,16 @@
               }
             },
             "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
           }
         },
         "summary": "Get Current Phase",

@@ -200,14 +200,24 @@ export const api = {
       headers,
     );
   },
-  world(headers: Record<string, string>, options: RequestOptions = {}): Promise<{ id: string; day: number; phase: string }> {
-    return request("/api/v1/world", {}, headers, options);
+  world(
+    headers: Record<string, string>,
+    options: RequestOptions = {},
+    worldId?: string,
+  ): Promise<{ id: string; day: number; phase: string }> {
+    const query = worldId ? `?world_id=${worldId}` : "";
+    return request(`/api/v1/world${query}`, {}, headers, options);
   },
   seed(headers: Record<string, string>): Promise<{ world_id: string; duplicate: boolean }> {
     return request("/api/v1/world/seed", { method: "POST" }, headers);
   },
-  currentPhase(headers: Record<string, string>, options: RequestOptions = {}): Promise<{ absolute_index: number }> {
-    return request("/api/v1/world/phases/current", {}, headers, options);
+  currentPhase(
+    headers: Record<string, string>,
+    options: RequestOptions = {},
+    worldId?: string,
+  ): Promise<{ absolute_index: number }> {
+    const query = worldId ? `?world_id=${worldId}` : "";
+    return request(`/api/v1/world/phases/current${query}`, {}, headers, options);
   },
   timeline(worldId: string, headers: Record<string, string>, after = 0, limit = 20): Promise<TimelineResponse> {
     return request<TimelineResponse>(`/api/v1/stage2/timeline?world_id=${worldId}&after=${after}&limit=${limit}`, {}, headers);

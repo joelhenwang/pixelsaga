@@ -102,7 +102,7 @@ onMounted(() => {
         </select>
       </label>
       <button type="button" @click="seed">seed</button>
-      <button type="button" @click="refresh">refresh</button>
+      <button type="button" @click="refresh()">refresh</button>
       <RouterLink to="/operations">operations</RouterLink>
       <span class="notice" v-if="notice">{{ notice }}</span>
       <span v-if="errorKind" class="notice">state: {{ errorKind }}</span>

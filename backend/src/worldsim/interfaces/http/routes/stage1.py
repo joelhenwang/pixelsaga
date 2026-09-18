@@ -28,7 +28,7 @@ from worldsim.domain.party import PartyMember
 from worldsim.domain.scenes import Intent, Reaction
 from worldsim.domain.time import absolute_index
 from worldsim.interfaces.http import schemas as api
-from worldsim.interfaces.http.routes.roles import effective_role, require_role
+from worldsim.interfaces.http.routes.roles import effective_role
 from worldsim.interfaces.http.state import dnd_tables
 
 router = APIRouter(tags=["stage1"])
@@ -54,7 +54,11 @@ def _party_view(member: PartyMember) -> api.PartyMemberView:
 
 
 async def _perspective(request: Request, world_id: UUID | None = None) -> tuple[str, UUID | None]:
-    """Header perspective for reads; grant-aware gates for mutating routes."""
+    """Header perspective for reads; grant-aware role for mutating routes.
+
+    World-scoped callers must follow with a capability check; this helper
+    no longer rejects Director/Deity up front (both hold ADVANCE).
+    """
     if world_id is None:
         role = request.headers.get("x-worldsim-role", "watcher").lower()
         if role not in ("watcher", "player", "director", "deity"):
@@ -73,7 +77,6 @@ async def _perspective(request: Request, world_id: UUID | None = None) -> tuple[
     role, viewer = await effective_role(request, world_id)
     if role not in ("watcher", "player", "director", "deity", "system"):
         raise DomainError(ErrorCode.VALIDATION_FAILED, f"unknown role: {role}")
-    require_role(role, "watcher", "player")
     if role == "player" and viewer is None:
         raise DomainError(ErrorCode.FORBIDDEN, "player perspective needs a bound character")
     return role, viewer
@@ -366,7 +369,8 @@ async def pause(body: api.RunIdRequest, request: Request) -> dict[str, str]:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.phases.get_run(body.run_id)).world_id
-    await _perspective(request, world_id)
+    role, _viewer = await _perspective(request, world_id)
+    require_capability(parse_role(role), Capability.ADVANCE)
     await _stage1(request).pause_phase(body.run_id)
     return {"run_id": str(body.run_id), "state": "paused"}
 
@@ -374,7 +378,8 @@ async def pause(body: api.RunIdRequest, request: Request) -> dict[str, str]:
 @router.get("/simulation/status", response_model=api.SimulationStatus)
 async def simulation_status(world_id: UUID, request: Request) -> api.SimulationStatus:
     """Reconcile open and latest runs without starting work."""
-    await _perspective(request, world_id)
+    role, _viewer = await _perspective(request, world_id)
+    require_capability(parse_role(role), Capability.ADVANCE)
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world = await uow.worlds.get(world_id)
@@ -395,7 +400,8 @@ async def resume(body: api.RunIdRequest, request: Request) -> dict[str, str]:
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         world_id = (await uow.phases.get_run(body.run_id)).world_id
-    await _perspective(request, world_id)
+    role, _viewer = await _perspective(request, world_id)
+    require_capability(parse_role(role), Capability.ADVANCE)
     await _stage1(request).resume_phase(body.run_id)
     return {"run_id": str(body.run_id), "state": "resumed"}
 

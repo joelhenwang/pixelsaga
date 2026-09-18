@@ -47,32 +47,41 @@ def _world_dto(world: World) -> WorldResponse:
     )
 
 
-async def _only_world(request: Request) -> World:
+async def _selected_world(request: Request, world_id: UUID | None) -> World:
+    """Explicit world selection; the single-world shortcut needs exactly one."""
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
+        if world_id is not None:
+            return await uow.worlds.get(world_id)
         worlds = await uow.worlds.list_worlds()
     if not worlds:
         raise DomainError(ErrorCode.NOT_FOUND, "no world has been seeded yet")
+    if len(worlds) > 1:
+        raise DomainError(
+            ErrorCode.PRECONDITION_FAILED,
+            "multiple worlds exist; pass an explicit world_id",
+            {"code": "WORLD_SELECTION_REQUIRED"},
+        )
     return worlds[0]
 
 
 @router.get("/world", response_model=WorldResponse)
-async def get_world(request: Request) -> WorldResponse:
-    return _world_dto(await _only_world(request))
+async def get_world(request: Request, world_id: UUID | None = None) -> WorldResponse:
+    return _world_dto(await _selected_world(request, world_id))
 
 
 @router.get("/world/clock", response_model=ClockResponse)
-async def get_clock(request: Request) -> ClockResponse:
-    world = await _only_world(request)
+async def get_clock(request: Request, world_id: UUID | None = None) -> ClockResponse:
+    world = await _selected_world(request, world_id)
     return ClockResponse(
         day=world.day, phase=world.phase, absolute_index=absolute_index(world.day, world.phase)
     )
 
 
 @router.get("/world/phases/current", response_model=CurrentPhaseResponse)
-async def get_current_phase(request: Request) -> CurrentPhaseResponse:
+async def get_current_phase(request: Request, world_id: UUID | None = None) -> CurrentPhaseResponse:
     state = request.app.state.app_state
-    world = await _only_world(request)
+    world = await _selected_world(request, world_id)
     async with state.uow_factory()() as uow:
         run = await uow.phases.find_open_run(world.id)
     return CurrentPhaseResponse(
@@ -85,13 +94,15 @@ async def get_current_phase(request: Request) -> CurrentPhaseResponse:
 
 
 @router.get("/world/events", response_model=EventsResponse)
-async def list_events(request: Request, after: int = 0, limit: int = 50) -> EventsResponse:
+async def list_events(
+    request: Request, world_id: UUID | None = None, after: int = 0, limit: int = 50
+) -> EventsResponse:
     if after < 0:
         raise DomainError(ErrorCode.VALIDATION_FAILED, "after cursor must be >= 0")
     if not 1 <= limit <= 100:
         raise DomainError(ErrorCode.VALIDATION_FAILED, "limit must be 1..100")
     state = request.app.state.app_state
-    world = await _only_world(request)
+    world = await _selected_world(request, world_id)
     async with state.uow_factory()() as uow:
         events = await uow.events.list_range(world.id, after, limit)
         entries = [
@@ -166,6 +177,7 @@ async def get_chronicle(
     state = request.app.state.app_state
     async with state.uow_factory()() as uow:
         return await chronicle_query(uow, world_id, parse_role(role), viewer, after, limit)
+
 
 @router.get("/world/conditions", response_model=api.ConditionsResponse)
 async def get_conditions(world_id: UUID, request: Request) -> api.ConditionsResponse:
