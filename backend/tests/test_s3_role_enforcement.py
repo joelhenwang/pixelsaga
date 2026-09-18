@@ -14,8 +14,12 @@ from uuid import UUID
 import httpx
 import pytest
 from fastapi.testclient import TestClient
-from test_stage1_api import ApiClient
+from test_stage1_api import (  # pyright: ignore[reportPrivateUsage]
+    ApiClient,
+    _route_for,
+)
 
+from worldsim.application.orchestration.service import derive_run_id, derive_snapshot_id
 from worldsim.infrastructure.model_gateway.fake import FakeGateway
 from worldsim.infrastructure.model_gateway.profiles import FAKE_TEST_PROFILE
 from worldsim.infrastructure.settings import Settings
@@ -163,12 +167,17 @@ def test_watcher_grant_wins_over_bare_player_header(
     assert _claim(client, bare_player, WREN_ID).status_code == 200
 
 
-def test_advance_denies_director_header(roles: tuple[ApiClient, FakeGateway]) -> None:
-    client, _gateway = roles
+def test_advance_allows_director_without_intents(roles: tuple[ApiClient, FakeGateway]) -> None:
+    """Directors hold ADVANCE: plain advance is authorized (A02 fixed the
+    blanket watcher/player gate that used to 403 here)."""
+    client, gateway = roles
     _seed(client)
+    ids = {"world": WORLD_ID, "wren": WREN_ID, "ash": ASH_ID}
+    snapshots = {1: derive_snapshot_id(derive_run_id(WORLD_ID, 1))}
+    gateway.route = _route_for(ids, snapshots)
     response = client.post(
         "/api/v1/stage1/advance",
         json={"world_id": str(WORLD_ID), "absolute_index": 1},
         headers={"X-Worldsim-Role": "director"},
     )
-    assert response.status_code in (400, 403), response.text
+    assert response.status_code == 200, response.text

@@ -379,3 +379,14 @@
   border-radius: 6px;
   cursor: pointer;
 }
+@media (max-width: 768px) {
+  .topbar {
+    flex-wrap: wrap;
+    min-height: 44px;
+  }
+  .topbar nav {
+    order: 3;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+}

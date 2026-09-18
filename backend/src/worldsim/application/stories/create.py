@@ -74,13 +74,11 @@ async def create_story(
         raise DomainError(
             ErrorCode.VALIDATION_FAILED, f"draft is not creatable: {'; '.join(issues)}"
         )
-    if draft.created_world_id is not None:
-        raise DomainError(ErrorCode.FORBIDDEN, "this draft already created a story")
     if not idempotency_key.strip():
         raise DomainError(ErrorCode.VALIDATION_FAILED, "idempotency key is required")
+    request_hash = _request_hash(draft, expected_draft_version)
     async with uow_factory() as uow:
         existing = await uow.stories.find_receipt(operator, idempotency_key.strip())
-        request_hash = _request_hash(draft, expected_draft_version)
         if existing is not None:
             if existing.request_hash != request_hash:
                 raise DomainError(
@@ -88,6 +86,8 @@ async def create_story(
                     "idempotency key was used for a different request",
                 )
             return await _replay(uow, existing)
+        if draft.created_world_id is not None:
+            raise DomainError(ErrorCode.FORBIDDEN, "this draft already created a story")
         world_preset = await _world_preset(uow, payload)
         cast_presets = await _cast_presets(uow, payload)
         result = await _instantiate(uow, draft, expected_draft_version, world_preset, cast_presets)

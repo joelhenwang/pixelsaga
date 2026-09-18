@@ -200,16 +200,29 @@ const route = useRoute();
 
 onMounted(() => {
   window.addEventListener("keydown", onKey);
-  void refresh().then(() => {
+  void refresh().then(async () => {
     void loadContext();
     const linked = route.query.scene;
     if (typeof linked === "string" && linked) {
       void selectScene(linked);
       return;
     }
+    try {
+      const status = await api.simulationStatus(worldId.value, headers.value);
+      const runId = status.latest_run_id ?? status.open_run_id;
+      if (runId) {
+        scenes.value = await api.scenes(runId, headers.value);
+      }
+    } catch (error) {
+      fail("scene list failed", error);
+      return;
+    }
     const restored = localStorage.getItem(sceneKey());
-    if (restored) {
+    if (restored && scenes.value.some((s) => s.id === restored)) {
       void selectScene(restored).catch(() => undefined);
+    } else if (scenes.value.length > 0) {
+      const last = scenes.value[scenes.value.length - 1];
+      if (last) void selectScene(last.id).catch(() => undefined);
     }
   });
 });

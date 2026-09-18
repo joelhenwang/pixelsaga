@@ -11,6 +11,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Header, Request
 
+from worldsim.application.stories.validation import validate_draft as validate_draft_payload
 from worldsim.domain.errors import DomainError, ErrorCode
 from worldsim.domain.ids import new_story_draft_id
 from worldsim.domain.stories import (
@@ -19,7 +20,6 @@ from worldsim.domain.stories import (
     StoryCatalogEntry,
     StoryDraft,
 )
-from worldsim.application.stories.validation import validate_draft as validate_draft_payload
 from worldsim.domain.time import absolute_index, utcnow
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role
