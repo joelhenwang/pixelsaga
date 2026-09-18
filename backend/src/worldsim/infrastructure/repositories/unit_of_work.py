@@ -34,6 +34,7 @@ from worldsim.infrastructure.repositories.perception import (
     SqlAlchemyPerceptionRepository,
 )
 from worldsim.infrastructure.repositories.phases import SqlAlchemyPhaseRepository
+from worldsim.infrastructure.repositories.presets import SqlAlchemyPresetRepository
 from worldsim.infrastructure.repositories.progress import (
     SqlAlchemyInventoryRepository,
     SqlAlchemyProgressRepository,
@@ -44,6 +45,7 @@ from worldsim.infrastructure.repositories.relationships import (
 from worldsim.infrastructure.repositories.roles import SqlAlchemyRoleRepository
 from worldsim.infrastructure.repositories.scenes import SqlAlchemySceneRepository
 from worldsim.infrastructure.repositories.schedules import SqlAlchemyScheduleRepository
+from worldsim.infrastructure.repositories.stories import SqlAlchemyStoryRepository
 from worldsim.infrastructure.repositories.summaries import SqlAlchemySummaryRepository
 from worldsim.infrastructure.repositories.tasks import SqlAlchemyTaskRepository
 from worldsim.infrastructure.repositories.traces import SqlAlchemyTraceRepository
@@ -75,6 +77,8 @@ class SqlAlchemyUnitOfWork:
         self._traces: SqlAlchemyTraceRepository | None = None
         self._scenes: SqlAlchemySceneRepository | None = None
         self._party: SqlAlchemyPartyRepository | None = None
+        self._stories: SqlAlchemyStoryRepository | None = None
+        self._presets: SqlAlchemyPresetRepository | None = None
         self._monsters: SqlAlchemyMonsterRepository | None = None
         self._assets: SqlAlchemyAssetRepository | None = None
         self._interventions: SqlAlchemyInterventionRepository | None = None
@@ -261,6 +265,18 @@ class SqlAlchemyUnitOfWork:
         if self._party is None:
             self._party = SqlAlchemyPartyRepository(self._require_session())
         return self._party
+
+    @property
+    def stories(self) -> SqlAlchemyStoryRepository:
+        if self._stories is None:
+            self._stories = SqlAlchemyStoryRepository(self._require_session())
+        return self._stories
+
+    @property
+    def presets(self) -> SqlAlchemyPresetRepository:
+        if self._presets is None:
+            self._presets = SqlAlchemyPresetRepository(self._require_session())
+        return self._presets
 
     @property
     def interventions(self) -> SqlAlchemyInterventionRepository:

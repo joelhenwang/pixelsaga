@@ -45,6 +45,12 @@ class ApiClient:
     def post(self, url: str, **kwargs: Any) -> httpx.Response:
         return cast(httpx.Response, self._raw_any().post(url, **kwargs))
 
+    def patch(self, url: str, **kwargs: Any) -> httpx.Response:
+        return cast(httpx.Response, self._raw_any().patch(url, **kwargs))
+
+    def delete(self, url: str, **kwargs: Any) -> httpx.Response:
+        return cast(httpx.Response, self._raw_any().delete(url, **kwargs))
+
 
 @pytest.fixture
 def api(migrated_db: None) -> Iterator[tuple[ApiClient, FakeGateway, dict[str, UUID]]]:

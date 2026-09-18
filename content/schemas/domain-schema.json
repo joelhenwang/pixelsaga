@@ -5364,6 +5364,489 @@
       "title": "PhaseSnapshot",
       "type": "object"
     },
+    "Preset": {
+      "$defs": {
+        "PresetKind": {
+          "enum": [
+            "world",
+            "character",
+            "style_pack",
+            "template"
+          ],
+          "title": "PresetKind",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "archived_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archived At"
+        },
+        "builtin": {
+          "default": false,
+          "title": "Builtin",
+          "type": "boolean"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "current_revision": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Current Revision",
+          "type": "integer"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/PresetKind"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "readonly": {
+          "default": false,
+          "title": "Readonly",
+          "type": "boolean"
+        },
+        "version": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "name"
+      ],
+      "title": "Preset",
+      "type": "object"
+    },
+    "PresetRevision": {
+      "$defs": {
+        "CharacterPresetPayload": {
+          "additionalProperties": false,
+          "properties": {
+            "appearance": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Appearance"
+            },
+            "background": {
+              "anyOf": [
+                {
+                  "maxLength": 4000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Background"
+            },
+            "kind": {
+              "const": "character",
+              "default": "character",
+              "title": "Kind",
+              "type": "string"
+            },
+            "name": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "personality": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Personality"
+            },
+            "portrait_asset_id": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Portrait Asset Id"
+            },
+            "starting_location_key": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Starting Location Key"
+            },
+            "tags": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 16,
+              "title": "Tags",
+              "type": "array"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "title": "CharacterPresetPayload",
+          "type": "object"
+        },
+        "StylePackPayload": {
+          "additionalProperties": false,
+          "properties": {
+            "display_name": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Display Name",
+              "type": "string"
+            },
+            "guidance": {
+              "anyOf": [
+                {
+                  "maxLength": 8000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Guidance"
+            },
+            "kind": {
+              "const": "style_pack",
+              "default": "style_pack",
+              "title": "Kind",
+              "type": "string"
+            },
+            "style_id": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Style Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "display_name",
+            "style_id"
+          ],
+          "title": "StylePackPayload",
+          "type": "object"
+        },
+        "TemplatePresetPayload": {
+          "additionalProperties": false,
+          "properties": {
+            "cast_preset_ids": {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 16,
+              "title": "Cast Preset Ids",
+              "type": "array"
+            },
+            "display_name": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Display Name",
+              "type": "string"
+            },
+            "kind": {
+              "const": "template",
+              "default": "template",
+              "title": "Kind",
+              "type": "string"
+            },
+            "pacing": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Pacing"
+            },
+            "tone": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Tone"
+            },
+            "world_preset_id": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "World Preset Id",
+              "type": "string"
+            },
+            "world_preset_revision": {
+              "minimum": 1,
+              "title": "World Preset Revision",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "display_name",
+            "world_preset_id",
+            "world_preset_revision"
+          ],
+          "title": "TemplatePresetPayload",
+          "type": "object"
+        },
+        "WorldLocationPreset": {
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Description"
+            },
+            "key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Key",
+              "type": "string"
+            },
+            "name": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "name"
+          ],
+          "title": "WorldLocationPreset",
+          "type": "object"
+        },
+        "WorldPresetPayload": {
+          "additionalProperties": false,
+          "properties": {
+            "default_cast": {
+              "items": {
+                "type": "string"
+              },
+              "title": "Default Cast",
+              "type": "array"
+            },
+            "description": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Description"
+            },
+            "kind": {
+              "const": "world",
+              "default": "world",
+              "title": "Kind",
+              "type": "string"
+            },
+            "locations": {
+              "items": {
+                "$ref": "#/$defs/WorldLocationPreset"
+              },
+              "maxItems": 64,
+              "minItems": 1,
+              "title": "Locations",
+              "type": "array"
+            },
+            "lore": {
+              "anyOf": [
+                {
+                  "maxLength": 8000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Lore"
+            },
+            "name": {
+              "maxLength": 128,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "starting_location_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Starting Location Key",
+              "type": "string"
+            },
+            "style_pack_id": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Style Pack Id"
+            },
+            "travel": {
+              "items": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "title": "Travel",
+              "type": "array"
+            }
+          },
+          "required": [
+            "name",
+            "locations",
+            "starting_location_key"
+          ],
+          "title": "WorldPresetPayload",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "payload": {
+          "discriminator": {
+            "mapping": {
+              "character": "#/$defs/CharacterPresetPayload",
+              "style_pack": "#/$defs/StylePackPayload",
+              "template": "#/$defs/TemplatePresetPayload",
+              "world": "#/$defs/WorldPresetPayload"
+            },
+            "propertyName": "kind"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/WorldPresetPayload"
+            },
+            {
+              "$ref": "#/$defs/CharacterPresetPayload"
+            },
+            {
+              "$ref": "#/$defs/StylePackPayload"
+            },
+            {
+              "$ref": "#/$defs/TemplatePresetPayload"
+            }
+          ],
+          "title": "Payload"
+        },
+        "preset_id": {
+          "format": "uuid",
+          "title": "Preset Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "preset_id",
+        "revision",
+        "payload",
+        "content_hash"
+      ],
+      "title": "PresetRevision",
+      "type": "object"
+    },
     "Reaction": {
       "$defs": {
         "AppealAction": {
@@ -8003,6 +8486,538 @@
         "version"
       ],
       "title": "SnapshotCharacter",
+      "type": "object"
+    },
+    "StoryCatalogEntry": {
+      "additionalProperties": false,
+      "description": "Application organization around a runtime World.",
+      "properties": {
+        "archived_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archived At"
+        },
+        "cover_asset_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cover Asset Id"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "last_played_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Played At"
+        },
+        "metadata_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Metadata Version",
+          "type": "integer"
+        },
+        "title": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "world_id",
+        "title"
+      ],
+      "title": "StoryCatalogEntry",
+      "type": "object"
+    },
+    "StoryCreationReceipt": {
+      "additionalProperties": false,
+      "description": "Idempotent creation record: same key plus same hash replays one story.",
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "created_world_id": {
+          "format": "uuid",
+          "title": "Created World Id",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Idempotency Key",
+          "type": "string"
+        },
+        "operator": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Operator",
+          "type": "string"
+        },
+        "request_hash": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Request Hash",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operator",
+        "idempotency_key",
+        "request_hash",
+        "created_world_id"
+      ],
+      "title": "StoryCreationReceipt",
+      "type": "object"
+    },
+    "StoryDraft": {
+      "$defs": {
+        "DraftAi": {
+          "additionalProperties": false,
+          "properties": {
+            "art_source": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Art Source"
+            },
+            "model": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Model"
+            },
+            "profile_revision": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Profile Revision"
+            },
+            "style_pack_revision": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Style Pack Revision"
+            }
+          },
+          "title": "DraftAi",
+          "type": "object"
+        },
+        "DraftCastMember": {
+          "additionalProperties": false,
+          "properties": {
+            "instance_key": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Instance Key",
+              "type": "string"
+            },
+            "location_key": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Location Key"
+            },
+            "name": {
+              "maxLength": 64,
+              "minLength": 1,
+              "title": "Name",
+              "type": "string"
+            },
+            "preset_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Preset Id"
+            },
+            "preset_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Preset Revision"
+            }
+          },
+          "required": [
+            "instance_key",
+            "name"
+          ],
+          "title": "DraftCastMember",
+          "type": "object"
+        },
+        "DraftMode": {
+          "additionalProperties": false,
+          "properties": {
+            "controlled_cast_key": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Controlled Cast Key"
+            },
+            "role": {
+              "maxLength": 16,
+              "minLength": 1,
+              "title": "Role",
+              "type": "string"
+            }
+          },
+          "required": [
+            "role"
+          ],
+          "title": "DraftMode",
+          "type": "object"
+        },
+        "DraftPayload": {
+          "additionalProperties": false,
+          "description": "Typed draft JSON; secrets and binary images never belong here.",
+          "properties": {
+            "ai": {
+              "$ref": "#/$defs/DraftAi"
+            },
+            "cast": {
+              "items": {
+                "$ref": "#/$defs/DraftCastMember"
+              },
+              "title": "Cast",
+              "type": "array"
+            },
+            "mode": {
+              "$ref": "#/$defs/DraftMode",
+              "default": {
+                "controlled_cast_key": null,
+                "role": "watcher"
+              }
+            },
+            "story": {
+              "$ref": "#/$defs/DraftStory"
+            },
+            "world": {
+              "$ref": "#/$defs/DraftWorld"
+            }
+          },
+          "title": "DraftPayload",
+          "type": "object"
+        },
+        "DraftStep": {
+          "enum": [
+            "world",
+            "characters",
+            "mode",
+            "story",
+            "ai",
+            "review"
+          ],
+          "title": "DraftStep",
+          "type": "string"
+        },
+        "DraftStory": {
+          "additionalProperties": false,
+          "properties": {
+            "pacing": {
+              "anyOf": [
+                {
+                  "maxLength": 32,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Pacing"
+            },
+            "premise": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Premise"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Title"
+            },
+            "tone": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Tone"
+            }
+          },
+          "title": "DraftStory",
+          "type": "object"
+        },
+        "DraftWorld": {
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "anyOf": [
+                {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Description"
+            },
+            "name": {
+              "anyOf": [
+                {
+                  "maxLength": 128,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Name"
+            },
+            "preset_id": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Preset Id"
+            },
+            "preset_revision": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "title": "Preset Revision"
+            }
+          },
+          "title": "DraftWorld",
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "created_world_id": {
+          "anyOf": [
+            {
+              "format": "uuid",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Created World Id"
+        },
+        "current_step": {
+          "$ref": "#/$defs/DraftStep",
+          "default": "world"
+        },
+        "id": {
+          "format": "uuid",
+          "title": "Id",
+          "type": "string"
+        },
+        "payload": {
+          "$ref": "#/$defs/DraftPayload"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "payload"
+      ],
+      "title": "StoryDraft",
+      "type": "object"
+    },
+    "StoryInitialSetup": {
+      "$defs": {
+        "SetupProvenance": {
+          "enum": [
+            "created",
+            "legacy_unknown"
+          ],
+          "title": "SetupProvenance",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Immutable resolved creation configuration for one story.",
+      "properties": {
+        "content_hash": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        },
+        "provenance": {
+          "$ref": "#/$defs/SetupProvenance",
+          "default": "created"
+        },
+        "schema_version": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "world_id": {
+          "format": "uuid",
+          "title": "World Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "world_id",
+        "payload",
+        "content_hash"
+      ],
+      "title": "StoryInitialSetup",
       "type": "object"
     },
     "TaskRun": {

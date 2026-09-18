@@ -8,7 +8,7 @@ ISO-8601 UTC.
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -1113,3 +1113,156 @@ class ConditionsResponse(BaseModel):
 
     world_id: UUID
     conditions: list[ConditionView] = Field(default_factory=list)
+
+
+class StorySummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    story_id: UUID
+    world_id: UUID
+    title: str
+    world_name: str
+    mode: str
+    day: int
+    phase: str
+    absolute_index: int
+    last_played_at: datetime | None = None
+    archived: bool = False
+    status: str
+
+
+class StoryDetail(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    story_id: UUID
+    world_id: UUID
+    title: str
+    world_name: str
+    mode: str
+    day: int
+    phase: str
+    absolute_index: int
+    last_played_at: datetime | None = None
+    archived_at: datetime | None = None
+    status: str
+    metadata_version: int
+
+
+class StoryListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    items: list[StorySummary] = Field(default_factory=list)
+    next_cursor: str | None = None
+
+
+class StorySetupView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    story_id: UUID
+    world_id: UUID
+    schema_version: int
+    provenance: str
+    payload: dict = Field(default_factory=dict)
+    content_hash: str
+    created_at: datetime
+
+
+class StoryPatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    title: str | None = Field(default=None, min_length=1, max_length=128)
+    cover_asset_id: UUID | None = None
+    expected_version: int = Field(ge=1)
+
+
+class StoryArchiveRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    expected_version: int = Field(ge=1)
+
+
+class StoryDraftPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    world: dict | None = None
+    cast: list[dict] | None = None
+    mode: dict | None = None
+    story: dict | None = None
+    ai: dict | None = None
+
+
+class StoryDraftCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    payload: StoryDraftPayload = Field(default_factory=StoryDraftPayload)
+    current_step: str = "world"
+
+
+class StoryDraftPatchRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    payload: StoryDraftPayload
+    current_step: str
+    expected_version: int = Field(ge=1)
+
+
+class StoryDraftView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    payload: StoryDraftPayload
+    current_step: str
+    version: int
+    created_at: datetime
+    updated_at: datetime
+    created_world_id: UUID | None = None
+
+
+class DraftValidationView(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    valid: bool
+    issues: list[str] = Field(default_factory=list)
+    resolved: dict = Field(default_factory=dict)
+
+
+class PresetSummary(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    kind: str
+    name: str
+    builtin: bool
+    readonly: bool
+    archived: bool
+    current_revision: int
+    version: int
+
+
+class PresetDetail(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    id: UUID
+    kind: str
+    name: str
+    builtin: bool
+    readonly: bool
+    archived_at: datetime | None = None
+    current_revision: int
+    version: int
+    revision: dict = Field(default_factory=dict)
+
+
+class PresetCreateRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    kind: str
+    name: str = Field(min_length=1, max_length=128)
+    payload: dict[str, Any]
+
+
+class PresetRevisionRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    payload: dict[str, Any]
+    expected_version: int = Field(ge=0)

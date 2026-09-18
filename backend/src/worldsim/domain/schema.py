@@ -37,11 +37,18 @@ from worldsim.domain.items import ItemDefinition
 from worldsim.domain.knowledge import Belief, Claim
 from worldsim.domain.narrative import NarrativeArc, NarrativeHook
 from worldsim.domain.party import Monster, PartyMember
+from worldsim.domain.presets import Preset, PresetRevision
 from worldsim.domain.progress import CharacterSkill, ItemInstance, SkillDefinition, TrainingSession
 from worldsim.domain.relationships import Relationship, RelationshipEvidence
 from worldsim.domain.roles import RoleGrant
 from worldsim.domain.rules.dnd import Sheet
 from worldsim.domain.schedules import ScheduledEffect
+from worldsim.domain.stories import (
+    StoryCatalogEntry,
+    StoryCreationReceipt,
+    StoryDraft,
+    StoryInitialSetup,
+)
 
 SCHEMA_VERSION = 1
 
@@ -125,6 +132,12 @@ REGISTRY: tuple[type[BaseModel], ...] = (
     macro.FocusAssignment,
     macro.EraSummary,
     macro.EndConditionEvidence,
+    Preset,
+    PresetRevision,
+    StoryCatalogEntry,
+    StoryCreationReceipt,
+    StoryDraft,
+    StoryInitialSetup,
     tracing.ManifestSource,
     tracing.ContextManifest,
     tracing.ModelCall,

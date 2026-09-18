@@ -26,12 +26,14 @@ from worldsim.application.ports.repositories import (
     PartyRepository,
     PerceptionRepository,
     PhaseRepository,
+    PresetRepository,
     ProgressRepository,
     RelationshipRepository,
     RoleRepository,
     RouteRepository,
     SceneRepository,
     ScheduleRepository,
+    StoryRepository,
     SummaryRepository,
     TaskRepository,
     VersionStore,
@@ -49,6 +51,10 @@ class UnitOfWork(Protocol):
     def characters(self) -> CharacterRepository: ...
     @property
     def party(self) -> PartyRepository: ...
+    @property
+    def stories(self) -> StoryRepository: ...
+    @property
+    def presets(self) -> PresetRepository: ...
     @property
     def interventions(self) -> InterventionRepository: ...
     @property

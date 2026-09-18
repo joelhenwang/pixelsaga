@@ -8,6 +8,7 @@ from fastapi import APIRouter, Header, Query, Request
 
 from worldsim.application.capabilities import is_omniscient, parse_role
 from worldsim.application.commands.seed_world import SeedService
+from worldsim.application.library.builtins import ensure_builtin_presets
 from worldsim.application.queries.presentation import (
     chronicle as chronicle_query,
 )
@@ -15,8 +16,8 @@ from worldsim.application.queries.presentation import (
     presentation as presentation_query,
 )
 from worldsim.domain.errors import DomainError, ErrorCode
-from worldsim.domain.time import absolute_index
-from worldsim.domain.world import World
+from worldsim.domain.stories import SetupProvenance, StoryCatalogEntry, StoryInitialSetup
+from worldsim.domain.time import absolute_index, utcnow
 from worldsim.interfaces.http import schemas as api
 from worldsim.interfaces.http.routes.roles import effective_role
 from worldsim.interfaces.http.schemas import (
@@ -123,6 +124,30 @@ async def list_events(
 async def seed_world(request: Request) -> SeedResponse:
     state = request.app.state.app_state
     result = await SeedService(state.uow_factory(), state.seed_dir).import_seed()
+    async with state.uow_factory()() as uow:
+        world = await uow.worlds.get(result.world_id)
+        try:
+            await uow.stories.get_catalog(result.world_id)
+        except DomainError as exc:
+            if exc.code != ErrorCode.NOT_FOUND:
+                raise
+            now = utcnow()
+            await uow.stories.put_catalog(
+                StoryCatalogEntry(
+                    world_id=result.world_id, title=world.name, created_at=now,
+                )
+            )
+            await uow.stories.put_setup(
+                StoryInitialSetup(
+                    world_id=result.world_id,
+                    payload={"schema_version": 1, "provenance": "legacy_unknown"},
+                    content_hash="legacy-unknown",
+                    created_at=now,
+                    provenance=SetupProvenance.LEGACY_UNKNOWN,
+                )
+            )
+        await ensure_builtin_presets(uow)
+        await uow.commit()
     return SeedResponse(
         world_id=result.world_id,
         seed_version=result.seed_version,
