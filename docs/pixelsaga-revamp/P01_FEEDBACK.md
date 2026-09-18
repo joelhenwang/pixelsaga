@@ -26,3 +26,18 @@
   to decide whether the scene changed enough to warrant one. Input to
   P04 (asset jobs need idempotency and cost caps) and P08.
 - Sidebar density: revisit against real data widths in P02/P08.
+
+## v3 revisions
+
+- Journal icons use a centered white inner dot; send button embeds
+  `send-message-icon.svg` (currentColor on teal).
+- Hero is 480px: title card top-left, narration card bottom, both
+  translucent dark so generated art cannot mask text.
+- Observatory is full-bleed map with floating rounded toolbar,
+  chronicle, and composer cards; collapse button removed.
+- Chronicle entries carry typed icons: portrait for solo actions,
+  portrait-type-portrait triples for interactions, highlighted cards
+  for world events.
+- Clicking an entry opens an 80%-viewport modal: 70% scene art,
+  30% detail with speaker rows, View on map, Previous/Next, Esc
+  to close. Fixture art stands in for per-event generation.
