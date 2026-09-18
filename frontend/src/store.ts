@@ -5,6 +5,7 @@
 // selection are ignored, never rendered. UI state (theme, settings drawer,
 // drafts) lives alongside but never mixes into server projections.
 import { computed, ref } from "vue";
+import { clearAssetCache } from "./assets";
 import { ApiError, api, headersFor, type ErrorKind, type Role } from "./api";
 
 // -- Server state -----------------------------------------------------------
@@ -75,7 +76,7 @@ export function switchRole(next: Role, character: string | null): void {
   sessionKey += 1;
   refreshAbort?.abort();
   refreshAbort = null;
-  // Privileged data must not survive a role change: clear first, reload after.
+  clearAssetCache();
   role.value = next;
   characterId.value = character ?? "";
   characters.value = [];

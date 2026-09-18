@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 import { api } from "../api";
-import { assetUrl } from "../assets";
+import { assetUrl, clearAssetCache } from "../assets";
 import { portraitFor } from "../portrait";
 import type { InterventionView } from "@gen";
 import { fail, headers, role, worldId } from "../store";
@@ -156,6 +156,7 @@ async function reloadQueue(): Promise<void> {
 const conditions = ref<{ public_label: string; status: string }[]>([]);
 
 async function reload(): Promise<void> {
+  clearAssetCache();
   faceSrc.value = {};
   mapSrc.value = "";
   await loadProjection(fail);

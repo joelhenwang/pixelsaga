@@ -26,6 +26,10 @@ const tabs = [
   { to: "/map", label: "world" },
   { to: "/party", label: "party" },
   { to: "/timeline", label: "journal" },
+  { to: "/diary", label: "diary" },
+  { to: "/relations", label: "relations" },
+  { to: "/generations", label: "eras" },
+  { to: "/operations", label: "ops" },
 ];
 
 function onRoleChange(event: Event): void {
@@ -48,6 +52,9 @@ onMounted(() => {
   if (saved === "dark" || saved === "light") {
     setTheme(saved);
   }
+  window.addEventListener("online", () => {
+    void refresh();
+  });
   void refresh();
 });
 </script>

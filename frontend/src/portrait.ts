@@ -6,7 +6,17 @@
 // below (seeded by id AND name); Stage 4 generation plugs into the
 // fetch step without touching callers. Stable across renders and
 // clients with zero network.
-import pack from "../../content/visual-styles/pixel-saga-v1.json";
+import packJson from "../../content/visual-styles/pixel-saga-v1.json";
+
+interface FixturePalette {
+  skin: string[];
+  hair: string[];
+  eyes: string[];
+  vest: string[];
+  blush: string;
+}
+
+const pack = packJson as { palette: FixturePalette };
 
 const GRID = 16;
 
