@@ -18,6 +18,7 @@ backend/.venv/
 perchance-ver/
 evidence/*
 !evidence/stage3-live-v1/
+backups/
 frontend/node_modules/
 frontend/dist/
 backend/src/worldsim.egg-info/
