@@ -9,12 +9,12 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from test_stage1_api import (  # pyright: ignore[reportPrivateUsage]
+from test_stage1_api import (
     ApiClient,
     FakeGateway,
-    _advance,
-    _route_for,
-    _seed_two,
+    _advance,  # pyright: ignore[reportPrivateUsage]
+    _route_for,  # pyright: ignore[reportPrivateUsage]
+    _seed_two,  # pyright: ignore[reportPrivateUsage]
 )
 
 from worldsim.application.orchestration.service import derive_run_id, derive_snapshot_id
