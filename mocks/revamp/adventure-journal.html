@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: Adventure Journal (fixture)</title>
+<style>
+:root{
+  --surface-page:#F7F4ED; --surface-panel:#FFFCF7;
+  --text-primary:#253247; --text-secondary:#627084;
+  --action-primary:#216B63; --accent-magic:#7155A5; --accent-social:#B84F68;
+  --accent-gold:#A8792B; --status-danger:#BA5148; --border-subtle:#DDD8CE;
+  --radius-panel:12px; --radius-control:8px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:16px/1.55 -apple-system,"Source Sans 3",Segoe UI,sans-serif}
+h1,h2{font-family:Georgia,"Source Serif 4",serif;margin:0 0 8px}
+.topbar{display:flex;gap:16px;align-items:center;padding:10px 16px;
+  background:var(--surface-panel);border-bottom:2px solid var(--accent-gold)}
+.topbar nav{display:flex;gap:12px}
+.topbar nav button{border:0;background:none;font:inherit;color:var(--text-secondary);cursor:pointer;padding:6px 8px;border-radius:var(--radius-control)}
+.topbar nav button[aria-current="true"]{color:var(--surface-panel);background:var(--action-primary)}
+.layout{display:grid;grid-template-columns:minmax(0,1020px) 360px;gap:16px;
+  max-width:1440px;margin:0 auto;padding:16px}
+.panel{background:var(--surface-panel);border:1px solid var(--border-subtle);
+  border-radius:var(--radius-panel);padding:16px}
+.scene-art{width:100%;height:320px;object-fit:cover;border-radius:var(--radius-control);display:block;background:#e8e2d4}
+.meta{color:var(--text-secondary);font-size:13px;margin:8px 0}
+.narration{font-size:17px;line-height:1.6}
+.dialogue{display:flex;gap:10px;align-items:center;background:#f3efe4;border-radius:var(--radius-control);padding:8px 12px;margin:12px 0}
+.dialogue img{width:48px;height:48px;border-radius:50%;object-fit:cover}
+.suggest{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.suggest button{border:1px solid var(--action-primary);background:#fff;color:var(--action-primary);
+  border-radius:var(--radius-control);padding:8px 12px;cursor:pointer}
+.composer textarea{width:100%;min-height:64px;border:1px solid var(--border-subtle);
+  border-radius:var(--radius-control);padding:8px;font:inherit}
+.composer button{background:var(--action-primary);color:#fff;border:0;border-radius:var(--radius-control);padding:8px 16px;cursor:pointer;margin-top:8px}
+.sidebar .row{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
+.sidebar img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.map-preview{width:100%;border-radius:var(--radius-control);display:block;margin-top:8px}
+.fixture-bar{position:sticky;bottom:0;background:#253247;color:#fff;padding:8px 16px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fixture-bar button{border-radius:6px;border:1px solid #fff;background:none;color:#fff;padding:4px 10px;cursor:pointer}
+.notice{border:1px solid var(--accent-gold);border-radius:var(--radius-control);padding:8px 12px;margin:12px 0;font-size:14px}
+.error{border-color:var(--status-danger);color:var(--status-danger)}
+.hidden{display:none}
+@media (max-width:1100px){.layout{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <strong>PixelSaga</strong>
+  <nav aria-label="Primary">
+    <button aria-current="true">Adventure</button><button>World</button><button>Party</button><button>Journal</button>
+  </nav>
+  <span class="meta" style="margin-left:auto">FIXTURE PROTOTYPE · no backend</span>
+</div>
+<div class="layout">
+  <main class="panel" id="main">
+    <h1 id="sceneTitle">Hearth, day 1 · dawn</h1>
+    <p class="meta" id="sceneMeta">Scene sc-fixture-1 · Ember Vale · Hearth</p>
+    <img class="scene-art" id="sceneArt" src="../../docs/pixelsaga-revamp/assets/images/hearth-background-v1.png" alt="Hearth traveler hall with a lit fireplace">
+    <div id="stateEmpty" class="notice hidden">No scene yet. Seed a world, then advance one phase.</div>
+    <div id="stateLoading" class="notice hidden">Loading scene…</div>
+    <div id="stateError" class="notice error hidden">Scene failed to load (fixture error state). Draft preserved below.</div>
+    <div id="sceneBody">
+      <p class="narration">Rain drums the shutters while Wren feeds the last log to the Hearth fire. A traveler shakes water from a Market cloak and asks after the toll road.</p>
+      <div class="dialogue">
+        <img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="Wren portrait">
+        <p><strong>Wren:</strong> “The tolls rose again. If you take the bridge road, go before dusk.”</p>
+      </div>
+      <p class="meta">Outcome: Wren shares a rumor. No check required. Event ev-fixture-7.</p>
+      <h2>What does Wren attempt?</h2>
+      <div class="suggest" id="suggest">
+        <button>Offer the traveler shelter</button>
+        <button>Ask about the Market tolls</button>
+        <button>Bank the fire and rest</button>
+      </div>
+      <div class="composer">
+        <textarea id="draft" aria-label="Custom action" placeholder="Describe Wren's attempt…"></textarea>
+        <button id="send" type="button">Attempt action</button>
+      </div>
+      <div id="queued" class="notice hidden">Queued: <span id="queuedText"></span>. Queued is not executed; it applies at the next phase boundary.</div>
+    </div>
+  </main>
+  <aside class="panel sidebar">
+    <h2>Party</h2>
+    <div class="row"><img src="../../docs/pixelsaga-revamp/assets/images/wren-portrait-v1.png" alt="Wren"><div><strong>Wren</strong><br><span class="meta">Hearth · bound character</span></div></div>
+    <div class="row"><img src="../../docs/pixelsaga-revamp/assets/images/ash-portrait-v1.png" alt="Ash"><div><strong>Ash</strong><br><span class="meta">Market · companion</span></div></div>
+    <h2>Story threads</h2>
+    <p class="meta">Accepted hooks only. No fabricated quest tracker.</p>
+    <p>· Rising tolls on the bridge road (hook-fixture-2)</p>
+    <h2>Map</h2>
+    <img class="map-preview" src="../../docs/pixelsaga-revamp/assets/images/ember-vale-map-display-v1.webp" alt="Ember Vale schematic preview">
+  </aside>
+</div>
+<div class="fixture-bar" aria-label="Fixture states">
+  <span>Fixture:</span>
+  <button data-s="normal">normal</button>
+  <button data-s="empty">empty</button>
+  <button data-s="loading">loading</button>
+  <button data-s="error">error</button>
+  <button data-s="imgfail">image failure</button>
+  <button id="themeBtn">theme: light</button>
+</div>
+<script>
+const root = document.documentElement;
+const states = ["stateEmpty","stateLoading","stateError"];
+function setState(s){
+  states.forEach(id => document.getElementById(id).classList.add("hidden"));
+  document.getElementById("sceneBody").classList.toggle("hidden", s !== "normal" && s !== "imgfail");
+  if(s === "empty") document.getElementById("stateEmpty").classList.remove("hidden");
+  if(s === "loading") document.getElementById("stateLoading").classList.remove("hidden");
+  if(s === "error") document.getElementById("stateError").classList.remove("hidden");
+  const art = document.getElementById("sceneArt");
+  if(s === "imgfail"){ art.dataset.src = art.src; art.src = "missing-fixture.png"; }
+  else if(art.dataset.src){ art.src = art.dataset.src; delete art.dataset.src; }
+}
+document.querySelectorAll(".fixture-bar [data-s]").forEach(b =>
+  b.addEventListener("click", () => setState(b.dataset.s)));
+document.getElementById("sceneArt").addEventListener("error", function(){
+  this.alt = "Scene art unavailable (fixture fallback)"; this.style.height = "64px";
+});
+document.getElementById("send").addEventListener("click", () => {
+  const draft = document.getElementById("draft").value.trim() || "Wren waits.";
+  document.getElementById("queuedText").textContent = draft;
+  document.getElementById("queued").classList.remove("hidden");
+});
+document.getElementById("themeBtn").addEventListener("click", function(){
+  const dark = root.style.colorScheme !== "dark";
+  root.style.colorScheme = dark ? "dark" : "light";
+  root.style.filter = dark ? "invert(0.92) hue-rotate(180deg)" : "";
+  this.textContent = "theme: " + (dark ? "dark* (proto)" : "light");
+});
+</script>
+</body>
+</html>
